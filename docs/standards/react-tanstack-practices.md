@@ -53,7 +53,8 @@ DOM widget、subscription、analytics表示など外部systemとの同期?
 
 ## React 19 primitive の使い分け
 
-- `useActionState`: Login、Organization作成、Todo作成、Handoff decision の pending と予期可能な error。
+- `useActionState`: Query cacheを共有しない単発formのpendingと予期可能なerror。LoginやOrganization作成が候補。
+- `useMutation`: Todo作成やHandoff decisionのように、成功後に複数画面のserver stateをinvalidateするcommand。
 - `useOptimistic`: 失敗時に元へ戻せる軽い変更だけ。Handoff acceptance のような権限・競合を伴う更新は、まず server result + invalidate を使う。
 - `memo`: profiler で再render cost が問題になった component だけ。
 - `useMemo`: 大きな計算または参照同一性が実際に必要な箇所だけ。
@@ -79,7 +80,10 @@ DOM widget、subscription、analytics表示など外部systemとの同期?
 ### Todo
 
 - list/queryとcreate/update mutationを分ける。
-- create formはaction state、成功後にlistをinvalidate。
+- loaderで`ensureQueryData`、Pageで`useSuspenseQuery`、create formは`useMutation`を使う。
+- success callbackで関連Queryの`invalidateQueries`をawaitし、再取得が終わるまでpendingを維持する。
+- `useActionState`とQuery mutationを同じformの二重状態管理として併用しない。
+- Todo作成は自動retry、offline永続化、楽観追加を行わない。
 - optimistic updateはrollbackが明瞭な完了toggleから検討する。
 
 ### Handoff

@@ -115,15 +115,16 @@ DB / Auth / Peopleは水平分割せず、[Identity → People縦切り計画](.
 
 **Files:**
 - Create: `packages/contracts/src/todo.ts`
-- Create: `packages/modules/todo/src/create-todo.ts`, `packages/modules/todo/src/list-todos.ts`
+- Create: `apps/api/src/domain/todo.ts`, `apps/api/src/application/create-todo.ts`, `apps/api/src/application/list-shared-todos.ts`
+- Create: `apps/api/src/infrastructure/db/todo-repository.ts`
 - Create: `apps/api/src/routes/todos.ts`
 - Create: `apps/web/src/features/todos/TodoComposer.tsx`, `apps/web/src/features/todos/TodoCard.tsx`
-- Modify: person detail route
+- Create: `apps/web/src/routes/$organizationId/people/$contextMembershipId/todos.tsx`
 
 **Produces:** A user can create a Todo for a Relationship and immediately see it assigned on the person detail screen.
 
 - [ ] Research current TanStack Query/Form, React Actions, invalidation, and optimistic UI practices; add the selected primitives to this task brief.
-- [ ] Define small Zod contracts for title, optional description, relationship, and assignee.
+- [ ] Define small Zod contracts for title, optional description, context Membership, and assignee.
 - [ ] Add create/list API routes that derive creator and organization from Principal.
 - [ ] Use TanStack Query optimistic feedback only for the submitting state; refetch after success.
 - [ ] Build useful empty, pending, validation-error, and saved states.
@@ -133,8 +134,9 @@ DB / Auth / Peopleは水平分割せず、[Identity → People縦切り計画](.
 ### Task 6: Handoff interaction
 
 **Files:**
-- Create: `packages/modules/todo/src/request-handoff.ts`, `packages/modules/todo/src/decide-handoff.ts`
-- Create: `packages/modules/todo/src/handoff.test.ts`
+- Create: `apps/api/src/domain/handoff.ts`, `apps/api/src/application/request-handoff.ts`, `apps/api/src/application/decide-handoff.ts`
+- Create: `apps/api/src/application/handoff.test.ts`
+- Create: `apps/api/src/infrastructure/db/handoff-repository.ts`
 - Create: `apps/api/src/routes/handoffs.ts`, `apps/api/src/routes/cross-tenant.integration.test.ts`
 - Create: `apps/web/src/features/handoffs/HandoffDialog.tsx`
 - Create: `apps/web/src/routes/_authed/$organizationId/inbox.tsx`
@@ -143,6 +145,7 @@ DB / Auth / Peopleは水平分割せず、[Identity → People縦切り計画](.
 
 - [ ] Research current transaction, command idempotency, concurrent decision, action-state, and accessible Dialog practices; add the selected primitives to this task brief.
 - [ ] Implement requested/accepted/rejected state and the single acceptance transaction.
+- [ ] Give Handoff an explicit `organization_id`, composite FKs to Todo/from/to Membership, and one requested Handoff per Todo.
 - [ ] Add one focused unit test for request → recipient accept → assignee changed.
 - [ ] Add one API integration test proving a session from another Organization cannot decide the Handoff.
 - [ ] Build a Base UI Dialog for choosing the recipient and an Inbox card with Accept/Reject actions.

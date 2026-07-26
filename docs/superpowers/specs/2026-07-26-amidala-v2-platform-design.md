@@ -94,15 +94,11 @@ amidala-v2/
 │   ├── contracts/                 # Zod DTO
 │   ├── api-client/                # Hono RPC client
 │   ├── db/                        # Drizzle schema / migrations
-│   └── modules/
-│       ├── identity/
-│       ├── relationship/
-│       └── todo/
 ├── docs/
 └── tooling/
 ```
 
-初期段階では細かいpackage分割を増やさない。1on1 moduleはTodo/Handoffを触って境界を確認してから追加する。
+初期段階では細かいpackage分割を増やさない。Identity / Relationship / Todoは、最初のruntime consumerがAPI Workerだけである間は`apps/api`のdomain / application / infrastructureへ責務別に閉じる。2つ目のconsumerが現れた時点でpackage抽出を判断する。1on1 moduleはTodo/Handoffを触って境界を確認してから追加する。
 
 ## 6. 依存方向
 
@@ -193,13 +189,15 @@ Relationship
 ```text
 Todo
   - organization_id
-  - relationship_context_id: nullable
+  - context_membership_id
+  - creator_membership_id
   - title
   - description
   - status: open | completed
   - assignee_membership_id
 
 Handoff
+  - organization_id
   - todo_id
   - from_membership_id
   - to_membership_id
@@ -208,9 +206,9 @@ Handoff
   - responded_at
 ```
 
-`relationship_context_id`はTodoが生まれた関係の文脈であり、現在の担当者や認可境界を表さない。承認時は1 transactionでHandoffをacceptedへ変更し、Todoの`assignee_membership_id`を相手へ更新する。完全なAssignment履歴は初期には作らず、Handoff行を最低限の履歴として画面表示する。
+`context_membership_id`はTodoが「誰との文脈で生まれたか」を表す不変のMembership IDであり、現在の担当者や認可境界を表さない。Relationship未設定のMemberともTodoを作れるため、nullableなRelationship IDを成立条件にしない。Handoffは`organization_id`を持ち、Todoとfrom/to Membershipを複合FKで同じOrganizationへ閉じる。requested HandoffはTodoごとに1件とし、承認時は1 transactionでrecipient・statusを再検証してHandoffをacceptedへ変更し、Todoの`assignee_membership_id`を相手へ更新する。完全なAssignment履歴は初期には作らず、Handoff行を最低限の履歴として画面表示する。
 
-すべてのドメインテーブルに`organization_id`を持たせ、API queryでは必ずPrincipalのOrganization IDを条件へ含める。基本的なFK、UNIQUE、CHECKは使用するが、初期から複雑な複合FK/RLSは導入しない。
+すべてのドメインテーブルに`organization_id`を持たせ、API queryでは必ずPrincipalのOrganization IDを条件へ含める。基本的なFK、UNIQUE、CHECKに加え、Organization越境を構造的に防ぐMembershipへの複合FKは使用する。RLSや汎用permission graphは初期には導入しない。
 
 ## 10. Web/BFFの責務
 
