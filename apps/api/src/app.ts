@@ -1,12 +1,11 @@
 import { Hono } from 'hono';
-import type { AwilixContainer } from 'awilix';
 import { createRootContainer, type RootContainer } from './composition/root-container';
 import { withRequestScope } from './composition/request-scope';
 import { HealthCheck } from './application/health-check';
 
 export type ApiEnv = {
   Bindings: Record<string, unknown>;
-  Variables: { scope: AwilixContainer };
+  Variables: { scope: RootContainer };
 };
 
 export function createApp({ rootContainer = createRootContainer() }: { rootContainer?: RootContainer } = {}) {

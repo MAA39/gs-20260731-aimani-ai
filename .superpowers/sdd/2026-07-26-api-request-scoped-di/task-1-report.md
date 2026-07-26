@@ -27,3 +27,9 @@
 ## Concerns
 
 なし。
+
+## Round 1/5 Fix
+
+- `apps/api/src/app.ts` から Awilix の型 import を削除し、composition が公開する `RootContainer` alias を `ApiEnv.Variables.scope` に使用。Awilix import は composition 配下に限定。
+- `pnpm --filter @amidala/api test -- --run`: exit 0、2 test files / 4 tests passed。
+- `pnpm --filter @amidala/api build`: exit 0（TypeScript 成功）。
