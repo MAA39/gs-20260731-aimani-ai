@@ -18,7 +18,7 @@ export async function getPeopleFromApi({ organizationId }: PeopleInput): Promise
   // parameterized `/people/:contextMembershipId/todos` sibling is present.
   // Keep the endpoint typed locally until the client generator can represent
   // both collection and parameterized members on the same branch.
-  const peopleGet = createApiClient(fetcher).organizations[':organizationId'].people as unknown as {
+  const peopleGet = (createApiClient(fetcher) as any).organizations[':organizationId'].people as {
     $get: (args: { param: { organizationId: string } }, options: { headers: HeadersInit }) => Promise<Response>;
   };
   const response = await peopleGet.$get({ param: { organizationId } }, { headers: { cookie } });

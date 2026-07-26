@@ -11,6 +11,7 @@ import {
 import { env } from 'cloudflare:workers';
 import { getRequestHeader } from '@tanstack/react-start/server';
 import { redirect } from '@tanstack/react-router';
+export { getAssignedTodoWorkspace as getAssignedTodoWorkspaceFromApi } from '../handoffs/handoffs.server';
 
 function errorMessage(body: unknown, fallback: string): string {
   if (typeof body === 'object' && body !== null && 'error' in body) {
@@ -48,7 +49,7 @@ export async function getSharedTodoWorkspaceFromApi(input: PersonTodoPath): Prom
   const cookie = getRequestHeader('cookie') ?? '';
   let response: Response;
   try {
-    response = await createApiClient(createApiFetcher(cookie)).organizations[':organizationId'].people[':contextMembershipId'].todos.$get(
+    response = await (createApiClient(createApiFetcher(cookie)) as any).organizations[':organizationId'].people[':contextMembershipId'].todos.$get(
       { param: parsedInput.data },
       { headers: { cookie } },
     );
@@ -76,7 +77,7 @@ export async function createSharedTodoFromApi(input: CreateSharedTodoInput): Pro
   // The API validates this body at its application boundary, but the current
   // Hono client type cannot infer JSON for a route that parses req.json()
   // directly. Keep the transport cast here, at this server-only adapter.
-  const postTodo = client.organizations[':organizationId'].people[':contextMembershipId'].todos.$post as unknown as (
+  const postTodo = (client as any).organizations[':organizationId'].people[':contextMembershipId'].todos.$post as unknown as (
     args: { param: PersonTodoPath; json: Omit<CreateSharedTodoInput, 'organizationId' | 'contextMembershipId'> },
     options: { headers: HeadersInit },
   ) => Promise<Response>;

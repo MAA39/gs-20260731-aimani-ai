@@ -13,6 +13,7 @@ export const createSharedTodoInputSchema = z.object({
   description: z.string().trim().max(2000).optional(),
   assigneeMembershipId: z.string().min(1),
 });
+export const assignedTodoWorkspaceInputSchema = z.object({ organizationId: z.string().min(1) });
 
 export const createSharedTodoResponseSchema = {
   safeParse(input: unknown) {
@@ -24,6 +25,7 @@ export const createSharedTodoResponseSchema = {
 
 export type PersonTodoPath = { organizationId: string; contextMembershipId: string };
 export type CreateSharedTodoInput = z.infer<typeof createSharedTodoInputSchema>;
+export type AssignedTodoWorkspaceInput = z.infer<typeof assignedTodoWorkspaceInputSchema>;
 export type { SharedTodoWorkspace, TodoSummary } from '@amidala/contracts';
 
 export type SharedTodoWorkspaceResult =
