@@ -66,6 +66,9 @@ importers:
       '@amidala/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
+      '@amidala/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@tanstack/react-router':
         specifier: 1.170.18
         version: 1.170.18(react-dom@19.1.1(react@19.1.1))(react@19.1.1)

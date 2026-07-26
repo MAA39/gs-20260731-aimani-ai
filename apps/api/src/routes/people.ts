@@ -1,9 +1,9 @@
-import type { Hono } from 'hono';
+import { Hono } from 'hono';
 import type { ApiEnv } from '../app';
 import { ApiError } from '../errors/api-error';
 import { listPeopleInputSchema } from '@amidala/contracts';
-export function mountPeople(app: Hono<ApiEnv>) {
-  app.get('/organizations/:organizationId/people', async (c) => {
+export function createPeopleRoutes() {
+  return new Hono<ApiEnv>().get('/organizations/:organizationId/people', async (c) => {
     const parsed = listPeopleInputSchema.safeParse({ organizationId: c.req.param('organizationId') });
     if (!parsed.success) throw new ApiError('validation_error', 'Invalid organization ID.');
     const scope = c.get('scope');
