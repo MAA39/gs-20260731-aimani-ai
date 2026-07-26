@@ -29,7 +29,7 @@ export function RootRoute() {
 function ApplicationShell() {
   const pathname = useLocation({ select: (location) => location.pathname });
   if (pathname === '/login' || pathname === '/organizations') return <Outlet />;
-  const pageTitle = /\/todos$/.test(pathname) ? '自分のTodo' : /\/handoffs$/.test(pathname) ? '引き継ぎ' : 'People';
+  const pageTitle = /^\/[^/]+\/people\/[^/]+\/todos$/.test(pathname) ? '共有Todo' : /\/todos$/.test(pathname) ? '自分のTodo' : /\/handoffs$/.test(pathname) ? '引き継ぎ' : 'People';
   const personTodoMatch = pathname.match(/^\/([^/]+)\/people\/([^/]+)\/todos$/);
   const organizationId = personTodoMatch?.[1] ?? pathname.match(/^\/([^/]+)\/(?:people|todos|handoffs)/)?.[1];
   return <div className="app-shell">
