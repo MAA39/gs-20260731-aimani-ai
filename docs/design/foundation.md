@@ -188,3 +188,16 @@ Button は結果を表す。「送信」ではなく「引き継ぎを依頼」�
 Login は Relationship rail の考え方を説明する面と認証面を分け、組織選択は Membership を選ぶ画面として実装した。People は dashboard 指標ではなく、Member と Relationship を最初に見せる。実データに Todo がまだない段階で件数を捏造せず「共有Todoはまだありません」と表示する。
 
 実画面確認により、TanStack Start の document shell と stylesheet 登録が欠けると、ビルド成功でも無装飾のSSR画面になることが分かった。以後のプロダクトでも `HeadContent`、route assetとしてのstylesheet、`Scripts` をroot documentの完了条件に含める。
+
+### Person SharedTodo workspace
+
+2026-07-27 に People → Person SharedTodo → 作成 → 一覧反映を実ブラウザで確認した。
+
+- Relationshipレコードが未設定でも成立するため、コードとUIの主語を`RelationshipTodo`ではなく`SharedTodo`へ統一した。
+- 親`people` routeはOutlet専用、People一覧はexact index routeへ分離する。子routeを追加した時に親Pageで上書きしない。
+- 1280×900でPerson context、composer、作成者→現在担当のrailを確認。作成後、一覧へ作成者「田中 彩」・担当「佐藤 花子」が反映された。
+- 390×844でrailを縦積みにし、長い日本語名を省略せず、bottom navigationと共存。`scrollWidth === clientWidth`。
+- SSRとbrowserの日時表示には`Asia/Tokyo`を明示し、runtime timezone差によるhydration mismatchを防ぐ。
+- fresh tabのconsole warning / errorは0件。
+
+以後もroute追加時はbuildだけでなく、親子routeを実際に遷移してOutletを確認する。日時をSSRする画面は表示timezoneを仕様として固定する。

@@ -33,7 +33,7 @@ git diff --check
 ## レビュー後の修正
 
 - 390px 幅で長い日本語の氏名が rail からはみ出さないよう、モバイル時のみ relationship rail / Todo card rail を縦積みに変更し、ラベルと責任の流れを保ったまま自然に折り返す CSS を追加した（デスクトップレイアウトは不変）。
-- 空状態のフォーカス先を安定した `todo-title` id に変更し、未使用の ref を削除した。
+- 空状態のフォーカスはPage所有の`RefObject`をComposerへ渡し、グローバルDOM検索なしでtitle inputへ移す。
 - 修正後も Web tsc/build、monorepo build、`git diff --check` を再実行する。
 
 レビュー追加修正: `document` のグローバル検索を廃止し、Page が所有する `RefObject` を Composer に渡して空状態 action から title input に focus する構造へ変更した。
@@ -43,3 +43,12 @@ git diff --check
 ブラウザ確認で、People route が親になった際に PeoplePage が `<Outlet />` を描画せず、Todo URL でも People 一覧を表示し続ける問題を発見した。People route を layout + `Outlet` に分離し、既存 loader / PeoplePage は `people/index.tsx` へ移動して、Todo 子 route が実際に描画される階層へ修正した。
 
 ブラウザ fresh reload で、SSR (UTC) と client (JST) の Todo 作成日表示が異なり hydration mismatch になった。日本語プロダクトの基準タイムゾーン `Asia/Tokyo` を `Intl.DateTimeFormat` に明示して、SSR / client の出力を決定的にした。
+
+## 最終ブラウザ検証
+
+- 1280×900: ownerでloginし、Acme StudioのPeopleから佐藤花子のSharedTodo workspaceへ遷移。
+- Todoを佐藤花子担当で作成し、一覧にtitle、未完了、作成者「田中 彩」、担当「佐藤 花子」が反映されることを確認。
+- fresh tabのdirect SSRとPeopleからのclient navigationの両方で、headingとcomposerが描画された。
+- 390×844: relationship railは縦積み、bottom nav表示、`scrollWidth === clientWidth`で横スクロールなし。
+- fresh tabのbrowser console warning / errorは0件。
+- focused integration 1/1、API unit 2/2、Web/monorepo build成功。独立レビューはCritical / Importantなしで承認。
