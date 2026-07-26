@@ -1,6 +1,6 @@
 import '@tanstack/react-start/server-only';
 import { createApiClient } from '@amidala/api-client';
-import { createTodoBodySchema, personTodoPathSchema, sharedTodoWorkspaceSchema } from '@amidala/contracts';
+import { assignedTodoWorkspaceSchema, createTodoBodySchema, personTodoPathSchema, sharedTodoWorkspaceSchema } from '@amidala/contracts';
 import {
   createSharedTodoResponseSchema,
   type CreateSharedTodoInput,
@@ -11,7 +11,19 @@ import {
 import { env } from 'cloudflare:workers';
 import { getRequestHeader } from '@tanstack/react-start/server';
 import { redirect } from '@tanstack/react-router';
-export { getAssignedTodoWorkspace as getAssignedTodoWorkspaceFromApi } from '../handoffs/handoffs.server';
+export async function getAssignedTodoWorkspaceFromApi(input: { organizationId: string }) {
+  const cookie = getRequestHeader('cookie') ?? '';
+  let response: Response;
+  try { response = await createApiFetcher(cookie)(`http://api.internal/organizations/${input.organizationId}/todos/assigned-to-me`, { headers: { cookie } }); } catch { return unavailable(); }
+  const body = await readBody(response);
+  if (response.status === 401) throw redirect({ to: '/login' });
+  if (response.status === 403) return { status: 'forbidden' as const, error: { code: 'forbidden' as const, message: errorMessage(body, 'この組織では閲覧できません。') } };
+  if (response.status === 404) return { status: 'not_found' as const, error: { code: 'not_found' as const, message: errorMessage(body, '対象が見つかりません。') } };
+  if (response.status === 409) return { status: 'conflict' as const, error: { code: 'conflict' as const, message: errorMessage(body, 'Todoの状態が更新されています。') } };
+  if (response.status !== 200) return unavailable();
+  const parsed = assignedTodoWorkspaceSchema.safeParse(body);
+  return parsed.success ? { status: 'ok' as const, workspace: parsed.data } : unavailable();
+}
 
 function errorMessage(body: unknown, fallback: string): string {
   if (typeof body === 'object' && body !== null && 'error' in body) {
@@ -49,7 +61,8 @@ export async function getSharedTodoWorkspaceFromApi(input: PersonTodoPath): Prom
   const cookie = getRequestHeader('cookie') ?? '';
   let response: Response;
   try {
-    response = await (createApiClient(createApiFetcher(cookie)) as any).organizations[':organizationId'].people[':contextMembershipId'].todos.$get(
+    type TodoGetEndpoint = { organizations: { ':organizationId': { people: { ':contextMembershipId': { todos: { $get: (args: { param: PersonTodoPath }, options: { headers: HeadersInit }) => Promise<Response> } } } } } };
+    response = await (createApiClient(createApiFetcher(cookie)) as unknown as TodoGetEndpoint).organizations[':organizationId'].people[':contextMembershipId'].todos.$get(
       { param: parsedInput.data },
       { headers: { cookie } },
     );
@@ -77,10 +90,8 @@ export async function createSharedTodoFromApi(input: CreateSharedTodoInput): Pro
   // The API validates this body at its application boundary, but the current
   // Hono client type cannot infer JSON for a route that parses req.json()
   // directly. Keep the transport cast here, at this server-only adapter.
-  const postTodo = (client as any).organizations[':organizationId'].people[':contextMembershipId'].todos.$post as unknown as (
-    args: { param: PersonTodoPath; json: Omit<CreateSharedTodoInput, 'organizationId' | 'contextMembershipId'> },
-    options: { headers: HeadersInit },
-  ) => Promise<Response>;
+  type TodoPostEndpoint = { organizations: { ':organizationId': { people: { ':contextMembershipId': { todos: { $post: (args: { param: PersonTodoPath; json: Omit<CreateSharedTodoInput, 'organizationId' | 'contextMembershipId'> }, options: { headers: HeadersInit }) => Promise<Response> } } } } } };
+  const postTodo = (client as unknown as TodoPostEndpoint).organizations[':organizationId'].people[':contextMembershipId'].todos.$post;
   let response: Response;
   try {
     response = await postTodo(

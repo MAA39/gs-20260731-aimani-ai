@@ -18,10 +18,10 @@ export async function getPeopleFromApi({ organizationId }: PeopleInput): Promise
   // parameterized `/people/:contextMembershipId/todos` sibling is present.
   // Keep the endpoint typed locally until the client generator can represent
   // both collection and parameterized members on the same branch.
-  const peopleGet = (createApiClient(fetcher) as any).organizations[':organizationId'].people as {
-    $get: (args: { param: { organizationId: string } }, options: { headers: HeadersInit }) => Promise<Response>;
-  };
-  const response = await peopleGet.$get({ param: { organizationId } }, { headers: { cookie } });
+  type PeopleEndpoint = { organizations: { ':organizationId': { people: { $get: (args: { param: { organizationId: string } }, options: { headers: HeadersInit }) => Promise<Response> } } } };
+  const peopleGet = (createApiClient(fetcher) as unknown as PeopleEndpoint).organizations[':organizationId'].people;
+  let response: Response;
+  try { response = await peopleGet.$get({ param: { organizationId } }, { headers: { cookie } }); } catch { return { status: 'error', error: { code: 'service_unavailable', message: 'People data is temporarily unavailable.' } }; }
   if (response.status === 401) throw redirect({ to: '/login' as never });
   const unavailable = (): GetPeopleResult => ({ status: 'error', error: { code: 'service_unavailable', message: 'People data is temporarily unavailable.' } });
   let body: unknown;

@@ -1,6 +1,5 @@
 import {
   assignedTodoWorkspaceSchema,
-  organizationPathSchema,
   requestTodoHandoffBodySchema,
   requestTodoHandoffPathSchema,
   todoHandoffPathSchema,
@@ -15,8 +14,8 @@ import type {
   TodoSummary,
 } from '@amidala/contracts';
 
-export const requestTodoHandoffInputSchema = z.object({ organizationId: z.string().min(1), todoId: z.string().min(1), recipientMembershipId: z.string().min(1), requestMessage: z.string().trim().max(500).optional() });
-export const acceptTodoHandoffInputSchema = z.object({ organizationId: z.string().min(1), handoffId: z.string().min(1) });
+export const requestTodoHandoffInputSchema = requestTodoHandoffPathSchema.and(requestTodoHandoffBodySchema) as unknown as z.ZodType<{ organizationId: string; todoId: string; recipientMembershipId: string; requestMessage?: string }>;
+export const acceptTodoHandoffInputSchema = todoHandoffPathSchema as unknown as z.ZodType<{ organizationId: string; handoffId: string }>;
 export const rejectTodoHandoffInputSchema = acceptTodoHandoffInputSchema;
 export const cancelTodoHandoffInputSchema = acceptTodoHandoffInputSchema;
 

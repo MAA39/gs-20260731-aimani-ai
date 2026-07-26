@@ -33,3 +33,11 @@ DONE
 ## 懸念
 
 - Handoff query UI への接続は Task 3 範囲。既存 people adapter の Hono client 型衝突は server adapter 内 cast で封じた。
+
+## Fix round 1
+
+- People Service Binding 呼び出しを try/catch し、network rejection を `service_unavailable` に変換。
+- assigned Todo adapter/function を Todos feature に集約し、Handoffs から重複公開を削除。
+- `as any` を除去し、server-only 内の最小 local endpoint interface + `unknown` narrow に限定。
+- Handoff input schema は Task 1 の shared path/body schemas を intersection で再利用。
+- 検証: `pnpm --filter @amidala/web exec tsc --noEmit`、`pnpm --filter @amidala/web build`、`git diff --check` 全て成功。
