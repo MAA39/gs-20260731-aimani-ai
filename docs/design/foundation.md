@@ -174,3 +174,17 @@ Button は結果を表す。「送信」ではなく「引き継ぎを依頼」�
 5. 既存 Amidala/BYARD の認知を活かしつつ、古い画面の密度を持ち込んでいないか。
 
 重箱の隅の pixel review はこの段階では行わない。触った時に判断を妨げる問題を先に直す。
+
+## 実画面レビュー記録
+
+2026-07-27 に Identity → People の最初の縦切りを実ブラウザで確認した。
+
+- 1280×900: Login、組織選択、Acme Studio / Northstar Lab の People、組織切替を確認。
+- 390×844: People card と bottom navigation を確認。`scrollWidth === clientWidth` で横スクロールなし。
+- People navigation は現在の Organization ID を保持する。
+- API failure と forbidden を別状態として表示し、service failure では再試行できる。
+- React/browser console の warning / error は0件。
+
+Login は Relationship rail の考え方を説明する面と認証面を分け、組織選択は Membership を選ぶ画面として実装した。People は dashboard 指標ではなく、Member と Relationship を最初に見せる。実データに Todo がまだない段階で件数を捏造せず「共有Todoはまだありません」と表示する。
+
+実画面確認により、TanStack Start の document shell と stylesheet 登録が欠けると、ビルド成功でも無装飾のSSR画面になることが分かった。以後のプロダクトでも `HeadContent`、route assetとしてのstylesheet、`Scripts` をroot documentの完了条件に含める。

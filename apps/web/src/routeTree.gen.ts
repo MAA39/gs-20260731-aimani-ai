@@ -11,8 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HandoffsRouteImport } from './routes/handoffs'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as OrganizationsRouteImport } from './routes/organizations'
 import { Route as TodosRouteImport } from './routes/todos'
-import { Route as ApiHealthRouteImport } from './routes/api.health'
+import { Route as OrganizationIdPeopleRouteImport } from './routes/$organizationId/people'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -24,49 +26,86 @@ const HandoffsRoute = HandoffsRouteImport.update({
   path: '/handoffs',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrganizationsRoute = OrganizationsRouteImport.update({
+  id: '/organizations',
+  path: '/organizations',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TodosRoute = TodosRouteImport.update({
   id: '/todos',
   path: '/todos',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiHealthRoute = ApiHealthRouteImport.update({
-  id: '/api/health',
-  path: '/api/health',
+const OrganizationIdPeopleRoute = OrganizationIdPeopleRouteImport.update({
+  id: '/$organizationId/people',
+  path: '/$organizationId/people',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/handoffs': typeof HandoffsRoute
+  '/login': typeof LoginRoute
+  '/organizations': typeof OrganizationsRoute
   '/todos': typeof TodosRoute
-  '/api/health': typeof ApiHealthRoute
+  '/$organizationId/people': typeof OrganizationIdPeopleRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/handoffs': typeof HandoffsRoute
+  '/login': typeof LoginRoute
+  '/organizations': typeof OrganizationsRoute
   '/todos': typeof TodosRoute
-  '/api/health': typeof ApiHealthRoute
+  '/$organizationId/people': typeof OrganizationIdPeopleRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/handoffs': typeof HandoffsRoute
+  '/login': typeof LoginRoute
+  '/organizations': typeof OrganizationsRoute
   '/todos': typeof TodosRoute
-  '/api/health': typeof ApiHealthRoute
+  '/$organizationId/people': typeof OrganizationIdPeopleRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/handoffs' | '/todos' | '/api/health'
+  fullPaths:
+    | '/'
+    | '/handoffs'
+    | '/login'
+    | '/organizations'
+    | '/todos'
+    | '/$organizationId/people'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/handoffs' | '/todos' | '/api/health'
-  id: '__root__' | '/' | '/handoffs' | '/todos' | '/api/health'
+  to:
+    | '/'
+    | '/handoffs'
+    | '/login'
+    | '/organizations'
+    | '/todos'
+    | '/$organizationId/people'
+  id:
+    | '__root__'
+    | '/'
+    | '/handoffs'
+    | '/login'
+    | '/organizations'
+    | '/todos'
+    | '/$organizationId/people'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HandoffsRoute: typeof HandoffsRoute
+  LoginRoute: typeof LoginRoute
+  OrganizationsRoute: typeof OrganizationsRoute
   TodosRoute: typeof TodosRoute
-  ApiHealthRoute: typeof ApiHealthRoute
+  OrganizationIdPeopleRoute: typeof OrganizationIdPeopleRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -85,6 +124,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HandoffsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/organizations': {
+      id: '/organizations'
+      path: '/organizations'
+      fullPath: '/organizations'
+      preLoaderRoute: typeof OrganizationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/todos': {
       id: '/todos'
       path: '/todos'
@@ -92,11 +145,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TodosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/health': {
-      id: '/api/health'
-      path: '/api/health'
-      fullPath: '/api/health'
-      preLoaderRoute: typeof ApiHealthRouteImport
+    '/$organizationId/people': {
+      id: '/$organizationId/people'
+      path: '/$organizationId/people'
+      fullPath: '/$organizationId/people'
+      preLoaderRoute: typeof OrganizationIdPeopleRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -105,8 +158,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HandoffsRoute: HandoffsRoute,
+  LoginRoute: LoginRoute,
+  OrganizationsRoute: OrganizationsRoute,
   TodosRoute: TodosRoute,
-  ApiHealthRoute: ApiHealthRoute,
+  OrganizationIdPeopleRoute: OrganizationIdPeopleRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

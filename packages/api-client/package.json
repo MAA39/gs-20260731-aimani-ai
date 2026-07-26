@@ -1,1 +1,1 @@
-{"name":"@amidala/api-client","private":true,"version":"0.0.0","type":"module","dependencies":{"hono":"4.12.32"}}
+{"name":"@amidala/api-client","private":true,"version":"0.0.0","type":"module","exports":{".":"./src/index.ts"},"dependencies":{"hono":"4.12.32"},"devDependencies":{"@amidala/api":"workspace:*"}}

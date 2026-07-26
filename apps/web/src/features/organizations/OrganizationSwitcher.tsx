@@ -1,0 +1,5 @@
+import { Link } from '@tanstack/react-router';
+import { ChevronsUpDown } from 'lucide-react';
+import type { OrganizationMembershipSummary } from './organizations-schema';
+const roles = { owner: 'オーナー', manager: 'マネージャー', member: 'メンバー' } as const;
+export function OrganizationSwitcher({ current, organizations }: { current: OrganizationMembershipSummary; organizations: OrganizationMembershipSummary[] }) { return <details className="organization-switcher"><summary><span><small>組織</small><strong>{current.name}</strong></span><ChevronsUpDown size={16} aria-hidden="true" /></summary><div className="switcher-menu">{organizations.map((organization) => <Link key={organization.organizationId} to="/$organizationId/people" params={{ organizationId: organization.organizationId }} aria-current={organization.organizationId === current.organizationId ? 'page' : undefined}>{organization.name}<small>{roles[organization.role]}</small></Link>)}</div></details>; }

@@ -42,7 +42,7 @@ Browser
   -> Cloudflare Service Binding (API.fetch)
   -> private Hono API Worker
        |- Better Auth handler
-       |- Principal = session User + selected Membership
+       |- CurrentMembershipContext = session User + validated Membership
        |- listOrganizations / listPeople application services
        `- Drizzle + pg.Client
   -> local PostgreSQL 17
@@ -77,7 +77,7 @@ Better Auth coreは公式adapterの既定table名 `user` / `account` / `session`
 - `display_name`
 - `title`
 - `role: owner | manager | member`
-- `status: active | inactive`
+- `status: active | invited | suspended`
 - `UNIQUE(user_id, organization_id)`
 
 `relationship`:
@@ -87,6 +87,7 @@ Better Auth coreは公式adapterの既定table名 `user` / `account` / `session`
 - `source_membership_id`
 - `target_membership_id`
 - `kind: manager_report | peer | supporter`
+- `manager_report`はsource Membershipがmanager、target Membershipがdirect reportである有向関係
 - source / targetの自己関係をCHECKで禁止
 - source / targetは `(membership.id, membership.organization_id)` への複合FKで同一Organizationを保証
 - `peer` / `supporter`の反転重複はapplication serviceで正規化し、`manager_report`の方向は保つ
@@ -99,12 +100,12 @@ applicationが依存するportは小さくする。
 
 ```ts
 export interface MembershipRepository {
-  listOrganizationsForUser(userId: string): Promise<OrganizationOption[]>;
+  listActiveMembershipsForUser(userId: string): Promise<OrganizationMembershipSummary[]>;
   findActive(userId: string, organizationId: string): Promise<MembershipRecord | null>;
 }
 
 export interface PeopleRepository {
-  listForMembership(membership: MembershipRecord): Promise<PersonSummary[]>;
+  listForMembership(membership: MembershipRecord): Promise<MemberSummary[]>;
 }
 ```
 
