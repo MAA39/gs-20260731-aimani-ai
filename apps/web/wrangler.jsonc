@@ -1,1 +1,1 @@
-{ "name": "amidala-web", "main": "dist/server/index.js", "compatibility_date": "2026-07-26", "compatibility_flags": ["nodejs_compat"], "assets": { "directory": "dist/client" }, "services": [{ "binding": "API", "service": "amidala-api" }] }
+{ "name": "amidala-web", "main": "src/server.ts", "compatibility_date": "2026-06-24", "compatibility_flags": ["nodejs_compat"], "assets": { "directory": "dist/client" }, "services": [{ "binding": "API", "service": "amidala-api" }] }

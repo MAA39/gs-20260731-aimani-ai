@@ -120,6 +120,7 @@ Vitest は Vite の変換・設定と揃え、Playwright は一つの主要ジ�
 
 - `nodejs_compat` と compatibility date を明示する。
 - Node.js API は完全互換ではないため、利用 package は local `wrangler dev` だけでなく production build で確認する。
+- 選定基準日は 2026-07-26 だが、ローカル workerd の対応上限に合わせ、Web/API の compatibility date は 2026-06-24 とする。
 - Service Binding の呼び出しも Worker invocation/subrequest の上限に含まれる。
 - API request 中に長時間の処理を行わない。必要性が出た時点で Queue/別 Worker を判断する。
 - 外部 Cloudflare/DB resource は、ローカルで Todo/Handoff が触れるまで作成しない。
@@ -133,4 +134,3 @@ Vitest は Vite の変換・設定と揃え、Playwright は一つの主要ジ�
 - Better Auth と Hyperdrive の session 接続に安定性問題が出た。
 - Service Binding を跨ぐ構成がローカル開発を大きく遅くした。
 - 実際のユーザージャーニーが Server Function だけで十分だと判明した。
-

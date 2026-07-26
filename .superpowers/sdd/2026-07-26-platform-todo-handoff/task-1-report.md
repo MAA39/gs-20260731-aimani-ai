@@ -83,3 +83,17 @@
 ### 懸念
 
 - ローカル workerd の compatibility date 上限が要件固定値より古いため、single `pnpm dev` での direct SSR routes / Service Binding health の実行確認は環境制約で未成立。設定と dry-run で SSR entry / binding の接続は確認済み。
+
+## Fix round 4
+
+### 変更
+
+- Web/API Wrangler の `compatibility_date` を local workerd 対応上限の `2026-06-24` に統一。
+- ADR-0001 に、選定基準日は 2026-07-26 だが compatibility date は workerd 上限 2026-06-24 と追記。
+- `apps/web/src/server.ts` を正式な custom Worker entry として採用し、`env.API.fetch('/health')` を `/api/health` で直接 proxy。その他のリクエストは TanStack Start handler へ委譲。
+
+### 実測
+
+- `pnpm build` — 成功（Web client/SSR、API tsc、auxiliary API bundle）。
+- 単一 `pnpm dev`（Vite + auxiliary Workers）URL `http://localhost:5174` — `/` `/todos` `/handoffs` は HTTP 200、`/api/health` は HTTP 200、body `{"ok":true}`。
+- `wrangler deploy --dry-run --config dist/server/wrangler.json` — 成功。SSR Worker entry/assets と `env.API` Service Binding を認識。
