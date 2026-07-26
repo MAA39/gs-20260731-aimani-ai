@@ -23,6 +23,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@amidala/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@amidala/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -60,6 +63,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@amidala/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
       '@tanstack/react-router':
         specifier: 1.170.18
         version: 1.170.18(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -100,6 +106,10 @@ importers:
       hono:
         specifier: 4.12.32
         version: 4.12.32
+    devDependencies:
+      '@amidala/api':
+        specifier: workspace:*
+        version: link:../../apps/api
 
   packages/contracts:
     dependencies:

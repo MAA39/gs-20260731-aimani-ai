@@ -7,6 +7,8 @@ import { createNodePgDatabase, type DatabaseResource } from '@amidala/db/client'
 import { createAuth } from '../auth/create-auth';
 import { MembershipRepository } from '../infrastructure/db/membership-repository';
 import { ListOrganizationMembershipsForUser } from '../application/list-organizations';
+import { PeopleRepository } from '../infrastructure/db/people-repository';
+import { ListMembersForCurrentOrganization } from '../application/list-people';
 
 export interface RequestScopeArgs {
   env: ApiBindings;
@@ -17,7 +19,7 @@ export interface RequestCradle extends RootCradle {
   env: ApiBindings;
   request: Request;
   healthCheck: HealthCheck;
-  databaseResource: Promise<DatabaseResource>; auth: Promise<ReturnType<typeof createAuth>>; membershipRepository: Promise<MembershipRepository>; listOrganizationMembershipsForUser: Promise<ListOrganizationMembershipsForUser>;
+  databaseResource: Promise<DatabaseResource>; auth: Promise<ReturnType<typeof createAuth>>; membershipRepository: Promise<MembershipRepository>; listOrganizationMembershipsForUser: Promise<ListOrganizationMembershipsForUser>; peopleRepository: Promise<PeopleRepository>; listMembersForCurrentOrganization: Promise<ListMembersForCurrentOrganization>;
 }
 
 export type RequestScope = AwilixContainer<RequestCradle>;
@@ -47,6 +49,8 @@ export async function withRequestScope<T>(
     auth: asFunction(async ({ databaseResource, env }: { databaseResource: Promise<DatabaseResource>; env: ApiBindings }) => { const resource = await databaseResource; return createAuth(resource.database, env); }).scoped(),
     membershipRepository: asFunction(async ({ databaseResource }: { databaseResource: Promise<DatabaseResource> }) => { const resource = await databaseResource; return new MembershipRepository(resource.database); }).scoped(),
     listOrganizationMembershipsForUser: asFunction(async ({ membershipRepository }: { membershipRepository: Promise<MembershipRepository> }) => new ListOrganizationMembershipsForUser(await membershipRepository)).scoped(),
+    peopleRepository: asFunction(async ({ databaseResource }: { databaseResource: Promise<DatabaseResource> }) => new PeopleRepository((await databaseResource).database)).scoped(),
+    listMembersForCurrentOrganization: asFunction(async ({ peopleRepository }: { peopleRepository: Promise<PeopleRepository> }) => new ListMembersForCurrentOrganization(await peopleRepository)).scoped(),
   });
 
   try {
