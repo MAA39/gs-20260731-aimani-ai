@@ -1,1 +1,1 @@
-{"name":"amidala-api","main":"src/worker.ts","compatibility_date":"2026-07-26","compatibility_flags":["nodejs_compat"]}
+{"name":"amidala-api","main":"src/worker.ts","workers_dev":false,"preview_urls":false,"compatibility_date":"2026-07-26","compatibility_flags":["nodejs_compat"]}
