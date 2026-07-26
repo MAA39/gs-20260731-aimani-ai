@@ -199,11 +199,11 @@ Run `pnpm db:seed`, API typecheck/test/build, `pnpm build`, and Wrangler dry-run
 
 Add a separate `test:integration` script and Vitest config that includes only `src/**/*.integration.test.ts`; keep the default test command DB-free. The integration config must fail immediately with `TEST_DATABASE_URL is required` before importing the app when the variable is absent. Start the local DB, migrate, and seed, then run with `TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala`.
 
-In the test, sign in `sato@amidala.local` / `amidala-demo-2026` through the existing Hono Better Auth route and extract all `Set-Cookie` values. Request `northstar-lab`'s People endpoint with that cookie. Assert status `403`, body equals `{ error: { code: 'forbidden', message: 'This organization is not available to this user.' } }`, and body has no `people` property. The test imports the existing `createApp`; before the People route is implemented it compiles and fails with actual 404 rather than setup/type errors.
+In the test, sign in `sato@amidala.local` / `amidala-demo-2026` through the existing Hono Better Auth route and extract all `Set-Cookie` values. Request Organization ID `org_northstar_lab`'s People endpoint with that cookie; do not substitute its slug `northstar-lab`. Assert status `403`, body equals `{ error: { code: 'forbidden', message: 'This organization is not available to this user.' } }`, and body has no `people` property. The test imports the existing `createApp`; before the People route is implemented it compiles and fails with actual 404 rather than setup/type errors.
 
 - [ ] **Step 2: Verify RED**
 
-Run `pnpm --filter @amidala/api test -- --run` and record the expected missing route/service failure.
+Run `TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala pnpm --filter @amidala/api test:integration -- --run` and record the expected missing route/service failure. The default DB-free test remains green.
 
 - [ ] **Step 3: Implement the tenant-safe query**
 
