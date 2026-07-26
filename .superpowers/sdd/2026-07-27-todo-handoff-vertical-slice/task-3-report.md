@@ -31,3 +31,9 @@ status: DONE_WITH_CONCERNS
 - mutation progress/resultをcard aria-live領域へ表示。
 
 検証: `pnpm --filter @amidala/web exec tsc --noEmit`、`pnpm --filter @amidala/web build`、`git diff --check` 全てpass。
+
+## Fix round 1 follow-up
+
+- HandoffPageが常時mountedのpage-level `liveMessage`/`aria-live`領域を所有し、各HandoffRequestCardへ`onAnnounce`を渡す構造へ変更。
+- card mutationはpending開始、success、409 conflict、forbidden/error、例外をpage callbackへ通知するため、invalidate後のcard移動/unmount後も結果をannounce可能。
+- useEffectなし、mutationは引き続きcard単位。

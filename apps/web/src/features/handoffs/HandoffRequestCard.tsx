@@ -7,19 +7,19 @@ import { assignedTodoWorkspaceKey } from '../todos/assigned-todo-queries';
 import { sharedTodoWorkspaceOrganizationPrefix } from '../todos/todo-queries';
 import { useState } from 'react';
 
-export function HandoffRequestCard({ handoff, kind }: { handoff: TodoHandoffSummary; kind: 'incoming' | 'outgoing' | 'recent' }) {
+export function HandoffRequestCard({ handoff, kind, onAnnounce }: { handoff: TodoHandoffSummary; kind: 'incoming' | 'outgoing' | 'recent'; onAnnounce: (message: string) => void }) {
   const mutation = useMutation({ mutationFn: async (action: 'accept' | 'reject' | 'cancel') => action === 'accept' ? acceptTodoHandoff({ data: { organizationId: handoff.organizationId, handoffId: handoff.handoffId } }) : action === 'reject' ? rejectTodoHandoff({ data: { organizationId: handoff.organizationId, handoffId: handoff.handoffId } }) : cancelTodoHandoff({ data: { organizationId: handoff.organizationId, handoffId: handoff.handoffId } }) });
   const client = useQueryClient();
   const [resultMessage, setResultMessage] = useState('');
   async function decide(action: 'accept' | 'reject' | 'cancel') {
-    setResultMessage('');
+    setResultMessage(''); onAnnounce('引き継ぎを処理中です。');
     try {
       const result = await mutation.mutateAsync(action);
       await Promise.all([client.invalidateQueries({ queryKey: todoHandoffWorkspaceKey(handoff.organizationId), exact: true }), client.invalidateQueries({ queryKey: assignedTodoWorkspaceKey(handoff.organizationId), exact: true }), client.invalidateQueries({ queryKey: sharedTodoWorkspaceOrganizationPrefix(handoff.organizationId), exact: false })]);
-      if (result.status === 'conflict') { setResultMessage('この依頼はすでに処理されています。'); mutation.reset(); return; }
-      if (result.status !== 'ok') { setResultMessage(result.error.message); return; }
-      setResultMessage(action === 'accept' ? '引き継ぎを受け入れました。' : action === 'reject' ? '引き継ぎを見送りました。' : '引き継ぎ依頼を取り消しました。');
-    } catch { setResultMessage('引き継ぎの処理に失敗しました。再試行してください。'); }
+      if (result.status === 'conflict') { setResultMessage('この依頼はすでに処理されています。'); onAnnounce('この依頼はすでに処理されています。'); mutation.reset(); return; }
+      if (result.status !== 'ok') { setResultMessage(result.error.message); onAnnounce(result.error.message); return; }
+      const message = action === 'accept' ? '引き継ぎを受け入れました。' : action === 'reject' ? '引き継ぎを見送りました。' : '引き継ぎ依頼を取り消しました。'; setResultMessage(message); onAnnounce(message);
+    } catch { const message = '引き継ぎの処理に失敗しました。再試行してください。'; setResultMessage(message); onAnnounce(message); }
   }
   const date = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }).format(new Date(handoff.requestedAt));
   const terminal = handoff.status !== 'requested';
