@@ -1,0 +1,177 @@
+# Amidala v2 Design Foundation
+
+基準日: 2026-07-26  
+ステータス: Touchable MVP 用。実画面レビューで更新する
+
+## デザインの主題
+
+対象は、マネージャーとメンバーが「誰と、何を進め、誰へ責任を渡したか」を理解するプロダクトである。
+
+最初の画面の仕事は dashboard の数字を見せることではない。次に関わる人と、その人との間に残っている仕事を選べるようにすること。
+
+## 方針
+
+### Relationship first
+
+People を単なる directory にしない。相手との関係、共有 Todo、次の action を同じ視線上に置く。
+
+### Responsibility is visible
+
+Todo の責任者を avatar だけで示さない。氏名、role、状態を表示し、Handoff 前後の変化を一本の流れとして見せる。
+
+### Calm, not corporate-heavy
+
+金融系 dashboard のような硬い table と警告の密度にしない。白い作業面、柔らかい indigo、十分な余白を使う。一方で、丸みと gradient を無秩序に増やして AI テンプレート風にしない。
+
+## 視覚シグネチャ: Relationship rail
+
+人物、Todo、Handoff を細い一本の rail で結ぶ。
+
+```text
+[依頼者] ── Todo ── [現在の担当] ──▶ [引継ぎ先]
+                               requested / accepted / rejected
+```
+
+rail は decoration ではなく、責任がどこからどこへ動くかを表す。People card の次 action、Todo card の assignee、Handoff inbox の decision に同じ文法を使う。
+
+## Color tokens
+
+既存 Amidala の indigo と BYARD の状態表現を再解釈する。緑を brand color ではなく成功/接続の意味に限定する。
+
+| token | value | 用途 |
+|---|---:|---|
+| `--ink` | `#26264A` | 見出し、主要本文 |
+| `--ink-muted` | `#686A86` | 補助情報 |
+| `--canvas` | `#F6F7FB` | app 背景。既存 Amidala を継承 |
+| `--surface` | `#FFFFFF` | card / dialog |
+| `--line` | `#E1E3EF` | border / rail inactive |
+| `--brand` | `#6677E8` | primary action。既存 `#758BFD` を少し締める |
+| `--brand-soft` | `#EEF0FF` | selected / focus background |
+| `--connected` | `#3D9B78` | accepted / connected |
+| `--attention` | `#D8962E` | pending / due soon |
+| `--danger` | `#D34F66` | destructive / rejected / error |
+
+状態は必ず text または icon を併用する。`green = good` だけで意味を伝えない。
+
+## Typography
+
+- Display / heading: `Manrope`, 既存 Amidala の親しみを継承。
+- Body: `Noto Sans JP`, 日本語の可読性と文字幅を優先。
+- Utility / data: `Manrope`, 数値・status label・date に限定。
+- body 16px / 1.65、caption 13px / 1.5。既存 14px body は密度が高いため採用しない。
+- 見出しは太さだけで階層を作り、過剰な大文字英語や letter spacing を使わない。
+
+## Layout
+
+Desktop:
+
+```text
+┌───────────────┬──────────────────────────────────────┐
+│ org / nav     │ page title                 account   │
+│ 240px         ├──────────────────────────────────────┤
+│               │ context / next action               │
+│ People        │                                      │
+│ Todos         │ primary work surface                 │
+│ Inbox         │ max 1120px, fluid                    │
+└───────────────┴──────────────────────────────────────┘
+```
+
+Mobile:
+
+```text
+┌──────────────────────────┐
+│ org              account │
+├──────────────────────────┤
+│ page / person context    │
+│                          │
+│ primary work surface     │
+│                          │
+├──────────────────────────┤
+│ People  Todos  Inbox     │
+└──────────────────────────┘
+```
+
+- 8px spacing rhythm。主要 gap は 8 / 12 / 16 / 24 / 32 / 48。
+- surface radius 16px、control 10px、pill 999px。
+- desktop は固定幅 1104px を廃止し、`minmax(0, 1120px)` を基準にする。
+- mobile breakpoint は 800px を出発点にするが、component の崩れで決め直す。
+
+## Components
+
+最初から作る primitive:
+
+- Button: primary / secondary / quiet / danger
+- TextField / TextArea / FieldError
+- PersonAvatar + RelationshipLabel
+- StatusBadge
+- Surface / EmptyState
+- Dialog（Base UI）
+- Menu（Base UI）
+- Toast
+- Skeleton
+
+最初から作らないもの:
+
+- 汎用 DataGrid
+- 汎用 workflow canvas
+- chart library wrapper
+- 何でも入る Card component
+- variant を大量に持つ design-system package
+
+同じ構造が3画面で繰り返されてから共通化する。
+
+## Motion
+
+特徴的な motion は Handoff decision の一箇所に使う。Accept 後、rail の node が旧担当から新担当へ 180–240ms で移り、status copy が更新される。
+
+- 通常 hover: 120–160ms
+- Dialog: opacity + 4px translate、180ms
+- `prefers-reduced-motion` では位置移動を止め、即時の色/文言更新だけにする。
+- page load の連続 fade-in や常時 pulse は使わない。
+
+## Copy vocabulary
+
+| 内部語 | UI 表示 |
+|---|---|
+| Account | アカウント（設定内のみ） |
+| Organization | 組織 |
+| Membership | メンバー / 組織での役割 |
+| Relationship | 関係 |
+| Todo | Todo |
+| Handoff | 引き継ぎ |
+| requested | 引き継ぎを依頼中 |
+| accepted | 引き継ぎ済み |
+| rejected | 引き継ぎを見送り |
+
+Button は結果を表す。「送信」ではなく「引き継ぎを依頼」、「OK」ではなく「引き受ける」。toast も同じ動詞を使う。
+
+## 状態別の画面ルール
+
+- Empty: 何がないか + 最初の action を一つ出す。
+- Pending: 最終 layout と同じ寸法の skeleton。global spinner で全画面を止めない。
+- Validation error: field の近くに修正方法を出す。
+- API error: 実行できなかった action と再試行を出す。
+- Success: toast だけで終わらず、一覧・担当者・status の変化を画面本体へ反映する。
+- Permission denied: 操作を隠すだけにせず、必要なら「この組織では閲覧できません」と現在 context を示す。
+
+## Accessibility floor
+
+- すべての操作を keyboard で到達・実行可能にする。
+- focus ring は `2px var(--brand)` + offset 2px。
+- icon-only button は accessible name と tooltip を持つ。
+- avatar、色、position のみで人や状態を識別させない。
+- dialog を閉じたら trigger に focus を戻す。
+- 主要操作の target は最低 40px、mobile は 44px を目安にする。
+
+## 初回デザインレビュー
+
+各主要画面で desktop 1440px と mobile 390px の screenshot を撮り、次だけを確認する。
+
+1. 3秒で次の action が分かるか。
+2. 今どの組織・誰との文脈かが分かるか。
+3. Todo の現在担当と Handoff の行き先が分かるか。
+4. 空/待機/失敗時に次の操作があるか。
+5. 既存 Amidala/BYARD の認知を活かしつつ、古い画面の密度を持ち込んでいないか。
+
+重箱の隅の pixel review はこの段階では行わない。触った時に判断を妨げる問題を先に直す。
+

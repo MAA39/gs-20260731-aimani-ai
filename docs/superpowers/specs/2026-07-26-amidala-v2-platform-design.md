@@ -1,406 +1,326 @@
-# Amidala v2 プラットフォーム・初期縦切り設計
+# Amidala v2 UX-firstプラットフォーム設計
 
 - 日付: 2026-07-26
-- 状態: ユーザーレビュー待ち
+- 状態: UX-first方針反映済み
 - 対象: 新規 `/Users/maa/Projects/gs/000_参照用/amidala-v2`
-- 既存資産: `amidala`、`amidala-angular`、`amidala-admin`、`BYARD` は読み取り専用
+- 既存資産: `amidala`、`amidala-angular`、`amidala-admin`、`BYARD`は読み取り専用
 
-## 1. 目的
+## 1. 最優先事項
 
-稼働停止中のAmidalaを直接改修せず、新製品として再構築する。新製品の核は次の3領域とする。
+初期ゴールは金融系システムのような完全性ではない。ユーザーが実際に画面を触りながら、次の体験とドメイン設計が正しいか確認できることを最優先する。
 
-1. 組織内の関係性（Relationship）
-2. Todoと担当移譲（Todo / Handoff）
-3. 1on1
+```text
+ログイン
+  -> 所属組織を開く
+  -> 関係のある相手を選ぶ
+  -> Todoを作る
+  -> 相手へHandoffする
+  -> 相手が承認または拒否する
+  -> 担当と履歴が画面へ反映される
+```
 
-最初の実装単位は、共通基盤とTodo/Handoffの縦切りである。1on1、月次ヒアリング、Knowledge、既存データ移行は後続の独立した設計・実装サイクルとする。
+設計の将来拡張性は保つが、初期段階で網羅的テスト、過剰なセキュリティ層、非同期基盤、完全な監査機構は作らない。
 
-## 2. 成功条件
+## 2. 初期リリースの成功条件
 
-最初の実装単位は、以下をすべて満たしたとき完了とする。
+- ブラウザ上で上記の導線を一通り操作できる
+- AccountはOrganizationから独立し、複数組織へMembershipで所属できる
+- Relationship、Todo、Handoffが画面上で理解できる
+- BrowserからDBや非公開APIへ直接アクセスしない
+- Handoffの承認時に担当者が正しく切り替わる
+- 未ログインと他組織の操作はAPIで拒否される
+- 主要導線1本のPlaywright E2Eが通る
+- Cloudflare previewでユーザーが触れる
+- 既存Amidala/BYARDへ変更がない
 
-- 既存4ディレクトリに変更がない
-- TanStack Start Web Workerと非公開Hono API Workerが独立してデプロイできる
-- BrowserからAPI Workerへ直接到達できない
-- Web WorkerからService BindingとHono RPCでAPIを呼べる
-- Better Authでサインアップ、ログイン、ログアウト、セッション確認ができる
-- AccountはOrganizationが0件でも存在できる
-- Membershipを通してのみAccountがOrganizationへ所属する
-- Todoを作成し、相手へHandoffを申請し、承認または拒否できる
-- API認可を迂回した直接リクエストが拒否される
-- PostgreSQLのFK、CHECK、UNIQUE、tenant境界がテストで証明される
-- Web、API、DB、ドメインのテストがCIで再現できる
+## 3. 初期スコープから外すもの
 
-## 3. 採用アーキテクチャ
+以下は必要性が実体験から確認できるまで実装しない。
+
+- PostgreSQL RLS
+- Event Sourcing
+- outbox / Cloudflare Queues
+- Webhook Worker
+- role変更履歴の完全保存
+- 網羅的な状態遷移テスト
+- coverage閾値
+- mutation testing
+- 全テーブルのTestcontainers検証
+- SSO、SCIM、MFA
+- メール確認とpassword reset
+- 既存Amidalaデータ移行
+- 月次ヒアリング、Knowledge、通知、詳細監査ログ
+
+ただし一般公開前には、メール確認、password reset、rate limit、RLSまたは同等のtenant防御、バックアップ/復旧を別のhardeningフェーズで判断する。
+
+## 4. アーキテクチャ
 
 ```text
 Browser
   |
-  | same-origin HTTP / Server Function
+  | same-origin
   v
 TanStack Start Web Worker
-  |  - SSR / Route / Search Params
-  |  - BFF DTO composition
+  |  - SSR / Router / Server Functions
+  |  - 画面用DTO composition
   |  - TanStack Query prefetch
   |
   | Service Binding + Hono RPC
   v
 Private Hono API Worker
   |  - Better Auth
+  |  - Awilix DI
   |  - authorization
-  |  - command/query handlers
-  |  - transaction / outbox
-  |
-  | node-postgres + Drizzle
+  |  - command / query
+  |  - Drizzle transaction
   v
-Cloudflare Hyperdrive (cache disabled)
+Cloudflare Hyperdrive
   v
-PlanetScale Postgres, AWS ap-northeast-1
+PlanetScale Postgres (Tokyo)
 ```
 
-API Workerは`workers_dev = false`、`preview_urls = false`とし、Service Bindingからのみ利用する。将来の公開Webhookは`apps/webhook`として別Workerを追加し、同じ非公開API WorkerをService Bindingで呼ぶ。
+ローカル開発ではDocker ComposeのPostgreSQLを使用する。PlanetScaleとHyperdriveは画面導線がローカルで成立した後に作成する。
 
-## 4. ディレクトリ構成
+API Workerは`workers_dev = false`、`preview_urls = false`とし、Web WorkerのService Bindingから呼ぶ。認証URLもWeb Workerの`/api/auth/*`で受け、raw RequestをAPI Workerへ転送する。
+
+## 5. モノレポ構成
 
 ```text
 amidala-v2/
 ├── apps/
-│   ├── web/                 # TanStack Start / BFF
-│   └── api/                 # Hono private Worker / Composition Root
+│   ├── web/                       # TanStack Start / BFF / UI
+│   └── api/                       # Hono / Auth / DI / DB access
 ├── packages/
-│   ├── api-client/          # compiled Hono RPC client
-│   ├── contracts/           # Zod input/output schemas and DTOs
-│   ├── db/                  # Drizzle schema, migrations, DB primitives
-│   ├── modules/
-│   │   ├── identity/
-│   │   ├── relationship/
-│   │   ├── todo/
-│   │   └── one-on-one/      # 後続フェーズで追加する最終形
-│   ├── testkit/
-│   └── config/
+│   ├── contracts/                 # Zod DTO
+│   ├── api-client/                # Hono RPC client
+│   ├── db/                        # Drizzle schema / migrations
+│   └── modules/
+│       ├── identity/
+│       ├── relationship/
+│       └── todo/
 ├── docs/
-│   ├── adr/
-│   ├── domain/
-│   ├── migration/
-│   └── superpowers/specs/
 └── tooling/
 ```
 
-各moduleは次の依存方向を守る。
+初期段階では細かいpackage分割を増やさない。1on1 moduleはTodo/Handoffを触って境界を確認してから追加する。
+
+## 6. 依存方向
 
 ```text
 domain <- application <- infrastructure <- apps/api
 ```
 
-- `domain`: 純粋TypeScript。I/O、Hono、Drizzle、Awilixをimportしない
-- `application`: commands、queries、Port interface、Result型
-- `infrastructure`: PostgreSQL repositoryなどPortの実装
-- `apps/api`: Hono route、認証、DI Composition Root、Cloudflare binding
-- `apps/web`: `contracts`と`api-client`のみ利用し、moduleやDBをimportしない
+- domainは純粋TypeScript
+- applicationはuse caseとPortを持つ
+- infrastructureはDrizzle repositoryを持つ
+- API routeはuse case呼び出しとHTTP変換だけを行う
+- Webはcontractsとapi-clientだけを利用する
+- WebからDB/moduleをimportしない
 
-初期scaffoldでは`identity`、`relationship`、`todo`だけを作る。空の`one-on-one` packageは作らず、Phase Cの設計承認後に追加する。
+依存境界はまず package exports と TypeScript project reference で表す。専用の検査ツールは、実際に越境が起きてから追加する。
 
-## 5. DI設計
+## 7. DI
 
-DIコンテナにはAwilixを採用する。TSyringeとInversifyはdecoratorとreflection metadataを要求するため採用しない。typed-injectは軽量だが、今回必要なrequest scopeとlifetime leak検査をAwilixほど明示的に提供しないため採用しない。
-
-Awilixは`apps/api`のComposition Rootだけで使用する。domain/applicationのクラスと関数はAwilixを知らず、通常のconstructor引数またはdeps objectで依存を受け取る。
+Awilixを採用し、`apps/api`のComposition Rootだけで使用する。domain/applicationはAwilixをimportしない。
 
 ```text
 Root container
-  singleton: Clock, IdGenerator, policy definitions
-  ※ I/Oオブジェクトを登録しない
+  - Clock
+  - IdGenerator
 
 Request scope
-  scoped: Env, Request, Principal, pg Client, UnitOfWork
-  scoped: repositories, command handlers, query handlers
+  - Env
+  - Request
+  - DB client
+  - Better Auth
+  - repositories
+  - use cases
 ```
-
-必須設定は次の通り。
 
 - `strict: true`
-- requestごとに`createScope()`する
-- DB clientやRequestをsingletonへ注入しない
-- request終了時にscopeをdisposeし、DB clientをcloseする
-- singletonは状態を持たない純粋なものに限定する
-- テストは原則としてuse caseへfake Portを直接注入する
-- route統合テストではtest用scopeを構成して差し替える
+- requestごとにchild scopeを作る
+- DB Clientをrequest終了時にcloseする
+- domain/applicationはconstructorまたはdeps objectで依存を受ける
+- 単体テストはDIコンテナを使わずfakeを直接渡せる
 
-DIの受入テストでは、短いlifetimeの依存をsingletonへ注入した登録がstrict modeで失敗することも確認する。
+DIのための網羅的テストは作らない。Composition Rootが主要use caseをresolveでき、request終了時にDB Clientをcloseできるsmoke testだけを置く。
 
-## 6. 認証と組織所属
+## 8. 認証・組織モデル
 
-Better Auth coreを採用するが、Organization Pluginは初期リリースでは使用しない。Organization、Membership、Roleは製品の中核ドメインであり、認証ライブラリのスキーマとライフサイクルへ従属させない。
+Better Auth coreを採用する。Organization Pluginは使わず、組織所属はドメインで管理する。
 
 ```text
-auth schema (Better Auth managed)
-├── accounts             # Better Auth user model。グローバルなログイン主体
-├── auth_identities      # Better Auth account model。password/OAuth provider
-├── sessions
-└── verifications
+auth.accounts                  # グローバルなログイン主体
+auth.auth_identities           # password / OAuth identity
+auth.sessions
+auth.verifications
 
-app schema (domain managed)
-├── organizations
-├── memberships
-├── organization_roles
-├── membership_role_assignments
-└── relationships
+app.organizations
+app.memberships                # accountとorganizationを接続
+app.relationships
 ```
 
-Better Authの`user` modelを`accounts`、providerの`account` modelを`auth_identities`へ明示的にrenameする。生成スキーマはBetter Auth CLIで生成するが、適用はDrizzle migrationへ統合し、productionでBetter Auth CLIによる自動migrationは行わない。
+AccountはOrganizationが0件でも存在できる。Organizationを退会してもAccountや他組織のMembershipを変更しない。
 
-`memberships.account_id`は`auth.accounts.id`を参照する。Organization解約・退職はMembershipを無効化し、Accountと他OrganizationのMembershipには触れない。Account自体の削除は本人によるアカウント削除ユースケースとして別に扱う。
+初期roleは`owner | manager | member`をMembershipに持つ。boolean role列は使わない。動的roleやrole履歴は実需要が出た時点で別テーブルへ切り出す。
 
-Organization選択はURLまたはBFF入力として渡す。CookieやURLのOrganization IDは権限の根拠にせず、APIが毎回Membershipを検証する。
-
-### 認証リクエスト
-
-```text
-Browser /api/auth/*
-  -> Web Worker same-origin proxy
-  -> API Service Binding
-  -> Better Auth handler
-  -> auth schema
-```
-
-OAuthを追加した場合も公開callback URLはWeb Workerとし、raw Request/ResponseをAPI Workerへ中継する。初期実装はemail/passwordのみとする。
-
-初期previewは招待された検証ユーザーだけを対象とし、email verificationを必須にしない。一般公開前にはtransactional email provider、email verification、password reset、auth endpointのrate limitを別のセキュリティゲートとして実装し、未完了ならproduction公開しない。
-
-## 7. 認可境界
-
-TanStack Routerの`beforeLoad`は画面UXのために使うが、セキュリティ境界にはしない。APIの各command/queryで次を解決する。
-
-```text
-Session
-  -> Account
-  -> requested Organization
-  -> active Membership
-  -> assigned Roles
-  -> resource/relationship policy
-  -> Principal
-```
-
-Browser入力から`accountId`、`authorType`、`role`を受け取らない。操作主体はSessionから決定する。Web BFFも認可結果をキャッシュして権限根拠にはしない。
-
-## 8. PostgreSQL設計原則
-
-採用する原則は次の通り。
-
-1. 概念設計、論理設計、物理設計の順に検討し、必要なら前段へ戻る
-2. 正本には観測・入力された事実を保存する
-3. ResourceとEvent/履歴をライフサイクルで分離する
-4. 導出値を保存する場合はprojectionと明記し、再生成可能にする
-5. FK、UNIQUE、CHECK、transactionで不正状態をDBでも拒否する
-6. nullableとindex数は設計レビューのシグナルであり、一律禁止にしない
-7. JSONBは構造が未確定または外部payloadの保存に限定する
-8. Full Event Sourcingは採用しない
-
-テナントデータには必ず`organization_id`を持たせる。関連テーブルには可能な限り複合FKを使い、異なるOrganizationのMembershipやRelationshipを接続できないようにする。
-
-API認可を第一境界としつつ、app schemaにはPostgreSQL RLSを適用する。migration roleとruntime roleを分け、runtime roleは`BYPASSRLS`を持たない。transaction内で検証済みのAccount IDとOrganization IDを`SET LOCAL`し、policyへ渡す。RLSを理由にapplication認可を省略してはならない。
-
-Principal解決も同じtransaction内で行う。Better Authが検証したAccount IDと、リクエストされたOrganization IDを`SET LOCAL`した後、RLS下で`memberships`を検索する。Organization IDは検索範囲を狭める値にすぎず、active Membershipが取得できた場合だけPrincipalを成立させる。以降のrepository queryはすべてこのtransactionとPrincipalを受け取る。
+初期previewは招待された検証ユーザーだけを対象とし、email/passwordでログインする。一般公開前の認証hardeningは別フェーズとする。
 
 ## 9. 初期データモデル
 
-### Identity / Organization
+### Organization / Membership
 
 ```text
-auth.accounts
-  1 -- N memberships N -- 1 organizations
-
-memberships
-  1 -- N membership_role_assignments N -- 1 organization_roles
+Account 1 -- N Membership N -- 1 Organization
 ```
 
-- AccountはOrganization非依存
-- Membershipは`active / suspended / left`の状態を持つ
-- roleはboolean列にせず、割当行として表す
-- Membershipの状態変更とRole変更は履歴を残す
+`memberships`は`account_id`、`organization_id`、`role`、`status`を持つ。`UNIQUE(account_id, organization_id)`で重複所属を防ぐ。
 
 ### Relationship
 
-Relationshipは同一Organizationの2つのMembership間に張る。順序が意味を持つ関係は`source_membership_id`と`target_membership_id`を使う。対称な関係を同じテーブルへ無理に混ぜない。
+```text
+Relationship
+  - organization_id
+  - source_membership_id
+  - target_membership_id
+  - kind: manager_report | peer | supporter
+```
+
+初期UIでは「自分と関係のある相手」を一覧するために使う。
 
 ### Todo / Handoff
 
 ```text
-todos
-├── current status
-├── creator membership
-└── optional relationship
+Todo
+  - organization_id
+  - relationship_id
+  - title
+  - description
+  - status: open | completed
+  - assignee_membership_id
 
-todo_assignments
-└── 現在・過去の担当期間
-
-todo_handoffs
-├── from membership
-├── to membership
-├── requested / accepted / rejected / cancelled
-└── request/respond timestamps
+Handoff
+  - todo_id
+  - from_membership_id
+  - to_membership_id
+  - status: requested | accepted | rejected
+  - requested_at
+  - responded_at
 ```
 
-Handoff承認は単一transactionで次を行う。
+承認時は1 transactionでHandoffをacceptedへ変更し、Todoの`assignee_membership_id`を相手へ更新する。完全なAssignment履歴は初期には作らず、Handoff行を最低限の履歴として画面表示する。
 
-1. pending Handoffをlockして再確認
-2. Handoffをacceptedへ遷移
-3. 現在Assignmentを終了
-4. 新しいAssignmentを作成
-5. outboxへ`TodoHandedOff`をINSERT
+すべてのドメインテーブルに`organization_id`を持たせ、API queryでは必ずPrincipalのOrganization IDを条件へ含める。基本的なFK、UNIQUE、CHECKは使用するが、初期から複雑な複合FK/RLSは導入しない。
 
-二重承認や異なる相手による承認はDB制約とcommand handlerの双方で拒否する。
+## 10. Web/BFFの責務
 
-## 10. CQRS-liteとイベント
+Web Workerは次を担当する。
 
-`commands/`と`queries/`をコード上で分けるが、初期は同じPostgreSQLを使う。
+- URL/search paramsのZod検証
+- same-origin auth proxy
+- Hono RPCによるAPI呼び出し
+- TanStack Queryのprefetchと再取得
+- pending/error/empty state
+- 画面単位DTOのcomposition
 
-- Commandはtransaction、domain invariant、outboxを担当する
-- Queryは画面用DTOを返し、domain entityをそのまま返さない
-- Web BFFは複数Queryの画面単位compositionを担当できる
-- API routeはhandler呼び出しとHTTP変換に限定する
+Web WorkerはDBへ接続せず、認可の最終判断もしない。
 
-重要なdomain eventだけ`outbox_events`へ保存する。outboxはCloudflare Queueへ配送し、成功後にdelivery状態を更新する。通知失敗によってdomain transactionをrollbackしない。
+初期画面は次の5つに限定する。
 
-APIはcommit後にQueue送信をbest effortで試みる。送信失敗またはWorker中断に備え、API Workerのscheduled handlerが未配送outboxを定期走査して再送する。Queue messageとconsumerは`outbox_event_id`を冪等キーにし、少なくとも1回配送による重複処理を無害化する。domain transaction内でQueueへ直接送信しない。
+1. Login
+2. Organization selector
+3. Organization home / People
+4. Person detail / Todo list
+5. Handoff inbox
 
-## 11. TanStack Start BFF
+## 11. UI方針
 
-Web Workerが担当するものは次の通り。
+- Tailwind CSS 4.3.3
+- Base UI 1.6.0はDialog/Menuなど必要な箇所だけ
+- Lucide React 1.27.0
+- desktopは左navigation、mobileはbottom navigationで操作可能
+- pending、empty、errorを必ず画面として用意する
+- デザインシステム構築はせず、色・余白・文字サイズの小さなtokenだけ定義する
+- Peopleを単なる名簿にせず、関係・未完了Todo・次のactionを同じ視線上に置く
+- Handoffは依頼者、現在担当、引継ぎ先を結ぶ`relationship rail`で可視化する
+- 既存Amidalaのindigoを再解釈し、BYARDのgreenはsuccess/connectedへ限定する
+- Manropeを見出し/utility、Noto Sans JPを本文に使う
+- 色だけで状態を表さず、iconと日本語labelを併用する
 
-- route/search paramsをZodで検証してQuery inputへ変換
-- Session cookieを保持したsame-origin endpoint
-- Hono RPCを使ったAPI呼び出し
-- Page DTOのcomposition
-- TanStack Queryの`queryOptions`とloader prefetch
-- API errorからroute error/pending UIへの変換
+最初から汎用TableやForm Builderを作らない。Todo/Handoffの画面を直接作り、2画面以上で同じ形が現れた時だけcomponentを共通化する。
 
-Web Workerは禁止事項は次の通り。
+色、typography、layout、motion、copy、accessibilityの具体値は [`docs/design/foundation.md`](../../design/foundation.md) を正本とする。既存画面からの移植判断は [`docs/product/legacy-ux-audit.md`](../../product/legacy-ux-audit.md) に記録する。
 
-- PostgreSQL/Hyperdriveへ直接接続する
-- Drizzle schemaやdomain moduleをimportする
-- BrowserへHono Service Binding clientを公開する
-- 認可やdomain invariantを最終決定する
+## 12. テスト予算
 
-## 12. ライブラリ
+初期実装で必須にするテストは次だけとする。
+
+- Todo/Handoffの主要happy path単体テスト1〜2本
+- 他組織の操作を拒否するAPI integration test 1本
+- Composition Root smoke test 1本
+- LoginからHandoff承認までのPlaywright E2E 1本
+
+細かな表示差分、全error branch、全DB制約をテストしない。実際にブラウザで触ったフィードバックを優先し、再発した不具合だけ回帰テストへ追加する。
+
+## 13. 実装順
+
+### Milestone 1: 触れる骨格
+
+- monorepo
+- TanStack Start画面
+- Hono API health
+- Awilix Composition Root
+- local PostgreSQL
+- Login画面
+
+### Milestone 2: 人と関係
+
+- Account / Organization / Membership
+- People一覧
+- Person詳細
+
+### Milestone 3: Todo/Handoff
+
+- Todo作成・一覧
+- Handoff Dialog
+- Inboxで承認・拒否
+- 画面への担当反映
+
+### Milestone 4: Preview
+
+- PlanetScale Postgres Tokyo
+- Hyperdrive
+- Cloudflare Web/API Workers
+- 主要導線E2E
+- ユーザーが実際に触るレビュー
+
+次の1on1設計は、Milestone 4の操作感レビュー後に開始する。
+
+## 14. 採用ライブラリ
 
 | 領域 | 採用 |
 | --- | --- |
-| workspace | pnpm workspaces + Turborepo |
+| workspace | pnpm + Turborepo |
 | Web/BFF | TanStack Start / Router / Query / Form |
+| UI | Tailwind CSS / Base UI / Lucide React |
 | API | Hono + Hono RPC |
 | validation | Zod |
-| auth | Better Auth core/minimal |
-| DI | Awilix strict mode |
-| database | PlanetScale Postgres Tokyo + Hyperdrive |
-| driver | node-postgres |
-| query/migration | Drizzle ORM + Drizzle Kit |
-| async | Cloudflare Queues + PostgreSQL outbox |
-| file | Cloudflare R2 |
-| unit tests | Vitest |
-| Worker tests | @cloudflare/vitest-pool-workers |
-| DB integration | Testcontainers PostgreSQL |
-| browser E2E | Playwright |
-| lint/boundary | ESLint + typescript-eslint + dependency-cruiser |
-| format | Prettier |
-| IDs | UUIDv7 |
+| auth | Better Auth core |
+| DI | Awilix |
+| DB | PostgreSQL / Hyperdrive |
+| query/migration | node-postgres / Drizzle ORM / Drizzle Kit |
+| tests | Vitest / Playwright |
 
-依存バージョンはscaffold時点のstableを調査して固定する。Better Authはminor versionも固定し、更新はschema diffと認証E2Eを通して行う。
+正確なversion、採用理由、代替案、Cloudflare制約は [`ADR-0001`](../../decisions/0001-technology-selection-2026-07-26.md) を正本とする。
 
-## 13. エラー設計
+## 15. 後から固める判断点
 
-application層の想定内失敗は、外部Resultライブラリを使わずdiscriminated unionで返す。
+実際に触った結果をもとに、次を必要な順番で判断する。
 
-```text
-{ ok: true, value }
-{ ok: false, error: { _tag, ...details } }
-```
-
-route adapterが`_tag`をHTTP statusと公開error codeへ変換する。DB例外や予期しない例外の内部情報は返さず、correlation IDだけを返す。認証不足は401、Membership/権限不足は403、競合は409、入力不正は400または422として一貫させる。
-
-## 14. テスト戦略
-
-### Domain/Application
-
-- pure unit test
-- fake repository、fake clock、deterministic ID generatorを直接注入
-- Handoff状態遷移の全分岐をtable-driven testで検証
-
-### PostgreSQL
-
-- Testcontainersで実PostgreSQLを起動
-- migrationを先頭から適用
-- FK、CHECK、UNIQUE、RLS、transaction rollbackを検証
-- 異なるOrganization間の参照がDBでも拒否されることを確認
-
-### Workers
-
-- Cloudflare Vitest integrationでBindingsとruntime差異を検証
-- Web/APIの単体Workerテスト
-- Service Bindingを含む複数Workerの統合はlocal WranglerまたはPlaywright E2Eで検証
-
-### E2E
-
-- signup -> organization作成 -> membership作成
-- Todo作成 -> Handoff申請 -> 相手が承認
-- 拒否、二重承認、他組織アクセス、未認証アクセス
-- logout後の直接API呼び出し
-
-## 15. デプロイとmigration
-
-デプロイ順は互換性を維持する。
-
-1. backward-compatible DB migration
-2. API Worker
-3. Web Worker
-4. Queue consumer
-5. 不要カラム削除は別リリース
-
-API Workerを先にデプロイし、Web Workerを後から切り替える。破壊的migrationとコード切替を同じリリースで行わない。rollback時にも旧APIが新schemaで動けるexpand/contract方式を使う。
-
-## 16. 既存Amidalaの扱い
-
-- 既存コード、DB、migration、設定は変更しない
-- 必要な仕様は読み取り調査し、新製品のdocsへ出典付きで再定義する
-- 既存schemaをそのまま新DBへ複製しない
-- 既存データ移行は新schemaと機能が安定した後の独立プロジェクトとする
-- 現段階では既存production credentialやDBを使用しない
-
-## 17. フェーズ分割
-
-### Phase A: Platform foundation
-
-- monorepo、CI、Workers、Service Binding
-- PostgreSQL、Hyperdrive、Drizzle migration
-- Better Auth、Account、Organization、Membership
-- Awilix Composition Root
-
-### Phase B: Todo/Handoff vertical slice
-
-- Relationship最小モデル
-- Todo、Assignment、Handoff
-- Web route、BFF Query、API commands/queries
-- outbox、テスト、preview deployment
-
-### Phase C以降
-
-- 1on1
-- Monthly Hearingとreporting projection
-- Knowledge/Advice
-- notification/integration
-- 既存データの選択的migration
-
-Phase C以降は、それぞれ別の設計書と実装計画を作る。
-
-## 18. 根拠資料
-
-- Linear: WF ストーリー→テーブル設計ガイド Part1 / Part2
-- Linear: Better Auth統合チェックリスト
-- Linear: ADR-V2-006 Effect-TS見送り
-- BYARD: Account / Membership / Organization、Definition / Executionモデル
-- そーだい: RDB THE Right Way
-- Cloudflare: Hyperdrive、Service Bindings、Workers testing
-- Better Auth: PostgreSQL、Hono、database schema
-- TanStack Start: authentication、hosting、server functions
-- Hono: RPC custom fetch / Service Binding
-- Drizzle: PostgreSQL、migration
+- Relationship中心の画面構成が使いやすいか
+- TodoとHandoffを分けて見せるべきか
+- 1on1をRelationship配下に置くべきか
+- roleをMembershipの1値から複数割当にするか
+- assignment履歴が必要か
+- RLS/outbox/Queueが必要になる運用条件は何か
+- 既存Amidalaから何を移行し、何を捨てるか
