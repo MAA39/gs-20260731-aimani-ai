@@ -159,6 +159,8 @@ DB / Auth / Peopleは水平分割せず、[Identity → People縦切り計画](.
 
 Task 4 verification completed against disposable `amidala_handoff`; desktop/mobile browser evidence and screenshots are recorded in `docs/research/2026-07-27-todo-handoff-verification.md`. Recipient role used the latest local Better Auth session row because logout UI is not implemented. Reduced-motion remains pending.
 
+Final review fixes `9108967` / `7527f41` scope Inbox read models to Membership parties, apply terminal `resolvedAt DESC` + SQL limit 20, keep Assigned Todo open-only and reactive through `useSuspenseQuery`, restrict accepted CTA to recipient/current assignee, and show Recent `resolvedAt`. Final API unit 2/2, integration 6/6, Web typecheck, full build, and diff-check pass. These structural/query fixes were not browser-rerun; independent review judged a rerun unnecessary.
+
 ### Task 7: One user-journey E2E and preview handoff
 
 **Files:**

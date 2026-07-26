@@ -16,8 +16,8 @@
 
 | command | result |
 |---|---|
-| `pnpm --filter @amidala/api test -- --run` | PASS（1 file / 2 tests） |
-| `TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff pnpm --filter @amidala/api test:integration -- todo-handoffs.integration.test.ts --run` | PASS（3 files / 4 tests。integration configが既存integration 3 fileを対象） |
+| `pnpm --filter @amidala/api test -- --run` | PASS（2/2 tests） |
+| `TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff pnpm --filter @amidala/api test:integration -- todo-handoffs.integration.test.ts --run` | PASS（6/6 tests） |
 | `pnpm --filter @amidala/web exec tsc --noEmit` | PASS |
 | `pnpm build --force` | PASS。Turbo warning: `@amidala/db#build` output files未設定のみ |
 | `pnpm --filter @amidala/api exec wrangler deploy --dry-run` | PASS。No bindings found。dry-runのみ |
@@ -34,12 +34,14 @@ recipient roleはlogout UIが未実装のため、ブラウザでMori loginを�
 
 初回Browser runでaccept後にstale UIが残る問題を検出し、`b45e87d`で`useSuspenseQuery` + invalidate/revalidationへ修正後、同じjourneyを再実行してRecent/Assigned Todoの更新を確認した。
 
+その後の最終レビューで、Organization全体のrecent漏洩とlimit-before-filter、Assigned routeのloader data stale、完了TodoのAssigned表示、accepted CTAのactor条件、Recentの`requestedAt`表示を検出した。`9108967`と`7527f41`で、requestedはMembership party scope、terminalはparty scope + `resolvedAt DESC`をSQLでlimit 20、Assignedはopenのみ、routeは`useSuspenseQuery`、accepted CTAはrecipientかつcurrent assigneeのみ、Recent日時は`resolvedAt`へ修正した。最終API unit 2/2、integration 6/6、Web typecheck、full build、diff-checkはPASS。独立reviewerは構造/query修正にBrowser再実行不要と判断したため、この2 commit後のBrowser再実行は行っていない。
+
 Screenshots: [accepted → recent desktop](../assets/todo-handoff/accepted-recent-desktop.png), [request Dialog mobile](../assets/todo-handoff/request-or-incoming-mobile.png)
 
 ## Deferred
 
-Task 3 deferred minor（raw anchor、recent `resolvedAt`）は未変更。reduced-motionは未エミュレートのためpending。
+Task 3でdeferredだったaccepted CTAとrecent `resolvedAt`は`7527f41`で解消した。reduced-motionは未エミュレートのためpending。
 
 ## 再利用できるlesson
 
-Dialogのfocus復帰と成功後wrapper focus、mutation後の関連Query invalidation、Organization-scoped typed navigation、SSR direct reloadのrequest-scoped QueryClient、そしてBrowser証拠がない場合に未確認を明示することを共通基準とする。
+Dialogのfocus復帰と成功後wrapper focus、mutation後の関連Query invalidation、Organization-scoped typed navigation、SSR direct reloadのrequest-scoped QueryClientを共通基準とする。Inbox read modelはOrganizationだけでなくactor partyでscopeし、filter/order/limitをSQL内でこの順に成立させる。Assigned Todoはopenのみ、terminal timelineは`resolvedAt`を表示し、CTAはactorと現在担当の双方を満たす場合だけ出す。
