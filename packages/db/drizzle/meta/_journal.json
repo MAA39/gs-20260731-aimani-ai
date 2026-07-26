@@ -8,6 +8,13 @@
       "when": 1785082388613,
       "tag": "0000_slimy_yellow_claw",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1785087620083,
+      "tag": "0001_neat_arclight",
+      "breakpoints": true
     }
   ]
 }
