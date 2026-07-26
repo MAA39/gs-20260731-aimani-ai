@@ -8,7 +8,6 @@ import { ApiError } from './errors/api-error';
 import { mountAuth } from './routes/auth';
 import { mountOrganizations } from './routes/organizations';
 import { createPeopleRoutes } from './routes/people';
-import { createTodoRoutes } from './routes/todos';
 
 export type ApiEnv = {
   Bindings: ApiBindings;
@@ -29,5 +28,5 @@ export function createApp({ rootContainer = createRootContainer() }: { rootConta
       console.error(err); return c.json({ error: { code: 'service_unavailable', message: 'Internal server error' } }, 500);
     })
     .get('/health', (c) => c.json(c.get('scope').resolve<HealthCheck>('healthCheck').execute()));
-  mountAuth(app); mountOrganizations(app); app.route('/', createPeopleRoutes()); return app.route('/', createTodoRoutes());
+  mountAuth(app); mountOrganizations(app); return app.route('/', createPeopleRoutes());
 }

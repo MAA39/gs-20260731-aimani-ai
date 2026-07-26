@@ -9,7 +9,6 @@ import { MembershipRepository } from '../infrastructure/db/membership-repository
 import { ListOrganizationMembershipsForUser } from '../application/list-organizations';
 import { PeopleRepository } from '../infrastructure/db/people-repository';
 import { ListMembersForCurrentOrganization } from '../application/list-people';
-import { TodoRepository } from '../infrastructure/db/todo-repository'; import { CreateTodoForRelationship } from '../application/create-todo'; import { ListSharedTodosForRelationship } from '../application/list-shared-todos';
 
 export interface RequestScopeArgs {
   env: ApiBindings;
@@ -20,7 +19,6 @@ export interface RequestCradle extends RootCradle {
   env: ApiBindings;
   request: Request;
   healthCheck: HealthCheck;
-  todoRepository: Promise<TodoRepository>; createTodoForRelationship: Promise<CreateTodoForRelationship>; listSharedTodosForRelationship: Promise<ListSharedTodosForRelationship>;
   databaseResource: Promise<DatabaseResource>; auth: Promise<ReturnType<typeof createAuth>>; membershipRepository: Promise<MembershipRepository>; listOrganizationMembershipsForUser: Promise<ListOrganizationMembershipsForUser>; peopleRepository: Promise<PeopleRepository>; listMembersForCurrentOrganization: Promise<ListMembersForCurrentOrganization>;
 }
 
@@ -53,9 +51,6 @@ export async function withRequestScope<T>(
     listOrganizationMembershipsForUser: asFunction(async ({ membershipRepository }: { membershipRepository: Promise<MembershipRepository> }) => new ListOrganizationMembershipsForUser(await membershipRepository)).scoped(),
     peopleRepository: asFunction(async ({ databaseResource }: { databaseResource: Promise<DatabaseResource> }) => new PeopleRepository((await databaseResource).database)).scoped(),
     listMembersForCurrentOrganization: asFunction(async ({ peopleRepository }: { peopleRepository: Promise<PeopleRepository> }) => new ListMembersForCurrentOrganization(await peopleRepository)).scoped(),
-    todoRepository: asFunction(async ({ databaseResource }: any) => new TodoRepository((await databaseResource).database)).scoped(),
-    createTodoForRelationship: asFunction(async ({ todoRepository,idGenerator,clock }: any) => new CreateTodoForRelationship(await todoRepository,idGenerator,clock)).scoped(),
-    listSharedTodosForRelationship: asFunction(async ({ todoRepository }: any) => new ListSharedTodosForRelationship(await todoRepository)).scoped(),
   });
 
   try {
