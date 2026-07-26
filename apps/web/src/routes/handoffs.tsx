@@ -1,4 +1,0 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { ArrowRight, Inbox } from 'lucide-react';
-export const Route = createFileRoute('/handoffs')({ component: HandoffsRoute });
-function HandoffsRoute(){ return <section className="content"><div className="intro"><p className="eyebrow">RESPONSIBILITY</p><h2>引き継ぎ</h2><p>担当が変わる仕事を、意図と一緒に確認します。</p></div><div className="rail-panel"><div className="rail-node"><span className="avatar">田</span><strong>田中 彩</strong></div><div className="rail-line"><span>Todo</span><ArrowRight size={18} aria-hidden="true"/></div><div className="rail-node"><span className="avatar warm">佐</span><strong>佐藤 花子</strong></div></div><div className="placeholder-surface"><Inbox size={24} aria-hidden="true"/><h3>引き継ぎ依頼はありません</h3><p>新しい依頼が届くと、ここで引き受けるか見送るかを選べます。</p></div></section> }

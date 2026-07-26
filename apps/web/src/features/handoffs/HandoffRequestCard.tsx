@@ -1,0 +1,16 @@
+import { Link } from '@tanstack/react-router';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { TodoHandoffSummary } from '@amidala/contracts';
+import { acceptTodoHandoff, rejectTodoHandoff, cancelTodoHandoff } from './handoffs.functions';
+import { todoHandoffWorkspaceKey } from './handoff-queries';
+import { assignedTodoWorkspaceKey } from '../todos/assigned-todo-queries';
+import { sharedTodoWorkspaceOrganizationPrefix } from '../todos/todo-queries';
+
+export function HandoffRequestCard({ handoff, kind }: { handoff: TodoHandoffSummary; kind: 'incoming' | 'outgoing' | 'recent' }) {
+  const mutation = useMutation({ mutationFn: async (action: 'accept' | 'reject' | 'cancel') => action === 'accept' ? acceptTodoHandoff({ data: { organizationId: handoff.organizationId, handoffId: handoff.handoffId } }) : action === 'reject' ? rejectTodoHandoff({ data: { organizationId: handoff.organizationId, handoffId: handoff.handoffId } }) : cancelTodoHandoff({ data: { organizationId: handoff.organizationId, handoffId: handoff.handoffId } }) });
+  const client = useQueryClient();
+  async function decide(action: 'accept' | 'reject' | 'cancel') { const result = await mutation.mutateAsync(action); await Promise.all([client.invalidateQueries({ queryKey: todoHandoffWorkspaceKey(handoff.organizationId), exact: true }), client.invalidateQueries({ queryKey: assignedTodoWorkspaceKey(handoff.organizationId), exact: true }), client.invalidateQueries({ queryKey: sharedTodoWorkspaceOrganizationPrefix(handoff.organizationId), exact: false })]); if (result.status === 'conflict') mutation.reset(); }
+  const date = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }).format(new Date(handoff.requestedAt));
+  const terminal = handoff.status !== 'requested';
+  return <article className={`handoff-card ${handoff.status}`} aria-busy={mutation.isPending}><div className="handoff-card-copy"><div className="todo-card-heading"><h3>{handoff.todo.title}</h3><span className="handoff-status">{handoff.status === 'requested' ? '引き継ぎを依頼中' : handoff.status === 'accepted' ? '引き継ぎ済み' : handoff.status === 'rejected' ? '引き継ぎを見送り' : '引き継ぎ依頼を取消済み'}</span></div><div className="handoff-rail"><span>{handoff.requester.name}</span><span className="todo-rail-line">Todo →</span><span>{handoff.recipient.name}</span></div>{handoff.requestMessage ? <p className="handoff-message">{handoff.requestMessage}</p> : null}<time dateTime={handoff.requestedAt}>{date}</time></div><div className="handoff-actions" aria-live="polite">{mutation.isPending ? <span>処理中…</span> : null}{kind === 'incoming' && !terminal ? <><button className="primary-button" disabled={mutation.isPending} onClick={() => decide('accept')}>引き受ける</button><button className="secondary-button" disabled={mutation.isPending} onClick={() => decide('reject')}>見送る</button></> : null}{kind === 'outgoing' && !terminal ? <button className="quiet-button" disabled={mutation.isPending} onClick={() => decide('cancel')}>依頼を取り消す</button> : null}{handoff.status === 'accepted' ? <Link className="quiet-button" to="/$organizationId/todos" params={{ organizationId: handoff.organizationId }}>自分のTodoで確認</Link> : null}</div></article>;
+}
