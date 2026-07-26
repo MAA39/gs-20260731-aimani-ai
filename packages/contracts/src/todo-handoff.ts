@@ -1,0 +1,12 @@
+import { z } from 'zod';
+import { todoMemberSummarySchema, todoSummarySchema } from './todo.js';
+export const todoHandoffStatusSchema=z.enum(['requested','accepted','rejected','canceled']);
+export const requestTodoHandoffBodySchema=z.object({recipientMembershipId:z.string().min(1),requestMessage:z.string().trim().max(500).optional()});
+export const requestTodoHandoffPathSchema=z.object({organizationId:z.string().min(1),todoId:z.string().min(1)});
+export const todoHandoffPathSchema=z.object({organizationId:z.string().min(1),handoffId:z.string().min(1)});
+export const organizationPathSchema=z.object({organizationId:z.string().min(1)});
+export const todoHandoffSummarySchema=z.object({handoffId:z.string(),organizationId:z.string(),todo:todoSummarySchema,requester:todoMemberSummarySchema,recipient:todoMemberSummarySchema,requestMessage:z.string().nullable(),status:todoHandoffStatusSchema,requestedAt:z.string(),resolvedAt:z.string().nullable()});
+export const todoHandoffResponseSchema=z.object({handoff:todoHandoffSummarySchema,todo:todoSummarySchema});
+export const todoHandoffWorkspaceSchema=z.object({organization:z.object({organizationId:z.string(),name:z.string()}),currentMember:todoMemberSummarySchema,incomingRequests:z.array(todoHandoffSummarySchema),outgoingRequests:z.array(todoHandoffSummarySchema),recentHandoffs:z.array(todoHandoffSummarySchema)});
+export const assignedTodoWorkspaceSchema=z.object({organization:z.object({organizationId:z.string(),name:z.string()}),currentMember:todoMemberSummarySchema,todos:z.array(todoSummarySchema)});
+export type TodoHandoffStatus=z.infer<typeof todoHandoffStatusSchema>; export type TodoHandoffSummary=z.infer<typeof todoHandoffSummarySchema>; export type TodoHandoffWorkspace=z.infer<typeof todoHandoffWorkspaceSchema>; export type AssignedTodoWorkspace=z.infer<typeof assignedTodoWorkspaceSchema>;

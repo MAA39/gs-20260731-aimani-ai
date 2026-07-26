@@ -94,7 +94,7 @@ export class TodoRepositoryDrizzle implements TodoRepositoryPort {
 
   private toTodoSummary(row: TodoRow, names?: { creatorName?: string | null; creatorTitle?: string | null; assigneeName?: string | null; assigneeTitle?: string | null }) {
     const member = (membershipId: string, name: string | null | undefined, title: string | null | undefined): TodoMemberSummary => ({ membershipId, name: name ?? '', title: title ?? null });
-    return { todoId: row.id, organizationId: row.organizationId, contextMembershipId: row.contextMembershipId, title: row.title, description: row.description, status: row.status as 'open' | 'completed', creator: member(row.creatorMembershipId, names?.creatorName, names?.creatorTitle), assignee: member(row.assigneeMembershipId, names?.assigneeName, names?.assigneeTitle), createdAt: row.createdAt.toISOString(), updatedAt: row.updatedAt.toISOString() };
+    return { todoId: row.id, organizationId: row.organizationId, contextMembershipId: row.contextMembershipId, title: row.title, description: row.description, status: row.status as 'open' | 'completed', creator: member(row.creatorMembershipId, names?.creatorName, names?.creatorTitle), assignee: member(row.assigneeMembershipId, names?.assigneeName, names?.assigneeTitle), createdAt: row.createdAt.toISOString(), updatedAt: row.updatedAt.toISOString(), pendingHandoff: null };
   }
 }
 
