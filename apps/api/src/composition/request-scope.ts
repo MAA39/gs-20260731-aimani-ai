@@ -9,6 +9,7 @@ import { MembershipRepository } from '../infrastructure/db/membership-repository
 import { ListOrganizationMembershipsForUser } from '../application/list-organizations';
 import { PeopleRepository } from '../infrastructure/db/people-repository';
 import { ListMembersForCurrentOrganization } from '../application/list-people';
+import { TodoRepository } from '../infrastructure/db/todo-repository'; import { CreateSharedTodo } from '../application/create-todo'; import { GetSharedTodoWorkspace } from '../application/list-shared-todos';
 
 export interface RequestScopeArgs {
   env: ApiBindings;
@@ -18,7 +19,7 @@ export interface RequestScopeArgs {
 export interface RequestCradle extends RootCradle {
   env: ApiBindings;
   request: Request;
-  healthCheck: HealthCheck;
+  healthCheck: HealthCheck; todoRepository: Promise<TodoRepository>; createSharedTodo: Promise<CreateSharedTodo>; getSharedTodoWorkspace: Promise<GetSharedTodoWorkspace>;
   databaseResource: Promise<DatabaseResource>; auth: Promise<ReturnType<typeof createAuth>>; membershipRepository: Promise<MembershipRepository>; listOrganizationMembershipsForUser: Promise<ListOrganizationMembershipsForUser>; peopleRepository: Promise<PeopleRepository>; listMembersForCurrentOrganization: Promise<ListMembersForCurrentOrganization>;
 }
 
@@ -51,6 +52,9 @@ export async function withRequestScope<T>(
     listOrganizationMembershipsForUser: asFunction(async ({ membershipRepository }: { membershipRepository: Promise<MembershipRepository> }) => new ListOrganizationMembershipsForUser(await membershipRepository)).scoped(),
     peopleRepository: asFunction(async ({ databaseResource }: { databaseResource: Promise<DatabaseResource> }) => new PeopleRepository((await databaseResource).database)).scoped(),
     listMembersForCurrentOrganization: asFunction(async ({ peopleRepository }: { peopleRepository: Promise<PeopleRepository> }) => new ListMembersForCurrentOrganization(await peopleRepository)).scoped(),
+    todoRepository: asFunction(async ({ databaseResource }: { databaseResource: Promise<DatabaseResource> }) => new TodoRepository((await databaseResource).database)).scoped(),
+    createSharedTodo: asFunction(async ({ todoRepository, idGenerator, clock }: { todoRepository: Promise<TodoRepository>; idGenerator: RootCradle['idGenerator']; clock: Clock }) => new CreateSharedTodo(await todoRepository, idGenerator, clock)).scoped(),
+    getSharedTodoWorkspace: asFunction(async ({ todoRepository }: { todoRepository: Promise<TodoRepository> }) => new GetSharedTodoWorkspace(await todoRepository)).scoped(),
   });
 
   try {

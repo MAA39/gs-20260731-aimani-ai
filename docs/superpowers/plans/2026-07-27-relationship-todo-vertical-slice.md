@@ -46,10 +46,10 @@
 
 **Interfaces:**
 - Produces table `todo(id, organization_id, context_membership_id, creator_membership_id, assignee_membership_id, title, description, status, created_at, updated_at)`.
-- Produces `CreateTodoForRelationship.execute(userId, input): Promise<TodoSummary>`.
-- Produces `ListSharedTodosForRelationship.execute(userId, input): Promise<RelationshipTodoWorkspace>`.
+- Produces `CreateSharedTodo.execute(userId, input): Promise<TodoSummary>`.
+- Produces `GetSharedTodoWorkspace.execute(userId, input): Promise<SharedTodoWorkspace>`.
 - Produces `GET|POST /organizations/:organizationId/people/:contextMembershipId/todos`.
-- Produces `createTodoInputSchema`, `relationshipTodoWorkspaceSchema`, `TodoSummary`, and `RelationshipTodoWorkspace` from `@amidala/contracts`.
+- Produces `createTodoInputSchema`, `sharedTodoWorkspaceSchema`, `TodoSummary`, and `SharedTodoWorkspace` from `@amidala/contracts`.
 
 - [ ] **Step 1: Write the failing integration test**
 
@@ -126,19 +126,19 @@ createTodoBodySchema = z.object({
   description: z.string().trim().max(2000).optional(),
   assigneeMembershipId: z.string().min(1),
 })
-relationshipTodoPathSchema = z.object({
+personTodoPathSchema = z.object({
   organizationId: z.string().min(1),
   contextMembershipId: z.string().min(1),
 })
 ```
 
-`TodoSummary` contains `todoId`, `organizationId`, `contextMembershipId`, `title`, `description: string | null`, `status`, `creator`, `assignee`, and ISO-string `createdAt`/`updatedAt`. `RelationshipTodoWorkspace` contains `organization: { organizationId: string; name: string }`, `currentMember: TodoMemberSummary`, `contextMember: MemberSummary`, and `todos: TodoSummary[]`. The API read model, not pathname parsing, provides the visible Organization name on direct navigation.
+`TodoSummary` contains `todoId`, `organizationId`, `contextMembershipId`, `title`, `description: string | null`, `status`, `creator`, `assignee`, and ISO-string `createdAt`/`updatedAt`. `SharedTodoWorkspace` contains `organization: { organizationId: string; name: string }`, `currentMember: TodoMemberSummary`, `contextMember: MemberSummary`, and `todos: TodoSummary[]`. The API read model, not pathname parsing, provides the visible Organization name on direct navigation.
 
 - [ ] **Step 5: Implement the pure application boundary**
 
 In `domain/todo.ts`, define `IdGenerator { next(): string }`, `CreateTodoCommand`, and the Todo read/write port types. Keep runtime validation at HTTP/contracts and business authorization in use cases.
 
-`CreateTodoForRelationship` must:
+`CreateSharedTodo` must:
 
 1. resolve active Current Membership from `userId + organizationId`;
 2. resolve active Context Membership from `contextMembershipId + organizationId`;
@@ -146,9 +146,9 @@ In `domain/todo.ts`, define `IdGenerator { next(): string }`, `CreateTodoCommand
 4. allow the assignee only when it equals current or context Membership;
 5. create an `open` Todo with server-derived creator, `idGenerator.next()`, and `clock.now()`.
 
-`ListSharedTodosForRelationship` performs the same current/context checks and asks the repository for the symmetric creator/context pair. Missing Current Membership is 403; missing Context Membership is a typed `not_found` 404.
+`GetSharedTodoWorkspace` performs the same current/context checks and asks the repository for the symmetric creator/context pair. Missing Current Membership is 403; missing Context Membership is a typed `not_found` 404.
 
-Register `idGenerator` in the root as `{ next: () => crypto.randomUUID() }`. Register `todoRepository`, `createTodoForRelationship`, and `listSharedTodosForRelationship` as scoped async Awilix resolvers, following existing DB disposal behavior.
+Register `idGenerator` in the root as `{ next: () => crypto.randomUUID() }`. Register `todoRepository`, `createSharedTodo`, and `getSharedTodoWorkspace` as scoped async Awilix resolvers, following existing DB disposal behavior.
 
 - [ ] **Step 6: Implement the Drizzle repository and Hono routes**
 
@@ -162,7 +162,7 @@ OR
 
 sort newest first by `created_at`, then `id` for deterministic ties. Read the current Relationship in both valid directions using the same `manager_report` direction and symmetric `peer|supporter` rule as PeopleRepository; return an empty `relationshipKinds` array when unset.
 
-The Hono POST parses path and JSON separately, calls `CreateTodoForRelationship`, and returns `{ todo }` with status 201. GET returns the `RelationshipTodoWorkspace`. Add `not_found` to `ApiErrorCode` with status 404. Preserve generic DB/configuration 503 mapping.
+The Hono POST parses path and JSON separately, calls `CreateSharedTodo`, and returns `{ todo }` with status 201. GET returns the `SharedTodoWorkspace`. Add `not_found` to `ApiErrorCode` with status 404. Preserve generic DB/configuration 503 mapping.
 
 - [ ] **Step 7: Run GREEN, existing tests, and commit**
 
@@ -194,8 +194,8 @@ Expected: the new test is 1/1 passing; existing API unit tests remain 2/2 passin
 
 **Interfaces:**
 - Consumes typed Hono endpoints from Task 1 through `@amidala/api-client`.
-- Produces `relationshipTodoWorkspaceQuery({ organizationId, contextMembershipId })`.
-- Produces `getRelationshipTodoWorkspace` GET Server Function and `createRelationshipTodo` POST Server Function.
+- Produces `sharedTodoWorkspaceQuery({ organizationId, contextMembershipId })`.
+- Produces `getSharedTodoWorkspace` GET Server Function and `createSharedTodo` POST Server Function.
 - Adds `queryClient` to typed TanStack Router context.
 
 - [ ] **Step 1: Pin and configure Query for SSR**
@@ -233,17 +233,17 @@ Do not create a module-global QueryClient.
 - preserves 403 as `forbidden`, 404 as `not_found`, validation as `validation_error`, and failures as `service_unavailable`;
 - validates every 200/201 body with the contract schemas before returning it.
 
-Use domain-specific names `getRelationshipTodoWorkspaceFromApi` and `createRelationshipTodoFromApi`, not generic `fetchData`/`postData`.
+Use domain-specific names `getSharedTodoWorkspaceFromApi` and `createSharedTodoFromApi`, not generic `fetchData`/`postData`.
 
 - [ ] **Step 3: Add stable query options**
 
 Define:
 
 ```ts
-export const relationshipTodoWorkspaceQuery = (input: RelationshipTodoPath) =>
+export const sharedTodoWorkspaceQuery = (input: PersonTodoPath) =>
   queryOptions({
-    queryKey: ['relationshipTodoWorkspace', input.organizationId, input.contextMembershipId],
-    queryFn: () => getRelationshipTodoWorkspace({ data: input }),
+    queryKey: ['sharedTodoWorkspace', input.organizationId, input.contextMembershipId],
+    queryFn: () => getSharedTodoWorkspace({ data: input }),
   })
 ```
 
@@ -276,7 +276,7 @@ Inspect the client build and ensure `cloudflare:workers`, DB, Hono server implem
 - Generated: `apps/web/src/routeTree.gen.ts`
 
 **Interfaces:**
-- Consumes `RelationshipTodoWorkspace` and Query/Server Functions from Task 2.
+- Consumes `SharedTodoWorkspace` and Query/Server Functions from Task 2.
 - Produces browser flow `/$organizationId/people` → `/$organizationId/people/$contextMembershipId/todos` → persisted Todo in the list.
 
 - [ ] **Step 1: Make People cards real navigation**
@@ -295,7 +295,7 @@ The route loader calls:
 
 ```ts
 context.queryClient.ensureQueryData(
-  relationshipTodoWorkspaceQuery({
+  sharedTodoWorkspaceQuery({
     organizationId: params.organizationId,
     contextMembershipId: params.contextMembershipId,
   }),
@@ -312,7 +312,7 @@ Use an uncontrolled native form and `FormData`. Fields:
 - `description` optional, maxLength 2000;
 - radio `assigneeMembershipId`: current member「自分が担当」default, or context member「<name>にお願い」.
 
-Use `useMutation({ mutationFn, onSuccess })`. The mutation function calls `createRelationshipTodo`. `onSuccess` awaits exact query invalidation and then resets the form. Disable submit while pending and display「Todoを作成中…」. Show Zod/API error near the form with `role="alert"`; show success in `aria-live="polite"` and through the refreshed list. Do not use `useEffect`, optimistic insertion, or a second action-state reducer.
+Use `useMutation({ mutationFn, onSuccess })`. The mutation function calls `createSharedTodo`. `onSuccess` awaits exact query invalidation and then resets the form. Disable submit while pending and display「Todoを作成中…」. Show Zod/API error near the form with `role="alert"`; show success in `aria-live="polite"` and through the refreshed list. Do not use `useEffect`, optimistic insertion, or a second action-state reducer.
 
 - [ ] **Step 4: Implement Person context and Todo cards**
 
@@ -320,14 +320,14 @@ The Page header shows:
 
 - backlink「Peopleへ戻る」;
 - context Member avatar, name, title, all Relationship labels or「関係を未設定」;
-- current Organization name from `RelationshipTodoWorkspace.organization`;
+- current Organization name from `SharedTodoWorkspace.organization`;
 - section label「共有Todo」. 存在しない「概要」routeやdisabled tabは表示しない。
 
 Each Todo card shows title, optional description, `未完了`/`完了`, creator name, current assignee name, and creation date. Use the Relationship rail visual language to connect「作成」→「現在の担当」. Empty copy is「この人との共有Todoはまだありません」with one action that focuses the title field.
 
 - [ ] **Step 5: Preserve Organization-aware navigation and responsive layout**
 
-Update authenticated-shell Organization extraction with the exact match `^/([^/]+)/people/([^/]+)/todos$`. On that route, derive `peopleTo = /$organizationId/people` and `todosTo = pathname`; render the desktop/mobile People Link with `peopleTo` and the Todos Link with `todosTo`, so Todos is active without navigating to the unscoped placeholder `/todos`. Organization-global Todos remains outside this slice. Use `RelationshipTodoWorkspace.organization.name` for the visible direct-navigation context. At 390px, composer and cards stack, touch targets are at least 44px, bottom navigation does not cover submit, and `scrollWidth === clientWidth`.
+Update authenticated-shell Organization extraction with the exact match `^/([^/]+)/people/([^/]+)/todos$`. On that route, derive `peopleTo = /$organizationId/people` and `todosTo = pathname`; render the desktop/mobile People Link with `peopleTo` and the Todos Link with `todosTo`, so Todos is active without navigating to the unscoped placeholder `/todos`. Organization-global Todos remains outside this slice. Use `SharedTodoWorkspace.organization.name` for the visible direct-navigation context. At 390px, composer and cards stack, touch targets are at least 44px, bottom navigation does not cover submit, and `scrollWidth === clientWidth`.
 
 - [ ] **Step 6: Verify and commit**
 

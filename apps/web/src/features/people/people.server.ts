@@ -14,7 +14,14 @@ export async function getPeopleFromApi({ organizationId }: PeopleInput): Promise
     if (cookie) headers.set('cookie', cookie);
     return apiBinding.fetch(new Request(input, { ...init, headers }));
   };
-  const response = await createApiClient(fetcher).organizations[':organizationId'].people.$get({ param: { organizationId } }, { headers: { cookie } });
+  // Hono's inferred client shape collapses the `/people` collection when a
+  // parameterized `/people/:contextMembershipId/todos` sibling is present.
+  // Keep the endpoint typed locally until the client generator can represent
+  // both collection and parameterized members on the same branch.
+  const peopleGet = createApiClient(fetcher).organizations[':organizationId'].people as unknown as {
+    $get: (args: { param: { organizationId: string } }, options: { headers: HeadersInit }) => Promise<Response>;
+  };
+  const response = await peopleGet.$get({ param: { organizationId } }, { headers: { cookie } });
   if (response.status === 401) throw redirect({ to: '/login' as never });
   const unavailable = (): GetPeopleResult => ({ status: 'error', error: { code: 'service_unavailable', message: 'People data is temporarily unavailable.' } });
   let body: unknown;

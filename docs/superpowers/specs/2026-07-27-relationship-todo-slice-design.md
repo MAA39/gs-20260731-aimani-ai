@@ -43,6 +43,8 @@ Peopleには「関係を未設定」のMemberも表示される。その二人�
 
 Todoは`context_membership_id`を必須・不変で持つ。これは「誰との文脈で生まれたか」という事実であり、現在の担当者や権限を表さない。Relationship labelは現在のRelationshipから読み、Todoへ複製しない。
 
+このため、ユースケースや読みモデルを`ForRelationship` / `RelationshipTodoWorkspace`とは呼ばない。Relationshipレコードが存在しない二者にも成立する実態を名前へ反映し、`CreateSharedTodo` / `GetSharedTodoWorkspace` / `SharedTodoWorkspace`とする。DBの`context_membership_id`は、Organization内で選択した相手を不変に指すため、そのまま使う。名前は実際の振る舞いを隠さず、理解の変化に合わせてモデルとともに更新するというDDDの基準に従う。[Eric Evans: Honest Names](https://www.domainlanguage.com/articles/good-design-is-imperfect-design-part-1-honest-names/)、[Martin Fowler: Ubiquitous Language](https://martinfowler.com/bliki/UbiquitousLanguage.html)
+
 ### TanStack Queryをこのsliceで導入する
 
 Todoはperson workspace、将来のorganization Todo一覧、Handoff inboxから同じデータを更新する。React `useActionState`だけではQuery cacheの所有と無効化を表せないため、一覧は`queryOptions`、作成は`useMutation`を採用する。
@@ -74,10 +76,10 @@ Todo
 ## 4. APIとアプリケーション語彙
 
 ```text
-ListSharedTodosForRelationship
-CreateTodoForRelationship
-TodoRepository.listSharedTodos(currentMembership, contextMembershipId)
-TodoRepository.createTodo(command)
+GetSharedTodoWorkspace
+CreateSharedTodo
+TodoRepository.getSharedTodoWorkspace(currentMembership, contextMembershipId)
+TodoRepository.createSharedTodo(command)
 
 GET  /organizations/:organizationId/people/:contextMembershipId/todos
 POST /organizations/:organizationId/people/:contextMembershipId/todos
@@ -98,7 +100,7 @@ type CreateTodoInput = {
 GET response:
 
 ```ts
-type RelationshipTodoWorkspace = {
+type SharedTodoWorkspace = {
   organization: { organizationId: string; name: string }
   currentMember: TodoMemberSummary
   contextMember: MemberSummary

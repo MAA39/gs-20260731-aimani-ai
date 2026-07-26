@@ -1,0 +1,10 @@
+import { z } from 'zod';
+import { memberSummarySchema } from './people.js';
+export const todoStatusSchema=z.enum(['open','completed']);
+export const todoMemberSummarySchema=z.object({membershipId:z.string().min(1),name:z.string(),title:z.string().nullable()});
+export const createTodoBodySchema=z.object({title:z.string().trim().min(1).max(160),description:z.string().trim().max(2000).optional(),assigneeMembershipId:z.string().min(1)});
+export const createTodoInputSchema=createTodoBodySchema;
+export const personTodoPathSchema=z.object({organizationId:z.string().min(1),contextMembershipId:z.string().min(1)});
+export const todoSummarySchema=z.object({todoId:z.string(),organizationId:z.string(),contextMembershipId:z.string(),title:z.string(),description:z.string().nullable(),status:todoStatusSchema,creator:todoMemberSummarySchema,assignee:todoMemberSummarySchema,createdAt:z.string(),updatedAt:z.string()});
+export const sharedTodoWorkspaceSchema=z.object({organization:z.object({organizationId:z.string(),name:z.string()}),currentMember:todoMemberSummarySchema,contextMember:memberSummarySchema,todos:z.array(todoSummarySchema)});
+export type TodoSummary=z.infer<typeof todoSummarySchema>; export type SharedTodoWorkspace=z.infer<typeof sharedTodoWorkspaceSchema>;

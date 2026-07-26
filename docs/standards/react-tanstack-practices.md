@@ -20,7 +20,10 @@ Effect は「React の外にある system と、画面表示を同期する」�
 | SHOULD | route ごとに pending / error / not-found を設計する |
 | SHOULD | filter/sort/page は typed URL search params に置き、render で導出する |
 | SHOULD | mutation 後は所有する Query または Router を明示的に invalidate する |
+| SHOULD | Query mutationの`onSuccess`で対象query keyの`invalidateQueries`をawaitし、再取得完了後にformをresetする |
 | SHOULD | form の pending/error は action state に置き、`aria-live` で結果を伝える |
+| MUST | SSRされる日時はproduct timezoneを明示し、server/client runtimeのtimezoneへ依存しない |
+| MUST | 子routeを持つfile routeは`Outlet`を描画するか、componentなしlayout + exact index routeへ分ける |
 | AVOID | `useEffect(() => setState(derivedValue))` |
 | AVOID | mount Effect から server data を fetch する |
 | AVOID | 特定 event の後処理を Effect で監視する |
@@ -97,10 +100,19 @@ DOM widget、subscription、analytics表示など外部systemとの同期?
 
 - `useEffect`、derived state、不要なmemoはまだ存在しない。
 - pathnameからpage titleを計算する実装はrender derivationであり妥当。
-- People/Todo/Handoffは静的placeholderなので、次のsliceでloader/action/pending/errorを追加する。
-- Organization switcher、account menu、People cardのbuttonはplaceholder。機能化する時にMenu/Link/actionの正しいsemanticへ置き換える。
-- TanStack Queryはまだ入れない。route専有dataで始め、共有cache/mutationが必要になるTaskで導入する。
+- PeopleとPerson SharedTodoはloader/action/pending/errorを持つ。Handoffだけが次sliceのplaceholder。
+- People cardはOrganization/Context Membershipを保持するsemantic Link、Todo composerはuncontrolled form + `useMutation`になった。
+- TanStack QueryはrequestごとのQueryClientで導入済み。loaderの`ensureQueryData`とPageの`useSuspenseQuery`を同じqueryOptionsで接続する。
+- Person SharedTodo作成後はexact query keyをawait invalidateし、作成者・現在担当を一覧本体へ反映してからformをresetする。
+- People親routeはOutlet専用、People一覧はexact index childとする。子route追加後はURLだけでなく実browser遷移を確認する。
+- Todo作成日は`Asia/Tokyo`を明示し、SSR/client hydrationを決定的にする。
 - StartのSSR entryとclient hydrationはbuild/local direct navigationで継続確認する。
+
+## Cloudflare deploy toolchain
+
+- API/Webとも`wrangler 4.114.0`を各workspaceへ明示する。transitive CLIへ依存しない。
+- WebのTanStack Start生成`dist/server/wrangler.json`はWeb workspaceのWranglerでdry-runする。
+- 4.102では生成configの`exports`がunknown field警告になり、4.114では警告なく通ることを2026-07-27に確認した。
 
 ## 公式根拠
 
