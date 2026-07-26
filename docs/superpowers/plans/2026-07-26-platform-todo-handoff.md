@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Put a working Login → People → Todo → Handoff → Accept/Reject experience in the browser as quickly as possible while preserving Account/Organization separation and Awilix DI.
+**Goal:** Put a working Login → People → Todo → Handoff → Accept/Reject experience in the browser as quickly as possible while preserving User/Organization separation and Awilix DI.
 
 **Architecture:** TanStack Start is the public Web/BFF Worker and calls a private Hono API Worker through a Service Binding and Hono RPC. The API owns Better Auth, Awilix request scopes, Drizzle, and PostgreSQL; the initial product uses simple application authorization and basic DB constraints rather than production-hardening every boundary.
 
@@ -15,7 +15,7 @@
 - Modify only `/Users/maa/Projects/gs/000_参照用/amidala-v2`.
 - Before every task, dispatch a read-only research agent using `docs/standards/research-before-build.md`; update the task brief from current official practices before implementation.
 - Optimize for a touchable browser experience; do not add coverage thresholds, exhaustive state tests, RLS, outbox, Queue, Webhook Worker, generic component frameworks, or speculative abstractions.
-- Keep Account independent from Organization and connect them through Membership.
+- Keep User independent from Organization and connect them through Membership. Reserve Better Auth `Account` for credentials.
 - Use Awilix only in the API Composition Root; domain/application code remains container-independent.
 - Web imports contracts/api-client only and never accesses PostgreSQL directly.
 - API queries always include the Principal's `organizationId`.
@@ -38,14 +38,14 @@
 **Produces:** `pnpm dev` opens an Amidala v2 shell and the API `/health` returns `{ "ok": true }`.
 
 - [x] Audit the shell against current React 19, TanStack Start, and Cloudflare practices; record the rules in `docs/standards/react-tanstack-practices.md`.
-- [ ] Pin the exact versions in ADR-0001 and install the workspace; if TypeScript 7 peer/build compatibility fails, record and use the newest compatible version.
-- [ ] Configure TanStack Start with the Cloudflare Vite plugin and Tailwind CSS.
-- [ ] Build the documented app shell: desktop left navigation and mobile bottom navigation for `People`, `Todos`, and `引き継ぎ`.
-- [ ] Add the home thesis「関係性から仕事を進める」and a People-first next action rather than a metric dashboard.
-- [ ] Implement the design tokens and typography from `docs/design/foundation.md`; add visible keyboard focus and reduced-motion defaults.
-- [ ] Add Hono `/health` and Web Worker Service Binding `API`.
-- [ ] Run `pnpm dev`, open the browser, and manually verify navigation and responsive layout.
-- [ ] Run `pnpm build` and commit `feat: add touchable Amidala v2 shell`.
+- [x] Pin the exact versions in ADR-0001 and install the workspace; TypeScript 7 / Worker build compatibility is verified.
+- [x] Configure TanStack Start with the Cloudflare Vite plugin and Tailwind CSS.
+- [x] Build the documented app shell: desktop left navigation and mobile bottom navigation for `People`, `Todos`, and `引き継ぎ`.
+- [x] Add the home thesis「関係性から仕事を進める」and a People-first next action rather than a metric dashboard.
+- [x] Implement the design tokens and typography from `docs/design/foundation.md`; add visible keyboard focus and reduced-motion defaults.
+- [x] Add Hono `/health` and Web Worker Service Binding `API`.
+- [x] Run `pnpm dev` and verify the desktop shell at 1280px and mobile bottom navigation at 390px in the in-app browser without horizontal overflow.
+- [x] Run `pnpm build` and commit `feat: add touchable Amidala v2 shell`.
 
 ### Task 2: Local PostgreSQL, Drizzle, and Awilix Composition Root
 
@@ -59,9 +59,11 @@
 
 **Status (2026-07-27):** DB・認証に先行し、Awilixのroot container、request scope、正常/例外時disposeの基盤は[DI専用計画](./2026-07-26-api-request-scoped-di.md)で実装・検証済み。以下はPostgreSQL / Drizzle / repositoryとの接続だけを残件とする。
 
-- [ ] Research current Drizzle/PostgreSQL/Hyperdrive/Awilix Workers practices and add the decisions to this task brief.
+DB / Auth / Peopleは水平分割せず、[Identity → People縦切り計画](./2026-07-27-identity-people-vertical-slice.md)でブラウザまで一本通す。この実装中はTask 2〜4の重複項目を別々に着手しない。
+
+- [x] Research current Drizzle/PostgreSQL/Hyperdrive/Awilix Workers practices and record the decisions in `docs/research/2026-07-26-auth-postgres-di.md`.
 - [ ] Add local PostgreSQL 17 with one documented `DATABASE_URL` in `.dev.vars.example`.
-- [ ] Add only the initial tables: Better Auth core tables, organizations, memberships, relationships, todos, handoffs.
+- [ ] Add only the identity slice tables first: Better Auth core tables, organizations, memberships, relationships. Add todos/handoffs in their own slice.
 - [ ] Use FK, UNIQUE, CHECK, and `organization_id`; do not add RLS or audit tables.
 - [x] Configure an Awilix root with a stateless Clock and create/dispose one child scope per request.
 - [ ] Add IdGenerator to the root and register DB/repositories in the request scope after PostgreSQL is introduced.
@@ -83,10 +85,10 @@
 - [ ] Research current Better Auth/Hono/Workers cookie, CSRF, session, and React 19 form practices and add them to this task brief.
 - [ ] Configure Better Auth core with email/password and renamed auth models; do not add Organization Plugin.
 - [ ] Proxy `/api/auth/*` through the Web Worker so cookies remain same-origin.
-- [ ] Add `createOrganization` that inserts Organization and owner Membership without modifying Account.
-- [ ] Seed a second demo Account and Membership for relationship/Handoff testing.
+- [ ] Add `createOrganization` that inserts Organization and owner Membership without modifying User or credential Account.
+- [ ] Seed a second demo User and Membership for relationship/Handoff testing.
 - [ ] Build Login and Organization selection screens with pending/error states.
-- [ ] Manually verify one Account can belong to two Organizations.
+- [ ] Manually verify one User can belong to two Organizations.
 - [ ] Commit `feat: add global accounts and organization login`.
 
 ### Task 4: People and Relationship experience

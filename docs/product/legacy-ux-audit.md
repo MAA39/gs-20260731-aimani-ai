@@ -56,7 +56,7 @@ Amidala は `/l/people/:uuid` の相手ワークスペースに `1on1`、`todo`�
 
 ### Account / Member / Organization の分離
 
-BYARD は Account を認証主体、Member を Organization 内の人物・権限として扱い、同じ Account の複数 Organization 所属を表現する。Amidala v2 では名称を Account / Membership に整理して継承する。
+BYARD は Account を認証主体、Member を Organization 内の人物・権限として扱い、同じ Account の複数 Organization 所属を表現する。Amidala v2 ではこの境界を継承しつつ、Better Authの公式語彙に合わせて User / Membership と呼ぶ。Accountはcredentialの意味に予約する。
 
 根拠:
 
@@ -91,7 +91,7 @@ BYARD の permission は Docs の説明より実装が多層化し、Stream/Work
 | People → 相手 workspace | そのまま継承 | People を初期 home とし、相手詳細から Todo へ入る |
 | 相手タブ | 再解釈 | 初期は Overview / Todos。1on1 / History / Goals は後続 slice |
 | Todo transfer | 再解釈 | request → accept/reject の明示 Handoff にする |
-| Account と Organization | そのまま継承 | Membership で接続し、一人が複数組織へ所属可能 |
+| User と Organization | そのまま継承 | Membership で接続し、一人が複数組織へ所属可能 |
 | Organization switcher | そのまま継承 | shell 上部に常設し、切替結果を明示する |
 | BYARD の Work 状態密度 | 再解釈 | Todo card に担当、関係、期限、handoff 状態を優先表示 |
 | 既存の固定 1104px layout | 不採用 | fluid content + max width。mobile では bottom navigation |
@@ -110,7 +110,7 @@ BYARD の permission は Docs の説明より実装が多層化し、Stream/Work
 
 ### 2. Organization switcher
 
-- Account と Organization が別であることを UI で自然に示す。
+- User と Organization が別であることを UI で自然に示す。
 - 現在の Organization、Membership role、切替先を一つの menu にする。
 - 切替後は People home へ移り、toast で現在地を伝える。
 
@@ -138,4 +138,3 @@ BYARD の permission は Docs の説明より実装が多層化し、Stream/Work
 - Angular の最終的な見た目は local 起動での目視確認が必要。
 - `Byard_mp4` の録画は BYARD の画面根拠であり、Amidala の画面として扱わない。
 - 初回 UI 実装後、legacy と新規を並べた screenshot critique を行う。
-

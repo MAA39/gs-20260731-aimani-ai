@@ -24,7 +24,7 @@
 ## 2. 初期リリースの成功条件
 
 - ブラウザ上で上記の導線を一通り操作できる
-- AccountはOrganizationから独立し、複数組織へMembershipで所属できる
+- UserはOrganizationから独立し、複数組織へMembershipで所属できる
 - Relationship、Todo、Handoffが画面上で理解できる
 - BrowserからDBや非公開APIへ直接アクセスしない
 - Handoffの承認時に担当者が正しく切り替わる
@@ -147,20 +147,20 @@ DIのための網羅的テストは作らない。Composition Rootが主要use c
 
 ## 8. 認証・組織モデル
 
-Better Auth coreを採用する。Organization Pluginは使わず、組織所属はドメインで管理する。
+Better Auth coreを採用する。Organization Pluginは使わず、組織所属はドメインで管理する。Better Authの公式語彙と衝突させないため、`User`を組織非依存のログイン主体、`Account`をpassword / OAuthなどのcredentialとする。
 
 ```text
-auth.accounts                  # グローバルなログイン主体
-auth.auth_identities           # password / OAuth identity
-auth.sessions
-auth.verifications
+user                           # グローバルなログイン主体
+account                        # password / OAuth credential
+session
+verification
 
-app.organizations
-app.memberships                # accountとorganizationを接続
-app.relationships
+organization
+membership                     # userとorganizationを接続
+relationship
 ```
 
-AccountはOrganizationが0件でも存在できる。Organizationを退会してもAccountや他組織のMembershipを変更しない。
+UserはOrganizationが0件でも存在できる。Organizationを退会してもUserや他組織のMembershipを変更しない。
 
 初期roleは`owner | manager | member`をMembershipに持つ。boolean role列は使わない。動的roleやrole履歴は実需要が出た時点で別テーブルへ切り出す。
 
@@ -171,10 +171,10 @@ AccountはOrganizationが0件でも存在できる。Organizationを退会して
 ### Organization / Membership
 
 ```text
-Account 1 -- N Membership N -- 1 Organization
+User 1 -- N Membership N -- 1 Organization
 ```
 
-`memberships`は`account_id`、`organization_id`、`role`、`status`を持つ。`UNIQUE(account_id, organization_id)`で重複所属を防ぐ。
+`membership`は`user_id`、`organization_id`、`role`、`status`を持つ。`UNIQUE(user_id, organization_id)`で重複所属を防ぐ。
 
 ### Relationship
 
@@ -193,7 +193,7 @@ Relationship
 ```text
 Todo
   - organization_id
-  - relationship_id
+  - relationship_context_id: nullable
   - title
   - description
   - status: open | completed
@@ -208,7 +208,7 @@ Handoff
   - responded_at
 ```
 
-承認時は1 transactionでHandoffをacceptedへ変更し、Todoの`assignee_membership_id`を相手へ更新する。完全なAssignment履歴は初期には作らず、Handoff行を最低限の履歴として画面表示する。
+`relationship_context_id`はTodoが生まれた関係の文脈であり、現在の担当者や認可境界を表さない。承認時は1 transactionでHandoffをacceptedへ変更し、Todoの`assignee_membership_id`を相手へ更新する。完全なAssignment履歴は初期には作らず、Handoff行を最低限の履歴として画面表示する。
 
 すべてのドメインテーブルに`organization_id`を持たせ、API queryでは必ずPrincipalのOrganization IDを条件へ含める。基本的なFK、UNIQUE、CHECKは使用するが、初期から複雑な複合FK/RLSは導入しない。
 
@@ -275,7 +275,7 @@ Web WorkerはDBへ接続せず、認可の最終判断もしない。
 
 ### Milestone 2: 人と関係
 
-- Account / Organization / Membership
+- User / Organization / Membership
 - People一覧
 - Person詳細
 

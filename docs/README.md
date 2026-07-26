@@ -20,6 +20,8 @@
 7. [デザイン基盤](design/foundation.md)
 8. [Amidala v2 UX-first プラットフォーム設計](superpowers/specs/2026-07-26-amidala-v2-platform-design.md)
 9. [Touchable MVP 実装計画](superpowers/plans/2026-07-26-platform-todo-handoff.md)
+10. [Identity → People 縦切り設計](superpowers/specs/2026-07-27-identity-people-vertical-slice-design.md)
+11. [Identity → People 実装計画](superpowers/plans/2026-07-27-identity-people-vertical-slice.md)
 
 ## 判断の優先順位
 

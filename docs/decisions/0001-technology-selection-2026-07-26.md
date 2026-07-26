@@ -73,7 +73,7 @@ Web と API を Service Binding で接続する。API Worker は公開 route を
 
 ### Better Auth — 採用（共通候補）
 
-framework-agnostic な TypeScript 認証を PostgreSQL 上で使える。Account は Organization から独立させるため、初期は Organization plugin を使わず、自前 Membership と接続する。
+framework-agnostic な TypeScript 認証を PostgreSQL 上で使える。Better Authの`User`をOrganizationから独立させ、`Account`はcredentialの意味に予約する。初期は Organization plugin を使わず、自前 Membership でUserとOrganizationを接続する。
 
 - 初期範囲: email/password、session、同一 origin cookie。
 - 後回し: SSO、SCIM、MFA、mail verification/reset。
@@ -93,7 +93,7 @@ DI は API の Composition Root だけで使う。root container は stateless d
 
 PostgreSQL の制約と移植性を保ち、SQL に近い Drizzle で schema/migration/query を記述する。本番 Worker は Hyperdrive binding の connection string を使う。
 
-- 採用理由: 型安全、軽量、SQL と schema が追跡しやすい。Account/Membership と Handoff transaction を自然に表せる。
+- 採用理由: 型安全、軽量、SQL と schema が追跡しやすい。User/Membership と Handoff transaction を自然に表せる。
 - 接続先: PlanetScale Postgres Tokyo を第一候補とする。preview 前に価格、リージョン、バックアップ、Hyperdrive 接続を再確認する。Supabase/Neon も代替可能。
 - 不採用: D1 は SQLite であり、今回の PostgreSQL 方針と将来の移植性に合わない。Prisma は edge/runtime と生成 engine の複雑さを避ける。Kysely は優れた query builder だが migration/schema の一体感を Drizzle に寄せる。
 - 制約: 長時間 transaction を作らない。初期は Hyperdrive query cache を無効にし、整合性を優先する。

@@ -1,8 +1,10 @@
 # Auth / PostgreSQL / DI Research Gate（2026-07-26）
 
+追補: 2026-07-27（Better Auth 1.6.25 / Drizzle ORM 0.45.2 / Cloudflare Hyperdrive公式資料を再確認）
+
 ## 目的
 
-Task 2 の Login → Organization 選択 → People を実装する前に、Cloudflare Workers、PostgreSQL、Better Auth、Drizzle、Awilix の現行プラクティスを公式資料から確認した記録。Amidala v2 だけでなく、同じ構成を採る新製品の叩き台として扱う。
+Identity → People 縦切りを実装する前に、Cloudflare Workers、PostgreSQL、Better Auth、Drizzle、Awilix の現行プラクティスを公式資料から確認した記録。Amidala v2 だけでなく、同じ構成を採る新製品の叩き台として扱う。
 
 優先順位は、金融系の過剰な堅牢性ではなく、ブラウザで早く触れて確認できること。そのうえで、認証・テナント境界・秘密情報の置き場所だけは後から崩しにくい形にする。
 
@@ -46,6 +48,8 @@ User ----< Account
 - People / Todo / Handoff などの業務データは `organizationId` を必須にし、query 時にも membership を検証する。
 
 Organization plugin の team、複雑なRBAC、invitation flowはMVPに先行導入しない。最初は organization 一覧、選択、membership 確認だけに絞る。
+
+Better Authのtable名とドメイン語彙は意味を反転させない。公式adapterの既定どおり`user`が組織非依存の人、`account`がcredential、`membership`がUserとOrganizationの接続である。Organization Pluginは使わず、`organization` / `membership` / `relationship`はアプリ側のDrizzle schemaとして管理する。
 
 ## Better Auth / TanStack Start
 
@@ -118,10 +122,10 @@ interfaces/http -> application -> domain
 
 MVPではWebhook WorkerもQueue resourceも作らない。同期use caseから外部Webhookを直接呼ばず、将来 `OutboxPublisher` / `EventPublisher` portをCloudflare Queue producerで実装できる依存方向にする。必要になった時点で `apps/webhook-worker` をconsumerとして追加し、retry / DLQ / idempotencyをそこで扱う。
 
-## Task 2 実装順
+## Identity → People 縦切りの実装順
 
 1. APIにDrizzle schema、DB factory、migration設定を追加する。
-2. Better Auth core + Organization schemaを生成する。
+2. Better Auth core schemaを生成し、Organization / Membership / Relationshipはアプリschemaとして追加する。
 3. Hono `/api/auth/*` とWeb/BFF proxyを接続する。
 4. Login画面を作り、成功後Organization chooserへ遷移させる。
 5. membershipを検証してPeopleを返すqueryを一本通す。
