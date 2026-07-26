@@ -14,11 +14,12 @@
 1. [再利用可能なプロダクト基準](standards/reusable-product-baseline.md)
 2. [実装前 Research Gate](standards/research-before-build.md)
 3. [React 19 / TanStack 実装プラクティス](standards/react-tanstack-practices.md)
-4. [技術選定記録](decisions/0001-technology-selection-2026-07-26.md)
-5. [既存プロダクト UX 監査](product/legacy-ux-audit.md)
-6. [デザイン基盤](design/foundation.md)
-7. [Amidala v2 UX-first プラットフォーム設計](superpowers/specs/2026-07-26-amidala-v2-platform-design.md)
-8. [Touchable MVP 実装計画](superpowers/plans/2026-07-26-platform-todo-handoff.md)
+4. [Auth / PostgreSQL / DI Research Gate](research/2026-07-26-auth-postgres-di.md)
+5. [技術選定記録](decisions/0001-technology-selection-2026-07-26.md)
+6. [既存プロダクト UX 監査](product/legacy-ux-audit.md)
+7. [デザイン基盤](design/foundation.md)
+8. [Amidala v2 UX-first プラットフォーム設計](superpowers/specs/2026-07-26-amidala-v2-platform-design.md)
+9. [Touchable MVP 実装計画](superpowers/plans/2026-07-26-platform-todo-handoff.md)
 
 ## 判断の優先順位
 
