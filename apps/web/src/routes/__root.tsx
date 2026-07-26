@@ -33,19 +33,21 @@ function ApplicationShell() {
   const personTodoMatch = pathname.match(/^\/([^/]+)\/people\/([^/]+)\/todos$/);
   const organizationId = personTodoMatch?.[1] ?? pathname.match(/^\/([^/]+)\/(?:people|todos|handoffs)/)?.[1];
   return <div className="app-shell">
-    <aside className="side-nav" aria-label="メインナビゲーション"><div className="brand"><span className="brand-mark">A</span><span>Amidala</span></div><p className="org-label">組織</p><Link className="org-switcher" to="/organizations">{organizationId ? '組織を切り替える' : '組織を選ぶ'} <span>⌄</span></Link><nav>{links.map((item) => <NavItem key={item.label} item={item} organizationId={organizationId} />)}</nav><div className="side-account"><div className="avatar small">?</div><div><strong>ログイン中</strong><span>アカウント</span></div></div></aside>
+    <aside className="side-nav" aria-label="メインナビゲーション"><div className="brand"><span className="brand-mark">A</span><span>Amidala</span></div><p className="org-label">組織</p><Link className="org-switcher" to="/organizations">{organizationId ? '組織を切り替える' : '組織を選ぶ'} <span>⌄</span></Link><nav>{links.map((item) => <NavItem key={item.label} item={item} organizationId={organizationId} pathname={pathname} />)}</nav><div className="side-account"><div className="avatar small">?</div><div><strong>ログイン中</strong><span>アカウント</span></div></div></aside>
     <main className="main-area"><header className="top-bar"><div><span className="eyebrow">{organizationId ? '現在の組織' : 'Amidala'}</span><h1>{pageTitle}</h1></div><span className="account-name">ログイン中</span></header><Outlet /></main>
-    <nav className="bottom-nav" aria-label="モバイルナビゲーション">{links.map((item) => <NavItem key={item.label} item={item} organizationId={organizationId} />)}</nav>
+    <nav className="bottom-nav" aria-label="モバイルナビゲーション">{links.map((item) => <NavItem key={item.label} item={item} organizationId={organizationId} pathname={pathname} />)}</nav>
   </div>;
 }
 
-function NavItem({ item, organizationId }: { item: (typeof links)[number]; organizationId?: string }) {
+function NavItem({ item, organizationId, pathname }: { item: (typeof links)[number]; organizationId?: string; pathname: string }) {
   const Icon = item.icon;
   if (!organizationId) return <Link to="/organizations" className="nav-link" activeOptions={{ exact: true }}><Icon size={19} aria-hidden="true"/><span>{item.label}</span></Link>;
   if (item.to === 'people') return <Link to="/$organizationId/people" params={{ organizationId }} activeOptions={{ exact: true }} className="nav-link" activeProps={{ className: 'nav-link active' }}><Icon size={19} aria-hidden="true"/><span>{item.label}</span></Link>;
-  if (item.to === 'todos') return <Link to="/$organizationId/todos" params={{ organizationId }} activeOptions={{ exact: true }} className="nav-link" activeProps={{ className: 'nav-link active' }}><Icon size={19} aria-hidden="true"/><span>{item.label}</span></Link>;
+  if (item.to === 'todos') return <Link to="/$organizationId/todos" params={{ organizationId }} activeOptions={{ exact: true }} className={`nav-link${personTodoMatchForNav(pathname) ? ' active' : ''}`} aria-current={personTodoMatchForNav(pathname) ? 'page' : undefined} activeProps={{ className: 'nav-link active', 'aria-current': 'page' }}><Icon size={19} aria-hidden="true"/><span>{item.label}</span></Link>;
   return <Link to="/$organizationId/handoffs" params={{ organizationId }} activeOptions={{ exact: true }} className="nav-link" activeProps={{ className: 'nav-link active' }}><Icon size={19} aria-hidden="true"/><span>{item.label}</span></Link>;
 }
+
+function personTodoMatchForNav(pathname: string) { return /^\/[^/]+\/people\/[^/]+\/todos$/.test(pathname); }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return <html lang="ja"><head><HeadContent /></head><body>{children}<Scripts /></body></html>;

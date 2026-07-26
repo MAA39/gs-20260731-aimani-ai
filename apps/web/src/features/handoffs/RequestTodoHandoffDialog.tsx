@@ -16,6 +16,7 @@ export function RequestTodoHandoffDialog({ organizationId, todo, currentMembersh
   const [recipientError, setRecipientError] = useState('');
   const [messageError, setMessageError] = useState('');
   const [conflict, setConflict] = useState('');
+  const [selectedRecipient, setSelectedRecipient] = useState('');
   const queryClient = useQueryClient();
   const people = useQuery({ ...peopleQuery(organizationId), enabled: open });
   const mutation = useMutation({ mutationFn: requestTodoHandoff });
@@ -37,7 +38,8 @@ export function RequestTodoHandoffDialog({ organizationId, todo, currentMembersh
     setOpen(false); await invalidate(); onRequested();
   }
   const candidates = people.data?.status === 'ok' ? people.data.people.filter((person) => person.membershipId !== currentMembershipId) : [];
-  return <Dialog.Root open={open} onOpenChange={setOpen}>
+  function handleOpenChange(nextOpen: boolean) { setOpen(nextOpen); if (!nextOpen) { setSelectedRecipient(''); setRecipientError(''); setMessageError(''); setConflict(''); } }
+  return <Dialog.Root open={open} onOpenChange={handleOpenChange}>
     <Dialog.Trigger className="secondary-button todo-handoff-trigger">引き継ぎを依頼</Dialog.Trigger>
     <Dialog.Portal><Dialog.Backdrop className="dialog-backdrop" /><Dialog.Viewport className="dialog-viewport"><Dialog.Popup className="dialog-popup">
       <Dialog.Title>Todoを引き継ぐ</Dialog.Title><Dialog.Description>{todo.title}</Dialog.Description>
@@ -46,10 +48,10 @@ export function RequestTodoHandoffDialog({ organizationId, todo, currentMembersh
         {people.data?.status === 'forbidden' ? <div className="handoff-state"><p>この組織のPeopleを閲覧できません。</p><a href="/organizations">組織を選び直す</a></div> : null}
         {people.data?.status === 'error' ? <div className="handoff-state"><p>{people.data.error.message}</p><button type="button" className="secondary-button" onClick={() => people.refetch()}>再試行</button></div> : null}
         {people.data?.status === 'ok' && candidates.length === 0 ? <p className="handoff-state">引き継ぎ先に選べるPeopleがいません。</p> : null}
-        {people.data?.status === 'ok' && candidates.length > 0 ? <label className="form-field">引き継ぎ先<select name="recipientMembershipId" defaultValue=""><option value="">選択してください</option>{candidates.map((person) => <option key={person.membershipId} value={person.membershipId}>{person.name} · {person.title ?? '役割を未設定'}</option>)}</select>{recipientError ? <span className="field-error">{recipientError}</span> : null}</label> : null}
+        {people.data?.status === 'ok' && candidates.length > 0 ? <label className="form-field">引き継ぎ先<select name="recipientMembershipId" value={selectedRecipient} onChange={(event) => { setSelectedRecipient(event.currentTarget.value); setRecipientError(''); }}><option value="">選択してください</option>{candidates.map((person) => <option key={person.membershipId} value={person.membershipId}>{person.name} · {person.title ?? '役割を未設定'}</option>)}</select>{recipientError ? <span className="field-error">{recipientError}</span> : null}</label> : null}
         <label className="form-field">依頼メッセージ（任意）<textarea name="requestMessage" maxLength={500} rows={4} placeholder="背景やお願いを伝えます" />{messageError ? <span className="field-error">{messageError}</span> : null}</label>
         {conflict ? <p className="field-error" role="alert">{conflict}</p> : null}
-        <div className="dialog-actions"><Dialog.Close className="secondary-button">閉じる</Dialog.Close><button className="primary-button" type="submit" disabled={mutation.isPending || !candidates.length}>{mutation.isPending ? '依頼中…' : '引き継ぎを依頼'}</button></div>
+        <div className="dialog-actions"><Dialog.Close className="secondary-button">閉じる</Dialog.Close><button className="primary-button" type="submit" disabled={mutation.isPending || !selectedRecipient}>{mutation.isPending ? '依頼中…' : '引き継ぎを依頼'}</button></div>
       </form>
     </Dialog.Popup></Dialog.Viewport></Dialog.Portal>
   </Dialog.Root>;
