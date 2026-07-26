@@ -1,5 +1,5 @@
 {
-  "id": "12b6887f-5325-4f5a-a841-ab43a7401bc0",
+  "id": "35dfba61-92d2-4934-aecc-0a785fa07d4d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -440,7 +440,7 @@
       "checkConstraints": {
         "membership_role_check": {
           "name": "membership_role_check",
-          "value": "\"membership\".\"role\" in ('owner', 'admin', 'member')"
+          "value": "\"membership\".\"role\" in ('owner', 'manager', 'member')"
         },
         "membership_status_check": {
           "name": "membership_status_check",

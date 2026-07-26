@@ -59,7 +59,7 @@ CREATE TABLE "membership" (
 	"updated_at" timestamp with time zone NOT NULL,
 	CONSTRAINT "membership_user_organization_unique" UNIQUE("user_id","organization_id"),
 	CONSTRAINT "membership_id_organization_unique" UNIQUE("id","organization_id"),
-	CONSTRAINT "membership_role_check" CHECK ("membership"."role" in ('owner', 'admin', 'member')),
+	CONSTRAINT "membership_role_check" CHECK ("membership"."role" in ('owner', 'manager', 'member')),
 	CONSTRAINT "membership_status_check" CHECK ("membership"."status" in ('active', 'invited', 'suspended'))
 );
 --> statement-breakpoint
