@@ -15,6 +15,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as OrganizationsRouteImport } from './routes/organizations'
 import { Route as TodosRouteImport } from './routes/todos'
 import { Route as OrganizationIdPeopleRouteImport } from './routes/$organizationId/people'
+import { Route as OrganizationIdPeopleContextMembershipIdTodosRouteImport } from './routes/$organizationId/people/$contextMembershipId/todos'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,12 @@ const OrganizationIdPeopleRoute = OrganizationIdPeopleRouteImport.update({
   path: '/$organizationId/people',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrganizationIdPeopleContextMembershipIdTodosRoute =
+  OrganizationIdPeopleContextMembershipIdTodosRouteImport.update({
+    id: '/$contextMembershipId/todos',
+    path: '/$contextMembershipId/todos',
+    getParentRoute: () => OrganizationIdPeopleRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -53,7 +60,8 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/organizations': typeof OrganizationsRoute
   '/todos': typeof TodosRoute
-  '/$organizationId/people': typeof OrganizationIdPeopleRoute
+  '/$organizationId/people': typeof OrganizationIdPeopleRouteWithChildren
+  '/$organizationId/people/$contextMembershipId/todos': typeof OrganizationIdPeopleContextMembershipIdTodosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -61,7 +69,8 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/organizations': typeof OrganizationsRoute
   '/todos': typeof TodosRoute
-  '/$organizationId/people': typeof OrganizationIdPeopleRoute
+  '/$organizationId/people': typeof OrganizationIdPeopleRouteWithChildren
+  '/$organizationId/people/$contextMembershipId/todos': typeof OrganizationIdPeopleContextMembershipIdTodosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -70,7 +79,8 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/organizations': typeof OrganizationsRoute
   '/todos': typeof TodosRoute
-  '/$organizationId/people': typeof OrganizationIdPeopleRoute
+  '/$organizationId/people': typeof OrganizationIdPeopleRouteWithChildren
+  '/$organizationId/people/$contextMembershipId/todos': typeof OrganizationIdPeopleContextMembershipIdTodosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,6 +91,7 @@ export interface FileRouteTypes {
     | '/organizations'
     | '/todos'
     | '/$organizationId/people'
+    | '/$organizationId/people/$contextMembershipId/todos'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -89,6 +100,7 @@ export interface FileRouteTypes {
     | '/organizations'
     | '/todos'
     | '/$organizationId/people'
+    | '/$organizationId/people/$contextMembershipId/todos'
   id:
     | '__root__'
     | '/'
@@ -97,6 +109,7 @@ export interface FileRouteTypes {
     | '/organizations'
     | '/todos'
     | '/$organizationId/people'
+    | '/$organizationId/people/$contextMembershipId/todos'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -105,7 +118,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   OrganizationsRoute: typeof OrganizationsRoute
   TodosRoute: typeof TodosRoute
-  OrganizationIdPeopleRoute: typeof OrganizationIdPeopleRoute
+  OrganizationIdPeopleRoute: typeof OrganizationIdPeopleRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -152,8 +165,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrganizationIdPeopleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$organizationId/people/$contextMembershipId/todos': {
+      id: '/$organizationId/people/$contextMembershipId/todos'
+      path: '/$contextMembershipId/todos'
+      fullPath: '/$organizationId/people/$contextMembershipId/todos'
+      preLoaderRoute: typeof OrganizationIdPeopleContextMembershipIdTodosRouteImport
+      parentRoute: typeof OrganizationIdPeopleRoute
+    }
   }
 }
+
+interface OrganizationIdPeopleRouteChildren {
+  OrganizationIdPeopleContextMembershipIdTodosRoute: typeof OrganizationIdPeopleContextMembershipIdTodosRoute
+}
+
+const OrganizationIdPeopleRouteChildren: OrganizationIdPeopleRouteChildren = {
+  OrganizationIdPeopleContextMembershipIdTodosRoute:
+    OrganizationIdPeopleContextMembershipIdTodosRoute,
+}
+
+const OrganizationIdPeopleRouteWithChildren =
+  OrganizationIdPeopleRoute._addFileChildren(OrganizationIdPeopleRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -161,7 +193,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   OrganizationsRoute: OrganizationsRoute,
   TodosRoute: TodosRoute,
-  OrganizationIdPeopleRoute: OrganizationIdPeopleRoute,
+  OrganizationIdPeopleRoute: OrganizationIdPeopleRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
