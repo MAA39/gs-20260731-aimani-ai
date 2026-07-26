@@ -37,7 +37,7 @@
 - Produces: `withRequestScope(root, { env, request }, execute): Promise<T>`
 - Produces: `createApp(options?): Hono<ApiEnv>`
 
-- [ ] **Step 1: Add pinned dependencies and the failing DI smoke test**
+- [x] **Step 1: Add pinned dependencies and the failing DI smoke test**
 
 Add `awilix@13.0.5` and `vitest@4.1.10`. The test must assert:
 
@@ -69,13 +69,13 @@ it('isolates request-scoped services and disposes resources', async () => {
 
 Add a second assertion in the same test file that throws inside `withRequestScope` and confirms the registered disposer still runs.
 
-- [ ] **Step 2: Run the focused test and verify RED**
+- [x] **Step 2: Run the focused test and verify RED**
 
 Run: `pnpm --filter @amidala/api test -- --run`
 
 Expected: FAIL because `root-container.ts` and `request-scope.ts` do not exist.
 
-- [ ] **Step 3: Implement the container-independent application service**
+- [x] **Step 3: Implement the container-independent application service**
 
 `health-check.ts` defines the `Clock` interface and a `HealthCheck` class. It must not import Awilix or Hono.
 
@@ -94,7 +94,7 @@ export class HealthCheck {
 }
 ```
 
-- [ ] **Step 4: Implement root and request containers**
+- [x] **Step 4: Implement root and request containers**
 
 `createRootContainer` uses `createContainer({ strict: true, injectionMode: InjectionMode.PROXY })` and registers only a system `clock` singleton.
 
@@ -106,7 +106,7 @@ export class HealthCheck {
 4. execute the callback;
 5. call `await scope.dispose()` in `finally`.
 
-- [ ] **Step 5: Wire Hono through middleware**
+- [x] **Step 5: Wire Hono through middleware**
 
 Change `app.ts` to export `createApp({ rootContainer } = {})`. Middleware wraps every request in `withRequestScope`, places the scope in Hono Variables, and calls `next()`. `/health` resolves `healthCheck` from `c.get('scope')`; the response remains exactly `{ "ok": true }`.
 
@@ -119,7 +119,7 @@ import { createRootContainer } from './composition/root-container';
 export default createApp({ rootContainer: createRootContainer() });
 ```
 
-- [ ] **Step 6: Run focused and full verification**
+- [x] **Step 6: Run focused and full verification**
 
 Run:
 
@@ -139,7 +139,7 @@ curl -fsS http://localhost:5173/api/health
 
 Expected body: `{"ok":true}`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add apps/api docs/superpowers/plans/2026-07-26-api-request-scoped-di.md pnpm-lock.yaml

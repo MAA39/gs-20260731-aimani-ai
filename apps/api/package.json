@@ -1,1 +1,1 @@
-{"name":"@amidala/api","private":true,"type":"module","scripts":{"build":"tsc -p tsconfig.json","test":"vitest"},"dependencies":{"awilix":"13.0.5","hono":"4.12.32"},"devDependencies":{"typescript":"7.0.2","vitest":"4.1.10","wrangler":"4.114.0"}}
+{"name":"@amidala/api","private":true,"type":"module","scripts":{"build":"tsc -p tsconfig.json","test":"tsc -p tsconfig.test.json && vitest"},"dependencies":{"awilix":"13.0.5","hono":"4.12.32"},"devDependencies":{"typescript":"7.0.2","vitest":"4.1.10","wrangler":"4.114.0"}}
