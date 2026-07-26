@@ -154,10 +154,10 @@ DB / Auth / Peopleは水平分割せず、[Identity → People縦切り計画](.
 - [x] Add one API integration test proving a session from another Organization cannot decide the Handoff.
 - [x] Build a Base UI Dialog for choosing the recipient and an Inbox card with Accept/Reject actions.
 - [x] Show a lightweight timeline using the Handoff row; do not add a generic audit/event system.
-- [ ] Run the two tests and manually complete both accept and reject flows in the browser (Task 4: Browser unavailable; NEEDS_CONTEXT).
+- [x] Run the two tests and manually complete both accept and reject flows in the browser (Task 4 desktop/mobile verification recorded; reduced-motion remains pending).
 - [x] Commit `feat: add interactive Todo handoff`.
 
-Task 4 local verification completed API/build/dry-run checks against disposable `amidala_handoff`; real browser journeys and screenshot capture remain pending until an In-App Browser is available.
+Task 4 verification completed against disposable `amidala_handoff`; desktop/mobile browser evidence and screenshots are recorded in `docs/research/2026-07-27-todo-handoff-verification.md`. Recipient role used the latest local Better Auth session row because logout UI is not implemented. Reduced-motion remains pending.
 
 ### Task 7: One user-journey E2E and preview handoff
 

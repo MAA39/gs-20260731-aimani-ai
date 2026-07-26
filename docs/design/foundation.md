@@ -187,9 +187,7 @@ Button は結果を表す。「送信」ではなく「引き継ぎを依頼」�
 
 ### Todo Handoff 検証（2026-07-27）
 
-ローカルの隔離DB（`amidala_handoff`）へのmigration/seed、API unit/integration、Web typecheck/build、Wrangler dry-runは完了した。一方、この実行環境では指定のIn-App Browserが利用できず（`Browser is not available: iab`）、desktop/mobileの実画面・focus・overflow・reduced-motion・console結果は未確認とした。スクリーンショットは実画面以外から作成しない。
-
-実ブラウザで再開する際は、1280×900でaccepted Handoffがrecentへ移るrail、390×844でDialogとincoming cardの44px操作領域、`scrollWidth === clientWidth`、reduced-motion時の責任node位置固定、fresh tabのhydration/application console 0件を確認し、結果を`docs/research/2026-07-27-todo-handoff-verification.md`へ追記する。
+1280×720でaccepted HandoffがincomingからRecentへ即時移るrailと、Assigned Todoで森 ハルへ責任が移ることを確認した。390×844ではrequest Dialogのrecipient初期focus、未選択時submit disabled、Close `80×48.4` / submit `144×50.4`、`clientWidth=390` / `scrollWidth=375`を確認した。warn/error logsは空。reduced-motionは未エミュレートのためpending。実画面は[desktop](../assets/todo-handoff/accepted-recent-desktop.png) / [mobile](../assets/todo-handoff/request-or-incoming-mobile.png)に保存した。
 
 2026-07-27 に Identity → People の最初の縦切りを実ブラウザで確認した。
 
