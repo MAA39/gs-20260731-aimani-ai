@@ -15,6 +15,13 @@
       "when": 1785087620083,
       "tag": "0001_neat_arclight",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785087809183,
+      "tag": "0002_gray_eddie_brock",
+      "breakpoints": true
     }
   ]
 }
