@@ -147,15 +147,17 @@ DB / Auth / Peopleは水平分割せず、[Identity → People縦切り計画](.
 
 **Produces:** The assignee can request a Handoff; the recipient can accept/reject it; acceptance updates the visible Todo assignee.
 
-- [ ] Research current transaction, command idempotency, concurrent decision, action-state, and accessible Dialog practices; add the selected primitives to this task brief.
-- [ ] Implement requested/accepted/rejected state and the single acceptance transaction.
+- [x] Research current transaction, command idempotency, concurrent decision, action-state, and accessible Dialog practices; add the selected primitives to this task brief.
+- [x] Implement requested/accepted/rejected state and the single acceptance transaction.
 - [ ] Give Handoff an explicit `organization_id`, composite FKs to Todo/from/to Membership, and one requested Handoff per Todo.
-- [ ] Add one focused unit test for request → recipient accept → assignee changed.
-- [ ] Add one API integration test proving a session from another Organization cannot decide the Handoff.
-- [ ] Build a Base UI Dialog for choosing the recipient and an Inbox card with Accept/Reject actions.
-- [ ] Show a lightweight timeline using the Handoff row; do not add a generic audit/event system.
-- [ ] Run the two tests and manually complete both accept and reject flows in the browser.
-- [ ] Commit `feat: add interactive Todo handoff`.
+- [x] Add one focused unit test for request → recipient accept → assignee changed.
+- [x] Add one API integration test proving a session from another Organization cannot decide the Handoff.
+- [x] Build a Base UI Dialog for choosing the recipient and an Inbox card with Accept/Reject actions.
+- [x] Show a lightweight timeline using the Handoff row; do not add a generic audit/event system.
+- [ ] Run the two tests and manually complete both accept and reject flows in the browser (Task 4: Browser unavailable; NEEDS_CONTEXT).
+- [x] Commit `feat: add interactive Todo handoff`.
+
+Task 4 local verification completed API/build/dry-run checks against disposable `amidala_handoff`; real browser journeys and screenshot capture remain pending until an In-App Browser is available.
 
 ### Task 7: One user-journey E2E and preview handoff
 

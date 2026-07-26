@@ -98,6 +98,13 @@ DOM widget、subscription、analytics表示など外部systemとの同期?
 
 ## 現在の shell 監査
 
+### Handoff 検証で再利用する実装基準
+
+- Dialogは依頼入力に限定し、inline decisionは確認Dialogへ二重化しない。閉じる操作では元のtriggerへfocusを戻し、依頼成功後にtriggerが置換される場合は安定したTodo action/status wrapperへfocusを移す。
+- Handoff mutation成功後はTodo assignee・Handoff inbox・Assigned Todoを所有するQuery keyへ明示的に`invalidateQueries`し、再取得完了後にformをresetする。競合結果は汎用500ではなく、verbごとのhandled 409 copyへ変換する。
+- Organization IDはtyped pathに保持し、loader/API queryとnavigation Linkの両方で同じIDを利用する。SSR direct reloadでもrequestごとのQueryClientで同じOrganization境界を再現する。
+- 実ブラウザ確認では、focus/overflow/SSR/consoleを画面サイズ別に記録する。今回の環境ではBrowser接続不可のため、これらは未確認として扱い、推測で完了扱いにしない。
+
 - `useEffect`、derived state、不要なmemoはまだ存在しない。
 - pathnameからpage titleを計算する実装はrender derivationであり妥当。
 - PeopleとPerson SharedTodoはloader/action/pending/errorを持つ。Handoffだけが次sliceのplaceholder。

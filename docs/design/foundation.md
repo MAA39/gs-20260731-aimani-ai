@@ -185,6 +185,12 @@ Button は結果を表す。「送信」ではなく「引き継ぎを依頼」�
 
 ## 実画面レビュー記録
 
+### Todo Handoff 検証（2026-07-27）
+
+ローカルの隔離DB（`amidala_handoff`）へのmigration/seed、API unit/integration、Web typecheck/build、Wrangler dry-runは完了した。一方、この実行環境では指定のIn-App Browserが利用できず（`Browser is not available: iab`）、desktop/mobileの実画面・focus・overflow・reduced-motion・console結果は未確認とした。スクリーンショットは実画面以外から作成しない。
+
+実ブラウザで再開する際は、1280×900でaccepted Handoffがrecentへ移るrail、390×844でDialogとincoming cardの44px操作領域、`scrollWidth === clientWidth`、reduced-motion時の責任node位置固定、fresh tabのhydration/application console 0件を確認し、結果を`docs/research/2026-07-27-todo-handoff-verification.md`へ追記する。
+
 2026-07-27 に Identity → People の最初の縦切りを実ブラウザで確認した。
 
 - 1280×900: Login、組織選択、Acme Studio / Northstar Lab の People、組織切替を確認。
