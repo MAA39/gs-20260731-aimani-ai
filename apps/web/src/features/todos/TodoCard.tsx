@@ -2,7 +2,7 @@ import { CheckCircle2, Circle } from 'lucide-react';
 import type { TodoSummary } from '@amidala/contracts';
 
 export function TodoCard({ todo }: { todo: TodoSummary }) {
-  const createdAt = new Intl.DateTimeFormat('ja-JP', { year: 'numeric', month: 'short', day: 'numeric' }).format(new Date(todo.createdAt));
+  const createdAt = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: 'short', day: 'numeric' }).format(new Date(todo.createdAt));
   return <article className="todo-card">
     <div className="todo-card-heading"><h3>{todo.title}</h3><span className={`todo-status ${todo.status === 'completed' ? 'is-complete' : ''}`}>{todo.status === 'completed' ? <CheckCircle2 size={16} aria-hidden="true" /> : <Circle size={16} aria-hidden="true" />}{todo.status === 'completed' ? '完了' : '未完了'}</span></div>
     {todo.description ? <p className="todo-description">{todo.description}</p> : null}
