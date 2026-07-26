@@ -13,6 +13,7 @@
 ## Global Constraints
 
 - Modify only `/Users/maa/Projects/gs/000_参照用/amidala-v2`.
+- Before every task, dispatch a read-only research agent using `docs/standards/research-before-build.md`; update the task brief from current official practices before implementation.
 - Optimize for a touchable browser experience; do not add coverage thresholds, exhaustive state tests, RLS, outbox, Queue, Webhook Worker, generic component frameworks, or speculative abstractions.
 - Keep Account independent from Organization and connect them through Membership.
 - Use Awilix only in the API Composition Root; domain/application code remains container-independent.
@@ -36,6 +37,7 @@
 
 **Produces:** `pnpm dev` opens an Amidala v2 shell and the API `/health` returns `{ "ok": true }`.
 
+- [x] Audit the shell against current React 19, TanStack Start, and Cloudflare practices; record the rules in `docs/standards/react-tanstack-practices.md`.
 - [ ] Pin the exact versions in ADR-0001 and install the workspace; if TypeScript 7 peer/build compatibility fails, record and use the newest compatible version.
 - [ ] Configure TanStack Start with the Cloudflare Vite plugin and Tailwind CSS.
 - [ ] Build the documented app shell: desktop left navigation and mobile bottom navigation for `People`, `Todos`, and `引き継ぎ`.
@@ -55,6 +57,7 @@
 
 **Produces:** API requests resolve a request-scoped DB/repository graph through Awilix and close the DB Client afterward.
 
+- [ ] Research current Drizzle/PostgreSQL/Hyperdrive/Awilix Workers practices and add the decisions to this task brief.
 - [ ] Add local PostgreSQL 17 with one documented `DATABASE_URL` in `.dev.vars.example`.
 - [ ] Add only the initial tables: Better Auth core tables, organizations, memberships, relationships, todos, handoffs.
 - [ ] Use FK, UNIQUE, CHECK, and `organization_id`; do not add RLS or audit tables.
@@ -74,6 +77,7 @@
 
 **Produces:** A user can sign up/sign in, create or select an Organization, and enter the authenticated app.
 
+- [ ] Research current Better Auth/Hono/Workers cookie, CSRF, session, and React 19 form practices and add them to this task brief.
 - [ ] Configure Better Auth core with email/password and renamed auth models; do not add Organization Plugin.
 - [ ] Proxy `/api/auth/*` through the Web Worker so cookies remain same-origin.
 - [ ] Add `createOrganization` that inserts Organization and owner Membership without modifying Account.
@@ -94,6 +98,7 @@
 
 **Produces:** People shows organization members and their relationship to the signed-in user; a person detail page becomes the entry to their shared work.
 
+- [ ] Research current Router loader/search/prefetch and accessible People-list patterns; add the selected primitives to this task brief.
 - [ ] Seed manager/report and peer Relationships for demo users.
 - [ ] Add `GET /organizations/:id/people` and person detail queries scoped by Principal organization.
 - [ ] Build a card list showing name, role, relationship kind, and open Todo count.
@@ -112,6 +117,7 @@
 
 **Produces:** A user can create a Todo for a Relationship and immediately see it assigned on the person detail screen.
 
+- [ ] Research current TanStack Query/Form, React Actions, invalidation, and optimistic UI practices; add the selected primitives to this task brief.
 - [ ] Define small Zod contracts for title, optional description, relationship, and assignee.
 - [ ] Add create/list API routes that derive creator and organization from Principal.
 - [ ] Use TanStack Query optimistic feedback only for the submitting state; refetch after success.
@@ -130,6 +136,7 @@
 
 **Produces:** The assignee can request a Handoff; the recipient can accept/reject it; acceptance updates the visible Todo assignee.
 
+- [ ] Research current transaction, command idempotency, concurrent decision, action-state, and accessible Dialog practices; add the selected primitives to this task brief.
 - [ ] Implement requested/accepted/rejected state and the single acceptance transaction.
 - [ ] Add one focused unit test for request → recipient accept → assignee changed.
 - [ ] Add one API integration test proving a session from another Organization cannot decide the Handoff.
@@ -148,6 +155,7 @@
 
 **Produces:** One command verifies the main UX locally, and the project is ready for explicit approval to provision/deploy preview resources.
 
+- [ ] Research current Cloudflare preview, Hyperdrive, Workers CI, and Playwright practices before writing deployment/CI configuration.
 - [ ] Write one Playwright journey: login as owner → open person → create Todo → request Handoff → login as recipient → accept → see new assignee.
 - [ ] Run only build, typecheck, the four focused tests, and that E2E in CI; do not add coverage gates.
 - [ ] Document a five-minute local demo with demo credentials and expected screens.

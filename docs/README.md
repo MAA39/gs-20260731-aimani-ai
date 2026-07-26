@@ -12,11 +12,13 @@
 ## 最初に読む順番
 
 1. [再利用可能なプロダクト基準](standards/reusable-product-baseline.md)
-2. [技術選定記録](decisions/0001-technology-selection-2026-07-26.md)
-3. [既存プロダクト UX 監査](product/legacy-ux-audit.md)
-4. [デザイン基盤](design/foundation.md)
-5. [Amidala v2 UX-first プラットフォーム設計](superpowers/specs/2026-07-26-amidala-v2-platform-design.md)
-6. [Touchable MVP 実装計画](superpowers/plans/2026-07-26-platform-todo-handoff.md)
+2. [実装前 Research Gate](standards/research-before-build.md)
+3. [React 19 / TanStack 実装プラクティス](standards/react-tanstack-practices.md)
+4. [技術選定記録](decisions/0001-technology-selection-2026-07-26.md)
+5. [既存プロダクト UX 監査](product/legacy-ux-audit.md)
+6. [デザイン基盤](design/foundation.md)
+7. [Amidala v2 UX-first プラットフォーム設計](superpowers/specs/2026-07-26-amidala-v2-platform-design.md)
+8. [Touchable MVP 実装計画](superpowers/plans/2026-07-26-platform-todo-handoff.md)
 
 ## 判断の優先順位
 
@@ -36,5 +38,5 @@
 - UX を既存製品から移植した場合は `product/legacy-ux-audit.md` の分類を更新する。
 - 色、文字、余白、状態表現の変更は `design/foundation.md` を先に更新する。
 - 共通基準と Amidala 固有判断を混ぜない。
+- 各実装スライスの前にResearch Gateを通し、公式知見をtask briefへ反映する。
 - Docs の完全性より、触れるプロダクトとの一致を優先する。
-
