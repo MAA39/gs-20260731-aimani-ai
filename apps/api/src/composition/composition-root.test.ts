@@ -2,8 +2,15 @@ import { asFunction } from 'awilix';
 import { describe, expect, it } from 'vitest';
 import { createRootContainer } from './root-container';
 import { withRequestScope } from './request-scope';
+import type { ApiBindings } from '../config/env';
 
-const requestArgs = () => ({ env: {}, request: new Request('http://localhost') });
+const requestArgs = () => ({
+  env: {
+    BETTER_AUTH_SECRET: 'test-secret',
+    BETTER_AUTH_URL: 'http://localhost:5173',
+  } satisfies ApiBindings,
+  request: new Request('http://localhost'),
+});
 
 describe('request-scoped composition root', () => {
   it('isolates request-scoped services and disposes resources', async () => {
