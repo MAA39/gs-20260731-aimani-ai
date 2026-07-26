@@ -38,7 +38,7 @@
 - Produces: `createNodePgDatabase(connectionString): { client: pg.Client; db: NodePgDatabase<typeof schema> }`
 - Produces: `closeNodePgDatabase(resource): Promise<void>`
 - Produces: Drizzle tables `user`, `account`, `session`, `verification`, `organization`, `membership`, `relationship`
-- Produces: scripts `pnpm db:up`, `pnpm db:migrate`, `pnpm db:seed`, `pnpm db:down`
+- Produces: scripts `pnpm db:up`, `pnpm db:migrate`, `pnpm db:down`
 
 - [ ] **Step 1: Pin packages and create the local database contract**
 
@@ -87,7 +87,7 @@ Run:
 ```bash
 pnpm install
 cp apps/api/.dev.vars.example apps/api/.dev.vars
-pnpm --filter @amidala/db drizzle-kit generate
+pnpm --filter @amidala/db exec drizzle-kit generate
 pnpm db:up
 pnpm db:migrate
 ```
