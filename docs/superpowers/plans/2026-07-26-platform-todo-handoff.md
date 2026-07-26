@@ -62,14 +62,14 @@
 DB / Auth / Peopleは水平分割せず、[Identity → People縦切り計画](./2026-07-27-identity-people-vertical-slice.md)でブラウザまで一本通す。この実装中はTask 2〜4の重複項目を別々に着手しない。
 
 - [x] Research current Drizzle/PostgreSQL/Hyperdrive/Awilix Workers practices and record the decisions in `docs/research/2026-07-26-auth-postgres-di.md`.
-- [ ] Add local PostgreSQL 17 with one documented `DATABASE_URL` in `.dev.vars.example`.
-- [ ] Add only the identity slice tables first: Better Auth core tables, organizations, memberships, relationships. Add todos/handoffs in their own slice.
-- [ ] Use FK, UNIQUE, CHECK, and `organization_id`; do not add RLS or audit tables.
+- [x] Add local PostgreSQL 17 with one documented `DATABASE_URL` in `.dev.vars.example`.
+- [x] Add only the identity slice tables first: Better Auth core tables, organizations, memberships, relationships. Add todos/handoffs in their own slice.
+- [x] Use FK, UNIQUE, CHECK, and `organization_id`; do not add RLS or audit tables.
 - [x] Configure an Awilix root with a stateless Clock and create/dispose one child scope per request.
-- [ ] Add IdGenerator to the root and register DB/repositories in the request scope after PostgreSQL is introduced.
-- [ ] Add one smoke test that resolves the main use-case factory and confirms disposal closes its fake DB Client.
-- [ ] Run the migration, `/health`, and the DI smoke test.
-- [ ] Commit `feat: add PostgreSQL and request-scoped DI`.
+- [x] Add IdGenerator to the root and register DB/repositories in the request scope after PostgreSQL is introduced.
+- [x] Add one smoke test that resolves the main use-case factory and confirms disposal closes its fake DB Client.
+- [x] Run the migration, `/health`, and the DI smoke test.
+- [x] Commit the PostgreSQL and request-scoped DI slice.
 
 ### Task 3: Login and organization context
 
@@ -82,14 +82,14 @@ DB / Auth / Peopleは水平分割せず、[Identity → People縦切り計画](.
 
 **Produces:** A user can sign up/sign in, create or select an Organization, and enter the authenticated app.
 
-- [ ] Research current Better Auth/Hono/Workers cookie, CSRF, session, and React 19 form practices and add them to this task brief.
-- [ ] Configure Better Auth core with email/password and renamed auth models; do not add Organization Plugin.
+- [x] Research current Better Auth/Hono/Workers cookie, CSRF, session, and React 19 form practices and add them to this task brief.
+- [x] Configure Better Auth core with email/password and the canonical User/Account model names; do not add Organization Plugin.
 - [ ] Proxy `/api/auth/*` through the Web Worker so cookies remain same-origin.
 - [ ] Add `createOrganization` that inserts Organization and owner Membership without modifying User or credential Account.
-- [ ] Seed a second demo User and Membership for relationship/Handoff testing.
-- [ ] Build Login and Organization selection screens with pending/error states.
-- [ ] Manually verify one User can belong to two Organizations.
-- [ ] Commit `feat: add global accounts and organization login`.
+- [x] Seed a second demo User and Membership for relationship/Handoff testing.
+- [x] Build Login and Organization selection screens with pending/error states.
+- [x] Manually verify one User can belong to two Organizations.
+- [x] Commit the global accounts and Organization login slice.
 
 ### Task 4: People and Relationship experience
 
@@ -103,8 +103,8 @@ DB / Auth / Peopleは水平分割せず、[Identity → People縦切り計画](.
 
 **Produces:** People shows organization members and their relationship to the signed-in user; a person detail page becomes the entry to their shared work.
 
-- [ ] Research current Router loader/search/prefetch and accessible People-list patterns; add the selected primitives to this task brief.
-- [ ] Seed manager/report and peer Relationships for demo users.
+- [x] Research current Router loader/search/prefetch and accessible People-list patterns; add the selected primitives to this task brief.
+- [x] Seed manager/report and peer Relationships for demo users.
 - [ ] Add `GET /organizations/:id/people` and person detail queries scoped by Principal organization.
 - [ ] Build a card list showing name, role, relationship kind, and open Todo count.
 - [ ] Build a person header and empty Todo state with a prominent「Todoを作る」button.
