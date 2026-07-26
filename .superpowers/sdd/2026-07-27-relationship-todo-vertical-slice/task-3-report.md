@@ -39,3 +39,5 @@ git diff --check
 レビュー追加修正: `document` のグローバル検索を廃止し、Page が所有する `RefObject` を Composer に渡して空状態 action から title input に focus する構造へ変更した。
 
 最終レビュー修正: `useRef` を条件分岐より前へ移動し、loader 結果の status が変わっても Hooks の呼び出し順が一定になるようにした。
+
+ブラウザ確認で、People route が親になった際に PeoplePage が `<Outlet />` を描画せず、Todo URL でも People 一覧を表示し続ける問題を発見した。People route を layout + `Outlet` に分離し、既存 loader / PeoplePage は `people/index.tsx` へ移動して、Todo 子 route が実際に描画される階層へ修正した。

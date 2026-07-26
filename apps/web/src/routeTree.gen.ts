@@ -15,6 +15,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as OrganizationsRouteImport } from './routes/organizations'
 import { Route as TodosRouteImport } from './routes/todos'
 import { Route as OrganizationIdPeopleRouteImport } from './routes/$organizationId/people'
+import { Route as OrganizationIdPeopleIndexRouteImport } from './routes/$organizationId/people/index'
 import { Route as OrganizationIdPeopleContextMembershipIdTodosRouteImport } from './routes/$organizationId/people/$contextMembershipId/todos'
 
 const IndexRoute = IndexRouteImport.update({
@@ -47,6 +48,12 @@ const OrganizationIdPeopleRoute = OrganizationIdPeopleRouteImport.update({
   path: '/$organizationId/people',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrganizationIdPeopleIndexRoute =
+  OrganizationIdPeopleIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => OrganizationIdPeopleRoute,
+  } as any)
 const OrganizationIdPeopleContextMembershipIdTodosRoute =
   OrganizationIdPeopleContextMembershipIdTodosRouteImport.update({
     id: '/$contextMembershipId/todos',
@@ -61,6 +68,7 @@ export interface FileRoutesByFullPath {
   '/organizations': typeof OrganizationsRoute
   '/todos': typeof TodosRoute
   '/$organizationId/people': typeof OrganizationIdPeopleRouteWithChildren
+  '/$organizationId/people/': typeof OrganizationIdPeopleIndexRoute
   '/$organizationId/people/$contextMembershipId/todos': typeof OrganizationIdPeopleContextMembershipIdTodosRoute
 }
 export interface FileRoutesByTo {
@@ -69,7 +77,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/organizations': typeof OrganizationsRoute
   '/todos': typeof TodosRoute
-  '/$organizationId/people': typeof OrganizationIdPeopleRouteWithChildren
+  '/$organizationId/people': typeof OrganizationIdPeopleIndexRoute
   '/$organizationId/people/$contextMembershipId/todos': typeof OrganizationIdPeopleContextMembershipIdTodosRoute
 }
 export interface FileRoutesById {
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/organizations': typeof OrganizationsRoute
   '/todos': typeof TodosRoute
   '/$organizationId/people': typeof OrganizationIdPeopleRouteWithChildren
+  '/$organizationId/people/': typeof OrganizationIdPeopleIndexRoute
   '/$organizationId/people/$contextMembershipId/todos': typeof OrganizationIdPeopleContextMembershipIdTodosRoute
 }
 export interface FileRouteTypes {
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/organizations'
     | '/todos'
     | '/$organizationId/people'
+    | '/$organizationId/people/'
     | '/$organizationId/people/$contextMembershipId/todos'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/organizations'
     | '/todos'
     | '/$organizationId/people'
+    | '/$organizationId/people/'
     | '/$organizationId/people/$contextMembershipId/todos'
   fileRoutesById: FileRoutesById
 }
@@ -165,6 +176,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrganizationIdPeopleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$organizationId/people/': {
+      id: '/$organizationId/people/'
+      path: '/'
+      fullPath: '/$organizationId/people/'
+      preLoaderRoute: typeof OrganizationIdPeopleIndexRouteImport
+      parentRoute: typeof OrganizationIdPeopleRoute
+    }
     '/$organizationId/people/$contextMembershipId/todos': {
       id: '/$organizationId/people/$contextMembershipId/todos'
       path: '/$contextMembershipId/todos'
@@ -176,10 +194,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface OrganizationIdPeopleRouteChildren {
+  OrganizationIdPeopleIndexRoute: typeof OrganizationIdPeopleIndexRoute
   OrganizationIdPeopleContextMembershipIdTodosRoute: typeof OrganizationIdPeopleContextMembershipIdTodosRoute
 }
 
 const OrganizationIdPeopleRouteChildren: OrganizationIdPeopleRouteChildren = {
+  OrganizationIdPeopleIndexRoute: OrganizationIdPeopleIndexRoute,
   OrganizationIdPeopleContextMembershipIdTodosRoute:
     OrganizationIdPeopleContextMembershipIdTodosRoute,
 }
