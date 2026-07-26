@@ -1,11 +1,11 @@
 import { Hono } from 'hono';
 import { createRootContainer, type RootContainer } from './composition/root-container';
-import { withRequestScope } from './composition/request-scope';
+import { withRequestScope, type RequestScope } from './composition/request-scope';
 import { HealthCheck } from './application/health-check';
 
 export type ApiEnv = {
   Bindings: Record<string, unknown>;
-  Variables: { scope: RootContainer };
+  Variables: { scope: RequestScope };
 };
 
 export function createApp({ rootContainer = createRootContainer() }: { rootContainer?: RootContainer } = {}) {

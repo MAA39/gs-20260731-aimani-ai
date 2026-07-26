@@ -1,23 +1,31 @@
 import { asFunction, asValue, type AwilixContainer } from 'awilix';
-import { HealthCheck } from '../application/health-check';
-import type { RootContainer } from './root-container';
+import { HealthCheck, type Clock } from '../application/health-check';
+import type { RootContainer, RootCradle } from './root-container';
 
 export interface RequestScopeArgs {
   env: unknown;
   request: Request;
 }
 
+export interface RequestCradle extends RootCradle {
+  env: unknown;
+  request: Request;
+  healthCheck: HealthCheck;
+}
+
+export type RequestScope = AwilixContainer<RequestCradle>;
+
 export async function withRequestScope<T>(
   root: RootContainer,
   { env, request }: RequestScopeArgs,
-  execute: (scope: AwilixContainer) => Promise<T>,
+  execute: (scope: RequestScope) => Promise<T>,
 ): Promise<T> {
-  const scope = root.createScope();
+  const scope = root.createScope() as RequestScope;
   scope.register({
     env: asValue(env),
     request: asValue(request),
     healthCheck: asFunction(
-      ({ clock }: { clock: ConstructorParameters<typeof HealthCheck>[0] }) => new HealthCheck(clock),
+      ({ clock }: { clock: Clock }) => new HealthCheck(clock),
     ).scoped(),
   });
 

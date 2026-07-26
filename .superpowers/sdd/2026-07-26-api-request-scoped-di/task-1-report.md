@@ -33,3 +33,11 @@
 - `apps/api/src/app.ts` から Awilix の型 import を削除し、composition が公開する `RootContainer` alias を `ApiEnv.Variables.scope` に使用。Awilix import は composition 配下に限定。
 - `pnpm --filter @amidala/api test -- --run`: exit 0、2 test files / 4 tests passed。
 - `pnpm --filter @amidala/api build`: exit 0（TypeScript 成功）。
+
+## Final Review Fix
+
+- `root-container.ts` の未使用 `HealthCheck` 値 import を削除。
+- `RootCradle` / `RequestCradle` と typed `RootContainer` / `RequestScope` alias を composition 配下に定義し、`app.ts` は `RequestScope` のみ参照。`healthCheck` の `resolve()` 名が型保証される構成に変更。
+- `pnpm --filter @amidala/api test -- --run`: exit 0、2 test files / 4 tests passed。
+- `pnpm --filter @amidala/api build`: exit 0。
+- `pnpm build`: turbo 2 successful、exit 0。
