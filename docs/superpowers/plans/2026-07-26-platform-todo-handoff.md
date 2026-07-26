@@ -103,13 +103,15 @@ DB / Auth / Peopleは水平分割せず、[Identity → People縦切り計画](.
 
 **Produces:** People shows organization members and their relationship to the signed-in user; a person detail page becomes the entry to their shared work.
 
+**Status (2026-07-27):** [Identity → People縦切り](./2026-07-27-identity-people-vertical-slice.md)と[Person SharedTodo縦切り](./2026-07-27-relationship-todo-vertical-slice.md)で実装・実ブラウザ検証済み。open Todo countは実データの一覧が成立した後の判断として、このsliceでは意図的に表示していない。
+
 - [x] Research current Router loader/search/prefetch and accessible People-list patterns; add the selected primitives to this task brief.
 - [x] Seed manager/report and peer Relationships for demo users.
-- [ ] Add `GET /organizations/:id/people` and person detail queries scoped by Principal organization.
+- [x] Add `GET /organizations/:id/people` and person detail queries scoped by Principal organization.
 - [ ] Build a card list showing name, role, relationship kind, and open Todo count.
-- [ ] Build a person header and empty Todo state with a prominent「Todoを作る」button.
-- [ ] Verify the screen manually with owner and demo member sessions.
-- [ ] Commit `feat: add relationship-centered people screens`.
+- [x] Build a person header and empty Todo state with a prominent「Todoを作る」button.
+- [x] Verify the screen manually with owner and demo member sessions.
+- [x] Commit the relationship-centered People screens.
 
 ### Task 5: Todo creation and list
 
@@ -121,15 +123,17 @@ DB / Auth / Peopleは水平分割せず、[Identity → People縦切り計画](.
 - Create: `apps/web/src/features/todos/TodoComposer.tsx`, `apps/web/src/features/todos/TodoCard.tsx`
 - Create: `apps/web/src/routes/$organizationId/people/$contextMembershipId/todos.tsx`
 
-**Produces:** A user can create a Todo for a Relationship and immediately see it assigned on the person detail screen.
+**Produces:** A user can create a SharedTodo in a Person context and immediately see its creator and current assignee on the same screen. A Relationship row is not required.
 
-- [ ] Research current TanStack Query/Form, React Actions, invalidation, and optimistic UI practices; add the selected primitives to this task brief.
-- [ ] Define small Zod contracts for title, optional description, context Membership, and assignee.
-- [ ] Add create/list API routes that derive creator and organization from Principal.
-- [ ] Use TanStack Query optimistic feedback only for the submitting state; refetch after success.
-- [ ] Build useful empty, pending, validation-error, and saved states.
-- [ ] Manually create Todos as both demo users and confirm separation by Organization.
-- [ ] Commit `feat: add relationship Todo flow`.
+**Status (2026-07-27):** [Person SharedTodo縦切り](./2026-07-27-relationship-todo-vertical-slice.md)でAPI/BFF/UIを実装。fresh DBでowner/member、Acme/Northstar分離、1280×900/390×844、direct SSR、Cloudflare dry-runを検証済み。
+
+- [x] Research current TanStack Query, React form, invalidation, and optimistic UI practices; record the selected primitives.
+- [x] Define small Zod contracts for title, optional description, context Membership, and assignee.
+- [x] Add create/list API routes that derive creator and organization from Principal.
+- [x] Keep only submitting feedback local, await exact Query invalidation, and refetch after success without optimistic insertion.
+- [x] Build useful empty, pending, validation-error, forbidden/not-found, and saved states.
+- [x] Manually create Todos as both demo users and confirm separation by Organization.
+- [x] Commit the Person SharedTodo flow.
 
 ### Task 6: Handoff interaction
 
