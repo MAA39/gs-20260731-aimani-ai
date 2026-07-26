@@ -13,6 +13,7 @@
 
 - `@tanstack/react-query`を`5.101.4`、`@tanstack/react-router-ssr-query`を`1.167.1`へ固定。
 - RouterごとにQueryClientを生成し、query stale time 30秒、mutation retry無効を設定。
+- Router型登録は`ReturnType<typeof getRouter>`で行い、`main.tsx`の起動時に`getRouter()`を呼ぶ。module-globalなQueryClient/Router instanceは作らない。
 - `PersonTodoPath` / `CreateSharedTodoInput`をvalidatorで検証。
 - `getSharedTodoWorkspaceFromApi` / `createSharedTodoFromApi`を追加。
   - cookieをAPI Workerへ転送。
