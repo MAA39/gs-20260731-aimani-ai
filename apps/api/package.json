@@ -1,0 +1,1 @@
+{"name":"@amidala/api","private":true,"type":"module","scripts":{"build":"tsc -p tsconfig.json"},"dependencies":{"hono":"4.12.32"},"devDependencies":{"typescript":"7.0.2","wrangler":"4.114.0"}}
