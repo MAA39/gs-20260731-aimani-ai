@@ -37,3 +37,7 @@ status: DONE_WITH_CONCERNS
 - HandoffPageが常時mountedのpage-level `liveMessage`/`aria-live`領域を所有し、各HandoffRequestCardへ`onAnnounce`を渡す構造へ変更。
 - card mutationはpending開始、success、409 conflict、forbidden/error、例外をpage callbackへ通知するため、invalidate後のcard移動/unmount後も結果をannounce可能。
 - useEffectなし、mutationは引き続きcard単位。
+
+## Fix round 2
+
+- `HandoffPage` の `useState` を non-ok early return より前へ移動し、result状態遷移時もHooks順序を常に一定化。
