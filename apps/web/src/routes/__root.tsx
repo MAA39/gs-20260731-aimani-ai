@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
-import { HeadContent, Link, Outlet, Scripts, createRootRoute, useLocation } from '@tanstack/react-router';
+import { HeadContent, Link, Outlet, Scripts, createRootRouteWithContext, useLocation } from '@tanstack/react-router';
+import type { QueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { CheckSquare, Inbox, Users } from 'lucide-react';
 import appCss from '../styles.css?url';
@@ -10,7 +11,7 @@ const links = [
   { to: '/handoffs', label: '引き継ぎ', icon: Inbox },
 ] as const;
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
       { charSet: 'utf-8' },
