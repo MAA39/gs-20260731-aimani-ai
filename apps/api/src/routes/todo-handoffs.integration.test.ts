@@ -1,6 +1,8 @@
+import { randomUUID } from 'node:crypto';
+import pg from 'pg';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { sharedTodoWorkspaceSchema, todoSummarySchema } from '@amidala/contracts';
+import { sharedTodoWorkspaceSchema, todoHandoffWorkspaceSchema, todoSummarySchema } from '@amidala/contracts';
 import { createApp } from '../app';
 
 const env = {
@@ -35,6 +37,7 @@ const assignedWorkspaceSchema = z.object({
 
 type Resource = z.infer<typeof resourceSchema>;
 type AssignedWorkspace = z.infer<typeof assignedWorkspaceSchema>;
+type HandoffWorkspace = z.infer<typeof todoHandoffWorkspaceSchema>;
 type ErrorBody = z.infer<typeof errorSchema>;
 type HandoffResponse = {
   status: number;
@@ -106,6 +109,12 @@ describe('Todo Handoff API', () => {
     const response = await app.fetch(new Request('http://localhost:8787/organizations/org_acme_studio/todos/assigned-to-me', { headers: { cookie } }), env);
     expect(response.status).toBe(200);
     return assignedWorkspaceSchema.parse(await response.json());
+  };
+
+  const getHandoffWorkspace = async (cookie: string): Promise<HandoffWorkspace> => {
+    const response = await app.fetch(new Request('http://localhost:8787/organizations/org_acme_studio/handoffs', { headers: { cookie } }), env);
+    expect(response.status).toBe(200);
+    return todoHandoffWorkspaceSchema.parse(await response.json());
   };
 
   const getSharedTodos = async (cookie: string) => {
@@ -191,5 +200,95 @@ describe('Todo Handoff API', () => {
       recipientMembershipId: currentAssigneeId === 'acme-studio-sato' ? 'acme-studio-owner' : 'acme-studio-mori',
     });
     expect(rerequested.status).toBe(201);
+  });
+
+  it('shows only Handoffs involving the current Member before applying the recent limit', async () => {
+    const ownerCookie = await signIn('owner@amidala.local');
+    const fixtureId = randomUUID();
+    const db = new pg.Client({ connectionString: env.DATABASE_URL });
+    await db.connect();
+    try {
+      await db.query("delete from todo where id like 'todo-workspace-%'");
+      const insertHandoff = async (input: {
+        sequence: number;
+        requesterMembershipId: string;
+        recipientMembershipId: string;
+        status: 'requested' | 'rejected';
+        resolvedAt?: Date;
+      }) => {
+        const todoId = `todo-workspace-${fixtureId}-${input.sequence}`;
+        const handoffId = `handoff-workspace-${fixtureId}-${input.sequence}`;
+        const assigneeMembershipId = input.requesterMembershipId;
+        const requestedAt = new Date(Date.UTC(2040, 0, 1, 0, 0, input.sequence));
+        await db.query(
+          `insert into todo (id, organization_id, context_membership_id, creator_membership_id, assignee_membership_id, title, description, status, created_at, updated_at)
+           values ($1, 'org_acme_studio', 'acme-studio-sato', 'acme-studio-owner', $2, $3, null, 'open', $4, $4)`,
+          [todoId, assigneeMembershipId, `workspace fixture ${input.sequence}`, requestedAt],
+        );
+        await db.query(
+          `insert into todo_handoff (id, organization_id, todo_id, requester_membership_id, recipient_membership_id, request_message, status, requested_at, resolved_at)
+           values ($1, 'org_acme_studio', $2, $3, $4, null, $5, $6, $7)`,
+          [handoffId, todoId, input.requesterMembershipId, input.recipientMembershipId, input.status, requestedAt, input.resolvedAt ?? null],
+        );
+        return handoffId;
+      };
+
+      const incomingHandoffId = await insertHandoff({ sequence: 1, requesterMembershipId: 'acme-studio-sato', recipientMembershipId: 'acme-studio-owner', status: 'requested' });
+      const outgoingHandoffId = await insertHandoff({ sequence: 2, requesterMembershipId: 'acme-studio-owner', recipientMembershipId: 'acme-studio-mori', status: 'requested' });
+      await insertHandoff({ sequence: 3, requesterMembershipId: 'acme-studio-owner', recipientMembershipId: 'acme-studio-mori', status: 'rejected', resolvedAt: new Date(Date.UTC(2040, 0, 1, 1)) });
+      const unrelatedHandoffIds: string[] = [];
+      for (let sequence = 10; sequence < 31; sequence += 1) {
+        unrelatedHandoffIds.push(await insertHandoff({
+          sequence,
+          requesterMembershipId: 'acme-studio-sato',
+          recipientMembershipId: 'acme-studio-mori',
+          status: 'rejected',
+          resolvedAt: new Date(Date.UTC(2041, 0, 1, 0, 0, sequence)),
+        }));
+      }
+      const ownRecentHandoffIds: string[] = [];
+      for (let sequence = 40; sequence < 61; sequence += 1) {
+        ownRecentHandoffIds.push(await insertHandoff({
+          sequence,
+          requesterMembershipId: 'acme-studio-owner',
+          recipientMembershipId: 'acme-studio-mori',
+          status: 'rejected',
+          resolvedAt: new Date(Date.UTC(2040, 0, 2, 0, 0, sequence)),
+        }));
+      }
+      for (let sequence = 70; sequence < 91; sequence += 1) {
+        await insertHandoff({
+          sequence,
+          requesterMembershipId: 'acme-studio-sato',
+          recipientMembershipId: 'acme-studio-mori',
+          status: 'requested',
+        });
+      }
+
+      const workspace = await getHandoffWorkspace(ownerCookie);
+      expect(workspace.incomingRequests.map((handoff) => handoff.handoffId)).toContain(incomingHandoffId);
+      expect(workspace.outgoingRequests.map((handoff) => handoff.handoffId)).toContain(outgoingHandoffId);
+      const recentHandoffIds = workspace.recentHandoffs.map((handoff) => handoff.handoffId);
+      expect(recentHandoffIds).toEqual(ownRecentHandoffIds.slice(1).reverse());
+      expect(recentHandoffIds.filter((handoffId) => unrelatedHandoffIds.includes(handoffId))).toEqual([]);
+    } finally {
+      await db.query("delete from todo where id like 'todo-workspace-%'");
+      await db.end();
+    }
+  });
+
+  it('does not include completed Todos in the Assigned Todo workspace', async () => {
+    const ownerCookie = await signIn('owner@amidala.local');
+    const completedTodo = await createTodo(ownerCookie);
+    const db = new pg.Client({ connectionString: env.DATABASE_URL });
+    await db.connect();
+    try {
+      await db.query("update todo set status = 'completed' where id = $1 and organization_id = 'org_acme_studio'", [completedTodo.todoId]);
+    } finally {
+      await db.end();
+    }
+
+    const assigned = await getAssignedTodos(ownerCookie);
+    expect(assigned.todos.map((todo) => todo.todoId)).not.toContain(completedTodo.todoId);
   });
 });
