@@ -6,7 +6,6 @@ import type { SharedTodoWorkspace } from '@amidala/contracts';
 
 export function TodoComposer({ workspace }: { workspace: SharedTodoWorkspace }) {
   const formRef = useRef<HTMLFormElement>(null);
-  const titleRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
   const [validationError, setValidationError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -46,7 +45,7 @@ export function TodoComposer({ workspace }: { workspace: SharedTodoWorkspace }) 
 
   return <form ref={formRef} className="todo-composer" onSubmit={handleSubmit} aria-busy={mutation.isPending}>
     <div className="section-heading"><div><p className="eyebrow">次の一手</p><h3>Todoを作る</h3></div></div>
-    <label className="form-field"><span>タイトル</span><input ref={titleRef} name="title" required maxLength={160} placeholder="例：来週の1on1で確認する" /></label>
+    <label className="form-field"><span>タイトル</span><input id="todo-title" name="title" required maxLength={160} placeholder="例：来週の1on1で確認する" /></label>
     <label className="form-field"><span>説明（任意）</span><textarea name="description" maxLength={2000} rows={3} placeholder="背景や完了の条件をメモできます" /></label>
     <fieldset className="assignee-field"><legend>担当</legend><div className="assignee-options">
       <label className="assignee-option"><input type="radio" name="assigneeMembershipId" value={workspace.currentMember.membershipId} defaultChecked />あなた</label>
