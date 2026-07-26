@@ -118,8 +118,8 @@ Run `pnpm --filter @amidala/db build`, `pnpm db:migrate`, and a read-only SQL qu
 **Interfaces:**
 - Produces: `createAuth(db, env): ReturnType<typeof betterAuth>` using `better-auth/minimal` and `@better-auth/drizzle-adapter`
 - Produces: `GET /api/auth/*`, `POST /api/auth/*`
-- Produces: `GET /organizations` returning `{ organizations: OrganizationOption[] }`, where `OrganizationOption = { organizationId: string; name: string; slug: string; membershipId: string; role: 'owner' | 'manager' | 'member'; displayName: string }`
-- Produces: `Principal = { userId: string; membershipId: string; organizationId: string; role: MembershipRole }`
+- Produces: `GET /organizations` returning `{ organizationMemberships: OrganizationMembershipSummary[] }`, where `OrganizationMembershipSummary = { organizationId: string; name: string; slug: string; membershipId: string; role: 'owner' | 'manager' | 'member'; displayName: string }`
+- Produces: `CurrentMembershipContext = { userId: string; membershipId: string; organizationId: string; role: MembershipRole }`
 - Produces: `ApiBindings = { DATABASE_URL?: string; HYPERDRIVE?: Hyperdrive; BETTER_AUTH_SECRET: string; BETTER_AUTH_URL: string }`
 - Produces: `ApiErrorBody = { error: { code: 'unauthorized' | 'forbidden' | 'validation_error' | 'service_unavailable'; message: string } }`
 
@@ -190,9 +190,9 @@ Run `pnpm db:seed`, API typecheck/test/build, `pnpm build`, and Wrangler dry-run
 - Create: `apps/api/src/app-type.ts`
 
 **Interfaces:**
-- Produces: `PersonSummary = { membershipId: string; name: string; title: string | null; relationshipKinds: Array<'manager_report' | 'supporter' | 'peer'> }`
+- Produces: `MemberSummary = { membershipId: string; name: string; title: string | null; relationshipKinds: Array<'manager_report' | 'supporter' | 'peer'> }`
 - Produces: `GET /organizations/:organizationId/people`
-- Produces: `getPeople({ data: { organizationId } }): Promise<{ people: PersonSummary[] }>`
+- Produces: `getPeople({ data: { organizationId } }): Promise<{ people: MemberSummary[] }>`
 - Produces: `createApiClient(fetcher): ReturnType<typeof hc<AppType>>`, where `@amidala/api-client` has a type-only workspace dependency on `@amidala/api` and Web imports only the client package
 
 - [ ] **Step 1: Write the failing cross-tenant test**
@@ -207,7 +207,7 @@ Run `pnpm --filter @amidala/api test -- --run` and record the expected missing r
 
 - [ ] **Step 3: Implement the tenant-safe query**
 
-Validate `organizationId`, derive `userId` from session, find the active Membership, reject absence with 403, then query active Memberships in the same Organization excluding the Principal. Left join Relationships on both Membership IDs and `organization_id`, so users without a Relationship remain visible. Return one card per Membership, sort names deterministically, and sort relationship kinds `manager_report`, `supporter`, `peer`. Never accept `membershipId` as identity input.
+Validate `organizationId`, derive `userId` from session, find the active Membership, reject absence with 403, then query active Memberships in the same Organization excluding the Current Membership. Left join Relationships on both Membership IDs and `organization_id`, so users without a Relationship remain visible. `manager_report` means source=manager and target=direct report. Return one card per Membership, sort names deterministically, and sort relationship kinds `manager_report`, `supporter`, `peer`. Never accept `membershipId` as identity input.
 
 Compose Hono route modules with `.route()` and export `AppType = ReturnType<typeof createApp>` from `apps/api/src/app-type.ts`. Add `"./app-type": { "types": "./src/app-type.ts" }` to `@amidala/api` exports. `@amidala/api-client` adds a type-only workspace dependency on `@amidala/api`, uses a no-emit tsconfig, exports its source from `package.json`, and constructs `hc<AppType>('http://api.internal', { fetch: fetcher })`; the supplied fetcher delegates to `env.API.fetch` and is never the public network fetch. The API package does not depend on api-client, so no package cycle is introduced.
 
