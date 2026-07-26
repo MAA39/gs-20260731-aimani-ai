@@ -1,11 +1,195 @@
 import { describe, expect, it } from 'vitest';
+import { z } from 'zod';
+import { sharedTodoWorkspaceSchema, todoSummarySchema } from '@amidala/contracts';
 import { createApp } from '../app';
-const env={DATABASE_URL:process.env.TEST_DATABASE_URL,BETTER_AUTH_SECRET:'integration-secret-at-least-32-chars',BETTER_AUTH_URL:'http://localhost:8787'};
-describe('Todo Handoff API',()=>{const app=createApp();
- const signIn=async(email:string)=>{const r=await app.fetch(new Request('http://localhost:8787/api/auth/sign-in/email',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,password:'amidala-demo-2026'})}),env);return r.headers.getSetCookie().join('; ')};
- const createTodo=async(cookie:string)=>{const r=await app.fetch(new Request('http://localhost:8787/organizations/org_acme_studio/people/acme-studio-sato/todos',{method:'POST',headers:{'content-type':'application/json',cookie},body:JSON.stringify({title:`handoff-${Date.now()}`,description:'x',assigneeMembershipId:'acme-studio-owner'})}),env);return (await r.json()) as any};
- const request=async(cookie:string,todoId:string,body:any)=>{const r=await app.fetch(new Request(`http://localhost:8787/organizations/org_acme_studio/todos/${todoId}/handoffs`,{method:'POST',headers:{'content-type':'application/json',cookie},body:JSON.stringify(body)}),env);return {status:r.status,...await r.json()} as any};
- const decide=async(cookie:string,id:string,verb:string)=>{const r=await app.fetch(new Request(`http://localhost:8787/organizations/org_acme_studio/handoffs/${id}/${verb}`,{method:'POST',headers:{cookie}}),env);return {status:r.status,...await r.json()} as any};
- it('moves responsibility only when the recipient accepts the Todo Handoff',async()=>{const owner=await signIn('owner@amidala.local');const mori=await signIn('mori@amidala.local');const t=await createTodo(owner);const q=await request(owner,t.todo.todoId,{recipientMembershipId:'acme-studio-mori',requestMessage:'次回の確認をお願いします'});expect(q.status).toBe(201);const a=await decide(mori,q.handoff.handoffId,'accept');expect(a.status).toBe(200);expect(a.todo.assignee.membershipId).toBe('acme-studio-mori');expect((await decide(mori,q.handoff.handoffId,'accept')).status).toBe(200);});
- it('serializes competing decisions and allows cancellation',async()=>{const owner=await signIn('owner@amidala.local');const sato=await signIn('sato@amidala.local');const t=await createTodo(owner);const q=await request(owner,t.todo.todoId,{recipientMembershipId:'acme-studio-sato',requestMessage:''});const same=await request(owner,t.todo.todoId,{recipientMembershipId:'acme-studio-sato'});expect(same.status).toBe(200);const [a,r]=await Promise.all([decide(sato,q.handoff.handoffId,'accept'),decide(sato,q.handoff.handoffId,'reject')]);expect([a.status,r.status].sort()).toEqual([200,409]);});
+
+const env = {
+  DATABASE_URL: process.env.TEST_DATABASE_URL,
+  BETTER_AUTH_SECRET: 'integration-secret-at-least-32-chars',
+  BETTER_AUTH_URL: 'http://localhost:8787',
+};
+
+const memberSchema = z.object({
+  membershipId: z.string().min(1),
+  name: z.string(),
+  title: z.string().nullable(),
+});
+const handoffSchema = z.object({
+  handoffId: z.string().min(1),
+  organizationId: z.string().min(1),
+  todo: todoSummarySchema,
+  requester: memberSchema,
+  recipient: memberSchema,
+  requestMessage: z.string().nullable(),
+  status: z.enum(['requested', 'accepted', 'rejected', 'canceled']),
+  requestedAt: z.string(),
+  resolvedAt: z.string().nullable(),
+});
+const resourceSchema = z.object({ handoff: handoffSchema, todo: todoSummarySchema });
+const errorSchema = z.object({ error: z.object({ code: z.string(), message: z.string() }) });
+const assignedWorkspaceSchema = z.object({
+  organization: z.object({ organizationId: z.string(), name: z.string() }),
+  currentMember: memberSchema,
+  todos: z.array(todoSummarySchema),
+});
+
+type Resource = z.infer<typeof resourceSchema>;
+type AssignedWorkspace = z.infer<typeof assignedWorkspaceSchema>;
+type ErrorBody = z.infer<typeof errorSchema>;
+type HandoffResponse = {
+  status: number;
+  handoff?: Resource['handoff'];
+  todo?: Resource['todo'];
+  error?: ErrorBody['error'];
+};
+
+describe('Todo Handoff API', () => {
+  const app = createApp();
+
+  const signIn = async (email: string): Promise<string> => {
+    const response = await app.fetch(new Request('http://localhost:8787/api/auth/sign-in/email', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email, password: 'amidala-demo-2026' }),
+    }), env);
+    expect(response.status).toBe(200);
+    return response.headers.getSetCookie().join('; ');
+  };
+
+  const createTodo = async (
+    cookie: string,
+    assigneeMembershipId = 'acme-studio-owner',
+  ): Promise<z.infer<typeof todoSummarySchema>> => {
+    const response = await app.fetch(new Request('http://localhost:8787/organizations/org_acme_studio/people/acme-studio-sato/todos', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', cookie },
+      body: JSON.stringify({ title: `handoff-${Date.now()}-${Math.random()}`, description: 'handoff integration fixture', assigneeMembershipId }),
+    }), env);
+    expect(response.status).toBe(201);
+    const body = z.object({ todo: todoSummarySchema }).parse(await response.json());
+    return body.todo;
+  };
+
+  const requestHandoff = async (
+    cookie: string,
+    todoId: string,
+    body: { recipientMembershipId: string; requestMessage?: string },
+  ): Promise<HandoffResponse> => {
+    const response = await app.fetch(new Request(`http://localhost:8787/organizations/org_acme_studio/todos/${todoId}/handoffs`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', cookie },
+      body: JSON.stringify(body),
+    }), env);
+    const parsed = response.status >= 400 ? errorSchema.parse(await response.json()) : resourceSchema.parse(await response.json());
+    return response.status >= 400
+      ? { status: response.status, error: parsed.error }
+      : { status: response.status, handoff: parsed.handoff, todo: parsed.todo };
+  };
+
+  const decide = async (
+    cookie: string,
+    handoffId: string,
+    action: 'accept' | 'reject' | 'cancel',
+    organizationId = 'org_acme_studio',
+  ): Promise<HandoffResponse> => {
+    const response = await app.fetch(new Request(`http://localhost:8787/organizations/${organizationId}/handoffs/${handoffId}/${action}`, {
+      method: 'POST',
+      headers: { cookie },
+    }), env);
+    const parsed = response.status >= 400 ? errorSchema.parse(await response.json()) : resourceSchema.parse(await response.json());
+    return response.status >= 400
+      ? { status: response.status, error: parsed.error }
+      : { status: response.status, handoff: parsed.handoff, todo: parsed.todo };
+  };
+
+  const getAssignedTodos = async (cookie: string): Promise<AssignedWorkspace> => {
+    const response = await app.fetch(new Request('http://localhost:8787/organizations/org_acme_studio/todos/assigned-to-me', { headers: { cookie } }), env);
+    expect(response.status).toBe(200);
+    return assignedWorkspaceSchema.parse(await response.json());
+  };
+
+  const getSharedTodos = async (cookie: string) => {
+    const response = await app.fetch(new Request('http://localhost:8787/organizations/org_acme_studio/people/acme-studio-sato/todos', { headers: { cookie } }), env);
+    expect(response.status).toBe(200);
+    return sharedTodoWorkspaceSchema.parse(await response.json());
+  };
+
+  it('moves responsibility only when the recipient accepts the Todo Handoff', async () => {
+    const ownerCookie = await signIn('owner@amidala.local');
+    const moriCookie = await signIn('mori@amidala.local');
+    const todo = await createTodo(ownerCookie);
+
+    const requested = await requestHandoff(ownerCookie, todo.todoId, {
+      recipientMembershipId: 'acme-studio-mori',
+      requestMessage: '次回の確認をお願いします',
+    });
+    expect(requested.status).toBe(201);
+    expect(requested.handoff).toBeDefined();
+
+    const sharedWorkspace = await getSharedTodos(ownerCookie);
+    const listedTodo = sharedWorkspace.todos.find((item) => item.todoId === todo.todoId);
+    expect(listedTodo).toBeDefined();
+    const pendingHandoff = listedTodo?.pendingHandoff;
+    expect(pendingHandoff).not.toBeNull();
+    if (!pendingHandoff || !requested.handoff) throw new Error('Expected pending Handoff projection.');
+    expect(pendingHandoff.handoffId).toBe(requested.handoff.handoffId);
+    expect(pendingHandoff.requester.membershipId).toBe('acme-studio-owner');
+    expect(pendingHandoff.recipient.membershipId).toBe('acme-studio-mori');
+    expect(pendingHandoff.requestMessage).toBe('次回の確認をお願いします');
+
+    const accepted = await decide(moriCookie, requested.handoff?.handoffId ?? '', 'accept');
+    expect(accepted.status).toBe(200);
+    expect(accepted.todo?.assignee.membershipId).toBe('acme-studio-mori');
+
+    const retry = await decide(moriCookie, requested.handoff?.handoffId ?? '', 'accept');
+    expect(retry.status).toBe(200);
+    expect(retry.handoff?.handoffId).toBe(requested.handoff?.handoffId);
+
+    const assigned = await getAssignedTodos(moriCookie);
+    expect(assigned.todos.some((item) => item.todoId === todo.todoId)).toBe(true);
+  });
+
+  it('serializes competing decisions, rejects another Organization, and allows cancellation', async () => {
+    const ownerCookie = await signIn('owner@amidala.local');
+    const satoCookie = await signIn('sato@amidala.local');
+    const suzukiCookie = await signIn('suzuki@amidala.local');
+    const todo = await createTodo(ownerCookie);
+    const requested = await requestHandoff(ownerCookie, todo.todoId, {
+      recipientMembershipId: 'acme-studio-sato',
+      requestMessage: '',
+    });
+    expect(requested.handoff).toBeDefined();
+    const handoffId = requested.handoff?.handoffId ?? '';
+
+    const sameRequest = await requestHandoff(ownerCookie, todo.todoId, { recipientMembershipId: 'acme-studio-sato' });
+    expect(sameRequest.status).toBe(200);
+    expect(sameRequest.handoff?.handoffId).toBe(handoffId);
+
+    const forbidden = await decide(suzukiCookie, handoffId, 'accept', 'org_northstar_lab');
+    expect(forbidden.status).toBe(404);
+
+    const [accepted, rejected] = await Promise.all([
+      decide(satoCookie, handoffId, 'accept'),
+      decide(satoCookie, handoffId, 'reject'),
+    ]);
+    expect([accepted.status, rejected.status].sort()).toEqual([200, 409]);
+
+    const acceptedWon = accepted.status === 200;
+    const currentAssigneeCookie = acceptedWon ? satoCookie : ownerCookie;
+    const currentAssigneeId = acceptedWon ? 'acme-studio-sato' : 'acme-studio-owner';
+    const nextRecipientId = acceptedWon ? 'acme-studio-mori' : 'acme-studio-sato';
+    const next = await requestHandoff(currentAssigneeCookie, todo.todoId, { recipientMembershipId: nextRecipientId });
+    expect(next.status).toBe(201);
+    const nextHandoffId = next.handoff?.handoffId ?? '';
+
+    const canceled = await decide(currentAssigneeCookie, nextHandoffId, 'cancel');
+    expect(canceled.status).toBe(200);
+    expect(canceled.handoff?.status).toBe('canceled');
+    expect((await decide(currentAssigneeCookie, nextHandoffId, 'cancel')).status).toBe(200);
+
+    const rerequested = await requestHandoff(currentAssigneeCookie, todo.todoId, {
+      recipientMembershipId: currentAssigneeId === 'acme-studio-sato' ? 'acme-studio-owner' : 'acme-studio-mori',
+    });
+    expect(rerequested.status).toBe(201);
+  });
 });
