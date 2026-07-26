@@ -1,14 +1,13 @@
 import '@tanstack/react-start/server-only';
 import { createApiClient } from '@amidala/api-client';
+import { createTodoBodySchema, personTodoPathSchema, sharedTodoWorkspaceSchema } from '@amidala/contracts';
 import {
   createSharedTodoResponseSchema,
-  personTodoPathInputSchema,
   type CreateSharedTodoInput,
   type CreateSharedTodoResult,
   type PersonTodoPath,
   type SharedTodoWorkspaceResult,
 } from './todo-schema';
-import { sharedTodoWorkspaceSchema } from '@amidala/contracts';
 import { env } from 'cloudflare:workers';
 import { getRequestHeader } from '@tanstack/react-start/server';
 import { redirect } from '@tanstack/react-router';
@@ -42,7 +41,7 @@ function createApiFetcher(cookie: string): typeof fetch {
 }
 
 export async function getSharedTodoWorkspaceFromApi(input: PersonTodoPath): Promise<SharedTodoWorkspaceResult> {
-  const parsedInput = personTodoPathInputSchema.safeParse(input);
+  const parsedInput = personTodoPathSchema.safeParse(input);
   if (!parsedInput.success) {
     return { status: 'error', error: { code: 'validation_error', message: 'Invalid Todo path.' } };
   }
@@ -67,6 +66,11 @@ export async function getSharedTodoWorkspaceFromApi(input: PersonTodoPath): Prom
 }
 
 export async function createSharedTodoFromApi(input: CreateSharedTodoInput): Promise<CreateSharedTodoResult> {
+  const parsedPath = personTodoPathSchema.safeParse(input);
+  const parsedBody = createTodoBodySchema.safeParse(input);
+  if (!parsedPath.success || !parsedBody.success) {
+    return { status: 'error', error: { code: 'validation_error', message: 'Invalid Todo input.' } };
+  }
   const cookie = getRequestHeader('cookie') ?? '';
   const client = createApiClient(createApiFetcher(cookie));
   // The API validates this body at its application boundary, but the current
