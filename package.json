@@ -7,7 +7,6 @@
     "build": "turbo run build",
     "db:up": "docker compose up -d postgres",
     "db:migrate": "node --env-file=apps/api/.dev.vars --import tsx packages/db/src/migrate.ts",
-    "db:seed": "node --env-file=apps/api/.dev.vars --import tsx apps/api/src/dev/seed.ts",
     "db:down": "docker compose down"
   },
   "devDependencies": {
