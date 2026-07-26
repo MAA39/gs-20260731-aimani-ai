@@ -57,11 +57,14 @@
 
 **Produces:** API requests resolve a request-scoped DB/repository graph through Awilix and close the DB Client afterward.
 
+**Status (2026-07-27):** DB・認証に先行し、Awilixのroot container、request scope、正常/例外時disposeの基盤は[DI専用計画](./2026-07-26-api-request-scoped-di.md)で実装・検証済み。以下はPostgreSQL / Drizzle / repositoryとの接続だけを残件とする。
+
 - [ ] Research current Drizzle/PostgreSQL/Hyperdrive/Awilix Workers practices and add the decisions to this task brief.
 - [ ] Add local PostgreSQL 17 with one documented `DATABASE_URL` in `.dev.vars.example`.
 - [ ] Add only the initial tables: Better Auth core tables, organizations, memberships, relationships, todos, handoffs.
 - [ ] Use FK, UNIQUE, CHECK, and `organization_id`; do not add RLS or audit tables.
-- [ ] Configure an Awilix root with stateless Clock/IdGenerator and a child scope per request containing DB and repositories.
+- [x] Configure an Awilix root with a stateless Clock and create/dispose one child scope per request.
+- [ ] Add IdGenerator to the root and register DB/repositories in the request scope after PostgreSQL is introduced.
 - [ ] Add one smoke test that resolves the main use-case factory and confirms disposal closes its fake DB Client.
 - [ ] Run the migration, `/health`, and the DI smoke test.
 - [ ] Commit `feat: add PostgreSQL and request-scoped DI`.
