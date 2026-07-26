@@ -65,3 +65,21 @@
 ### 懸念
 
 - 現環境の `pnpm dev` は Vite 開発サーバー表示までで、Cloudflare auxiliary Worker の SSR runtime を直接起動しないため、dev URL への直接 `/api/health` は未成立。production build には SSR bundle と auxiliary Worker 設定が含まれる。
+
+## Fix round 3
+
+### 変更
+
+- Web Wrangler config に `main: "dist/server/index.js"` と `assets: { directory: "dist/client" }` を追加し、TanStack Start SSR Worker entry を接続
+- Web server route は Cloudflare 公式の `import { env } from "cloudflare:workers"` から `env.API.fetch()` を使用
+- auxiliary API Worker の build output も生成されることを確認
+
+### Commands / results
+
+- `pnpm build` — 成功。`dist/server/index.js`、SSR worker-entry、`dist/amidala_api/index.js` を生成
+- `pnpm --filter @amidala/web exec wrangler deploy --dry-run --config dist/server/wrangler.json` — 成功。SSR Worker entry と 7 modules / 800.92 KiB、API Service Binding を確認。外部 deploy は未実行
+- `wrangler dev` local runtime — compatibility date `2026-07-26` が現在の workerd (`2026-06-24` 対応) より新しく、起動時に拒否された
+
+### 懸念
+
+- ローカル workerd の compatibility date 上限が要件固定値より古いため、single `pnpm dev` での direct SSR routes / Service Binding health の実行確認は環境制約で未成立。設定と dry-run で SSR entry / binding の接続は確認済み。
