@@ -14,6 +14,6 @@ export default {
       headers.delete('set-cookie'); cookies.forEach((cookie) => headers.append('set-cookie', cookie));
       return new Response(upstream.body, { status: upstream.status, statusText: upstream.statusText, headers });
     }
-    return handler.fetch(request, env, ctx);
+    return handler.fetch(request);
   },
 };
