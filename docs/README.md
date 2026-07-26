@@ -23,6 +23,8 @@
 10. [Touchable MVP 実装計画](superpowers/plans/2026-07-26-platform-todo-handoff.md)
 11. [Identity → People 縦切り設計](superpowers/specs/2026-07-27-identity-people-vertical-slice-design.md)
 12. [Identity → People 実装計画](superpowers/plans/2026-07-27-identity-people-vertical-slice.md)
+13. [Person SharedTodo 縦切り設計](superpowers/specs/2026-07-27-relationship-todo-slice-design.md)
+14. [Todo Handoff 縦切り設計](superpowers/specs/2026-07-27-todo-handoff-slice-design.md)
 
 ## 判断の優先順位
 

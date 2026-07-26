@@ -36,8 +36,15 @@
 | CurrentMembershipContext | session Userと検証済みMembershipから作る認可文脈 | ブラウザ入力のidentity |
 | Relationship | 同じOrganizationのMembership間の関係 | Organizationをまたぐ関係 |
 | MemberSummary | People画面へ返す組織内の人の要約 | グローバルUserの全情報 |
+| TodoHandoff | 現在担当者が引き継ぎ先へTodo担当の移管を依頼し、受諾・見送り・取消のいずれかで終わる記録 | 汎用workflow、即時の担当上書き |
+| requester Membership | TodoHandoffを依頼した時点の現在担当 | credential User、常に現在担当であり続ける人 |
+| recipient Membership | TodoHandoffを引き受けるか見送る人 | accept前のTodo担当者 |
 
 `manager_report`はsource Membershipがmanager、target Membershipがdirect reportである有向関係とする。画面ラベルは翻訳辞書で「直属の部下」等に変換し、DB値を直接表示しない。Membership statusは`active | invited | suspended`を正本とする。
+
+TodoHandoffの公開ユースケースは`RequestTodoHandoff`、`AcceptTodoHandoff`、`RejectTodoHandoff`、`CancelTodoHandoff`とする。acceptだけがTodo担当を変更するため、`DecideHandoff(decision)`や`UpdateStatus`へ副作用の差を隠さない。Organization内のactorに`UserId`を使わずMembership IDを使う。
+
+read use caseは、返すworkspaceと対象を名前へ残す。`GetTodoHandoffWorkspace`は`TodoHandoffWorkspace`を、`GetAssignedTodoWorkspace`は`AssignedTodoWorkspace`を返す。汎用`GetHandoffWorkspace`や、workspaceを返すのに`ListAssignedTodos`とは呼ばない。
 
 ## テストとの関係
 

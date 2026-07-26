@@ -28,11 +28,14 @@ Todo の責任者を avatar だけで示さない。氏名、role、状態を表
 人物、Todo、Handoff を細い一本の rail で結ぶ。
 
 ```text
-[依頼者] ── Todo ── [現在の担当] ──▶ [引継ぎ先]
-                               requested / accepted / rejected
+依頼中:          [現在担当（依頼者）] ── Todo ──▶ [引き継ぎ先]       requested
+引き継ぎ済み:    [旧担当（依頼者）]   ── Todo ──▶ [現在担当]         accepted
+見送り / 取消済み:[現在担当（依頼者）] ── Todo ──× [候補だった相手]   rejected / canceled
 ```
 
 rail は decoration ではなく、責任がどこからどこへ動くかを表す。People card の次 action、Todo card の assignee、Handoff inbox の decision に同じ文法を使う。
+
+責任nodeを実際に移動するのはacceptedだけである。rejected / canceledでは現在担当を依頼者のままにし、候補へのrailを切れた線と文言で表す。
 
 ## Color tokens
 
@@ -49,7 +52,7 @@ rail は decoration ではなく、責任がどこからどこへ動くかを表
 | `--brand-soft` | `#EEF0FF` | selected / focus background |
 | `--connected` | `#3D9B78` | accepted / connected |
 | `--attention` | `#D8962E` | pending / due soon |
-| `--danger` | `#D34F66` | destructive / rejected / error |
+| `--danger` | `#D34F66` | destructive / error。見送りはerrorとして扱わない |
 
 状態は必ず text または icon を併用する。`green = good` だけで意味を伝えない。
 
@@ -138,12 +141,17 @@ Mobile:
 | Membership | メンバー / 組織での役割 |
 | Relationship | 関係 |
 | Todo | Todo |
-| Handoff | 引き継ぎ |
+| TodoHandoff（画面概念） | 引き継ぎ |
 | requested | 引き継ぎを依頼中 |
 | accepted | 引き継ぎ済み |
 | rejected | 引き継ぎを見送り |
+| canceled | 引き継ぎ依頼を取消済み |
 
 Button は結果を表す。「送信」ではなく「引き継ぎを依頼」、「OK」ではなく「引き受ける」。toast も同じ動詞を使う。
+
+「引き継ぎ」画面はそれ自体が意思決定のwork surfaceである。incoming cardに「引き受ける」「見送る」をinlineで置き、同じ判断を確認Dialogで繰り返さない。依頼入力だけは引き継ぎ先と意図を集中して確認するためDialogを使う。送った依頼には「依頼を取り消す」をquiet actionとして置く。
+
+状態色はacceptedを`--connected`、requestedを`--attention`、rejected / canceledをneutralなmuted surfaceで表す。見送りをdangerやerrorとして罰する表現にしない。取消action自体のhover/errorには`--danger`を使ってよいが、取消済み状態はneutralにする。
 
 ## 状態別の画面ルール
 
