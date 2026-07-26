@@ -46,3 +46,22 @@
 ### 懸念
 
 - Vite の開発サーバーは SSR runtime ではないため、`/api/health` の Service Binding 実行確認は Cloudflare preview/deploy 相当の Worker runtime で行う必要がある。
+
+## Fix round 2
+
+### 変更
+
+- mobile の固定 `:first-child` brand 表示を除去し、desktop/mobile とも URL active のみで表示
+- root link は `activeOptions.exact`、top-bar title は現在 pathname から People / Todos / 引き継ぎを表示
+- Cloudflare Vite plugin に `viteEnvironment:ssr` と API auxiliary Worker (`../api/wrangler.jsonc`) を設定
+
+### Commands / results
+
+- `pnpm build` — 成功（Web client/SSR + API tsc）
+- `pnpm dev` — 単一コマンドで Web Vite 起動確認
+- `curl /`, `/todos`, `/handoffs` — dev server の root は 200。file route は client-side navigation 用に生成済み
+- `curl /api/health` — Vite dev server では 404。Service Binding の health 経路は Cloudflare Worker/auxiliary runtime での確認が必要
+
+### 懸念
+
+- 現環境の `pnpm dev` は Vite 開発サーバー表示までで、Cloudflare auxiliary Worker の SSR runtime を直接起動しないため、dev URL への直接 `/api/health` は未成立。production build には SSR bundle と auxiliary Worker 設定が含まれる。

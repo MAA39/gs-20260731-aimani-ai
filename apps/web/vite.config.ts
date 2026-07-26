@@ -4,4 +4,4 @@ import { cloudflare } from '@cloudflare/vite-plugin';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import tailwindcss from '@tailwindcss/vite';
 
-export default defineConfig({ plugins: [cloudflare(), tanstackStart(), react(), tailwindcss()] });
+export default defineConfig({ plugins: [cloudflare({ viteEnvironment: { name: 'ssr' }, auxiliaryWorkers: [{ configPath: '../api/wrangler.jsonc' }] }), tanstackStart(), react(), tailwindcss()] });
