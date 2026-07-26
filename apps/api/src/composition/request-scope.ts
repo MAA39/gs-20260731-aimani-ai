@@ -36,8 +36,13 @@ export async function withRequestScope<T>(
     ).scoped(),
     databaseResource: asFunction(async ({ env }: { env: ApiBindings }) => {
       const resource = createNodePgDatabase(resolveDatabaseUrl(env));
-      await resource.client.connect();
-      return resource;
+      try {
+        await resource.client.connect();
+        return resource;
+      } catch (cause) {
+        await resource.client.end().catch(() => undefined);
+        throw cause;
+      }
     }).scoped().disposer(async (resourcePromise: Promise<DatabaseResource>) => { const resource = await resourcePromise; await resource.client.end(); }),
     auth: asFunction(async ({ databaseResource, env }: { databaseResource: Promise<DatabaseResource>; env: ApiBindings }) => { const resource = await databaseResource; return createAuth(resource.database, env); }).scoped(),
     membershipRepository: asFunction(async ({ databaseResource }: { databaseResource: Promise<DatabaseResource> }) => { const resource = await databaseResource; return new MembershipRepository(resource.database); }).scoped(),
