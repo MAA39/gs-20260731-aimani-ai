@@ -44,6 +44,8 @@ git diff --check
 
 ブラウザ fresh reload で、SSR (UTC) と client (JST) の Todo 作成日表示が異なり hydration mismatch になった。日本語プロダクトの基準タイムゾーン `Asia/Tokyo` を `Intl.DateTimeFormat` に明示して、SSR / client の出力を決定的にした。
 
+デプロイ dry-run の再現性確認として Web に `wrangler: 4.114.0` を明示追加し、lockfile を更新した。`wrangler deploy --config dist/server/wrangler.json --dry-run` は `wrangler 4.114.0` を表示し、`exports` unknown warning なしで完了した。
+
 ## 最終ブラウザ検証
 
 - 1280×900: ownerでloginし、Acme StudioのPeopleから佐藤花子のSharedTodo workspaceへ遷移。
