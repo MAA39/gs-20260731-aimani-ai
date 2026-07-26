@@ -37,3 +37,5 @@ git diff --check
 - 修正後も Web tsc/build、monorepo build、`git diff --check` を再実行する。
 
 レビュー追加修正: `document` のグローバル検索を廃止し、Page が所有する `RefObject` を Composer に渡して空状態 action から title input に focus する構造へ変更した。
+
+最終レビュー修正: `useRef` を条件分岐より前へ移動し、loader 結果の status が変わっても Hooks の呼び出し順が一定になるようにした。

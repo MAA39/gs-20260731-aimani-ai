@@ -8,9 +8,9 @@ import { TodoComposer } from './TodoComposer';
 const relationshipLabels = { manager_report: '直属の部下', supporter: 'サポートする人', peer: '同僚' } as const;
 
 export function TodoPage({ organizationId, result, retry }: { organizationId: string; result: SharedTodoWorkspaceResult; retry?: () => void }) {
+  const titleRef = useRef<HTMLInputElement>(null);
   if (result.status !== 'ok') return <section className="content"><div className="empty-surface"><h2>{result.status === 'forbidden' ? 'この組織では閲覧できません' : result.status === 'not_found' ? '相手が見つかりません' : '共有Todoを読み込めませんでした'}</h2><p>{result.error.message}</p>{retry ? <button className="secondary-button" type="button" onClick={retry}><RefreshCw size={16} aria-hidden="true" />再試行</button> : null}<Link className="secondary-button" to="/$organizationId/people" params={{ organizationId }}>Peopleへ戻る</Link></div></section>;
   const { workspace } = result;
-  const titleRef = useRef<HTMLInputElement>(null);
   const relationships = workspace.contextMember.relationshipKinds.map((kind) => relationshipLabels[kind]);
   return <section className="content todo-workspace">
     <Link className="back-link" to="/$organizationId/people" params={{ organizationId }}><ArrowLeft size={17} aria-hidden="true" />Peopleへ戻る</Link>
