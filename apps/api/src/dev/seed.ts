@@ -6,6 +6,11 @@ const env = process.env as unknown as ApiBindings;
 const password = 'amidala-demo-2026';
 const users = [['owner@amidala.local','田中 彩'],['sato@amidala.local','佐藤 花子'],['suzuki@amidala.local','鈴木 健'],['mori@amidala.local','森 ハル']] as const;
 const orgs = [['org_acme_studio','acme-studio','Acme Studio'],['org_northstar_lab','northstar-lab','Northstar Lab']] as const;
+function requireMembershipId(rows: any[], organizationId: string, userId: string, email: string): string {
+  const membership = rows.find((row) => row.organizationId === organizationId && row.userId === userId);
+  if (!membership) throw new Error(`Seed fixture incomplete: active membership for ${email} in ${organizationId} is missing.`);
+  return membership.id;
+}
 async function main() {
   const resource = createNodePgDatabase(resolveDatabaseUrl(env)); await resource.client.connect();
   try {
@@ -23,7 +28,7 @@ async function main() {
       const members = slug === 'acme-studio' ? [['owner@amidala.local','owner','田中 彩'],['sato@amidala.local','manager','佐藤 花子'],['mori@amidala.local','member','森 ハル']] : [['owner@amidala.local','owner','田中 彩'],['suzuki@amidala.local','member','鈴木 健']];
       for (const [email,role,displayName] of members) { const u:any = byEmail.get(email); await resource.database.insert(schema.membership).values({ id: `${slug}-${email.split('@')[0]}`, userId:u.id, organizationId:org.id, displayName, role, status:'active', createdAt:now, updatedAt:now }).onConflictDoUpdate({ target:[schema.membership.userId,schema.membership.organizationId], set:{displayName,role,status:'active',updatedAt:now} }); }
       const membershipRows:any[] = await resource.database.select().from(schema.membership);
-      const memberId = (email:string) => membershipRows.find((m:any) => m.organizationId === org.id && m.userId === byEmail.get(email)?.id)?.id;
+      const memberId = (email: string) => requireMembershipId(membershipRows, org.id, byEmail.get(email)?.id, email);
       const relation = slug === 'acme-studio' ? ['sato@amidala.local','manager_report'] : ['suzuki@amidala.local','peer'];
       await resource.database.insert(schema.relationship).values({ id: `${slug}-owner-${relation[0].split('@')[0]}`, organizationId: org.id, sourceMembershipId: memberId('owner@amidala.local'), targetMembershipId: memberId(relation[0]), kind: relation[1], createdAt: now, updatedAt: now }).onConflictDoUpdate({ target:[schema.relationship.organizationId,schema.relationship.sourceMembershipId,schema.relationship.targetMembershipId,schema.relationship.kind], set:{updatedAt:now} });
     }
