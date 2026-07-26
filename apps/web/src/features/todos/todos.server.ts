@@ -20,6 +20,7 @@ export async function getAssignedTodoWorkspaceFromApi(input: { organizationId: s
   if (response.status === 403) return { status: 'forbidden' as const, error: { code: 'forbidden' as const, message: errorMessage(body, 'この組織では閲覧できません。') } };
   if (response.status === 404) return { status: 'not_found' as const, error: { code: 'not_found' as const, message: errorMessage(body, '対象が見つかりません。') } };
   if (response.status === 409) return { status: 'conflict' as const, error: { code: 'conflict' as const, message: errorMessage(body, 'Todoの状態が更新されています。') } };
+  if (response.status === 400) return { status: 'error' as const, error: { code: 'validation_error' as const, message: errorMessage(body, 'Todoの指定を確認してください。') } };
   if (response.status !== 200) return unavailable();
   const parsed = assignedTodoWorkspaceSchema.safeParse(body);
   return parsed.success ? { status: 'ok' as const, workspace: parsed.data } : unavailable();

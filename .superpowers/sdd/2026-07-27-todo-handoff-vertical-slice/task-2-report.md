@@ -41,3 +41,7 @@ DONE
 - `as any` を除去し、server-only 内の最小 local endpoint interface + `unknown` narrow に限定。
 - Handoff input schema は Task 1 の shared path/body schemas を intersection で再利用。
 - 検証: `pnpm --filter @amidala/web exec tsc --noEmit`、`pnpm --filter @amidala/web build`、`git diff --check` 全て成功。
+
+## Fix round 2
+
+- canonical assigned Todo adapter の HTTP 400 を `validation_error` として明示分類し、他 adapter と整合。
