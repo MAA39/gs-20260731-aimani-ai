@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getOrganizations } from '../features/organizations/organizations.functions';
 import { OrganizationChooser } from '../features/organizations/OrganizationChooser';
-export const Route = createFileRoute('/organizations')({ loader: () => getOrganizations(), pendingComponent: () => <main className="chooser-page"><div className="skeleton-block" /></main>, component: OrganizationsRoute });
+export const Route = createFileRoute('/organizations')({ loader: () => getOrganizations(), pendingComponent: () => <main className="chooser-page"><div className="skeleton-block" /></main>, errorComponent: ({ reset }) => <main className="chooser-page"><div className="empty-surface chooser-empty"><h2>組織を読み込めませんでした</h2><p>組織情報を取得できません。接続を確認して再試行してください。</p><button className="secondary-button" type="button" onClick={reset}>再試行</button></div></main>, component: OrganizationsRoute });
 function OrganizationsRoute() { return <main className="chooser-page"><div className="brand large-brand"><span className="brand-mark">A</span><span>Amidala</span></div><OrganizationChooser result={Route.useLoaderData()} /></main>; }
