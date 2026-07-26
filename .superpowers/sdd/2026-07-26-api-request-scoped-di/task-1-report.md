@@ -41,3 +41,11 @@
 - `pnpm --filter @amidala/api test -- --run`: exit 0、2 test files / 4 tests passed。
 - `pnpm --filter @amidala/api build`: exit 0。
 - `pnpm build`: turbo 2 successful、exit 0。
+
+## Post-verification Fix
+
+- `apps/api/vitest.config.ts` の include を `src/**/*.test.ts` に限定。
+- `apps/api/tsconfig.json` の exclude に `src/**/*.test.ts` を追加し、tsc がテストを `dist` にemitしないよう修正。既存の生成済み重複テスト出力は削除。
+- `pnpm --filter @amidala/api test -- --run`: exit 0、**1 test file / 2 tests passed**。
+- `pnpm --filter @amidala/api build`: exit 0。
+- `pnpm build`: turbo 2 successful、exit 0。
