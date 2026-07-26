@@ -5,23 +5,27 @@ import { createAuth } from '../auth/create-auth';
 const env = process.env as unknown as ApiBindings;
 const password = 'amidala-demo-2026';
 const users = [['owner@amidala.local','田中 彩'],['sato@amidala.local','佐藤 花子'],['suzuki@amidala.local','鈴木 健'],['mori@amidala.local','森 ハル']] as const;
-const orgs = [['acme-studio','Acme Studio'],['northstar-lab','Northstar Lab']] as const;
+const orgs = [['org_acme_studio','acme-studio','Acme Studio'],['org_northstar_lab','northstar-lab','Northstar Lab']] as const;
 async function main() {
   const resource = createNodePgDatabase(resolveDatabaseUrl(env)); await resource.client.connect();
   try {
-    const auth = createAuth(resource.db, env);
+    const auth = createAuth(resource.database, env);
     for (const [email,name] of users) {
-      const existing = await (resource.db.select().from(schema.user) as any).where(((await import('drizzle-orm')).eq as any)(schema.user.email,email));
+      const existing = await (resource.database.select().from(schema.user) as any).where(((await import('drizzle-orm')).eq as any)(schema.user.email,email));
       if (!existing.length) await auth.api.signUpEmail({ body: { email, password, name } });
-      else { const result = await auth.api.signInEmail({ body: { email, password } }); if (!result) throw new Error(`Seed collision for ${email}: password/account unavailable; resolve locally without changing credentials.`); }
+      else { try { await auth.api.signInEmail({ body: { email, password } }); } catch (cause) { throw new Error(`Seed collision for ${email}: password/account unavailable; resolve locally without changing credentials.`, { cause }); } }
     }
     const now = new Date();
-    const userRows = await resource.db.select().from(schema.user);
+    const userRows = await resource.database.select().from(schema.user);
     const byEmail = new Map(userRows.map((u:any)=>[u.email,u]));
-    for (const [slug,name] of orgs) {
-      const [org] = await resource.db.insert(schema.organization).values({ id: slug, slug, name, createdAt: now, updatedAt: now }).onConflictDoUpdate({ target: schema.organization.slug, set: { name, updatedAt: now } }).returning();
+    for (const [id,slug,name] of orgs) {
+      const [org] = await resource.database.insert(schema.organization).values({ id, slug, name, createdAt: now, updatedAt: now }).onConflictDoUpdate({ target: schema.organization.slug, set: { name, updatedAt: now } }).returning();
       const members = slug === 'acme-studio' ? [['owner@amidala.local','owner','田中 彩'],['sato@amidala.local','manager','佐藤 花子'],['mori@amidala.local','member','森 ハル']] : [['owner@amidala.local','owner','田中 彩'],['suzuki@amidala.local','member','鈴木 健']];
-      for (const [email,role,displayName] of members) { const u:any = byEmail.get(email); await resource.db.insert(schema.membership).values({ id: `${slug}-${email.split('@')[0]}`, userId:u.id, organizationId:org.id, displayName, role, status:'active', createdAt:now, updatedAt:now }).onConflictDoUpdate({ target:[schema.membership.userId,schema.membership.organizationId], set:{displayName,role,status:'active',updatedAt:now} }); }
+      for (const [email,role,displayName] of members) { const u:any = byEmail.get(email); await resource.database.insert(schema.membership).values({ id: `${slug}-${email.split('@')[0]}`, userId:u.id, organizationId:org.id, displayName, role, status:'active', createdAt:now, updatedAt:now }).onConflictDoUpdate({ target:[schema.membership.userId,schema.membership.organizationId], set:{displayName,role,status:'active',updatedAt:now} }); }
+      const membershipRows:any[] = await resource.database.select().from(schema.membership);
+      const memberId = (email:string) => membershipRows.find((m:any) => m.organizationId === org.id && m.userId === byEmail.get(email)?.id)?.id;
+      const relation = slug === 'acme-studio' ? ['sato@amidala.local','manager_report'] : ['suzuki@amidala.local','peer'];
+      await resource.database.insert(schema.relationship).values({ id: `${slug}-owner-${relation[0].split('@')[0]}`, organizationId: org.id, sourceMembershipId: memberId('owner@amidala.local'), targetMembershipId: memberId(relation[0]), kind: relation[1], createdAt: now, updatedAt: now }).onConflictDoUpdate({ target:[schema.relationship.organizationId,schema.relationship.sourceMembershipId,schema.relationship.targetMembershipId,schema.relationship.kind], set:{updatedAt:now} });
     }
   } finally { await resource.client.end(); }
 }

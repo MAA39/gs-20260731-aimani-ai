@@ -6,7 +6,7 @@ import { resolveDatabaseUrl } from '../config/env';
 import { createNodePgDatabase } from '@amidala/db/client';
 import { createAuth } from '../auth/create-auth';
 import { MembershipRepository } from '../infrastructure/db/membership-repository';
-import { ListOrganizations } from '../application/list-organizations';
+import { ListOrganizationMembershipsForUser } from '../application/list-organizations';
 
 export interface RequestScopeArgs {
   env: ApiBindings;
@@ -17,7 +17,7 @@ export interface RequestCradle extends RootCradle {
   env: ApiBindings;
   request: Request;
   healthCheck: HealthCheck;
-  db: any; auth: ReturnType<typeof createAuth>; membershipRepository: MembershipRepository; listOrganizations: ListOrganizations;
+  databaseResource: Awaited<ReturnType<typeof createNodePgDatabase>>; auth: ReturnType<typeof createAuth>; membershipRepository: MembershipRepository; listOrganizationMembershipsForUser: ListOrganizationMembershipsForUser;
 }
 
 export type RequestScope = AwilixContainer<RequestCradle>;
@@ -34,13 +34,14 @@ export async function withRequestScope<T>(
     healthCheck: asFunction(
       ({ clock }: { clock: Clock }) => new HealthCheck(clock),
     ).scoped(),
-    db: asFunction(({ env }: { env: ApiBindings }) => {
+    databaseResource: asFunction(async ({ env }: { env: ApiBindings }) => {
       const resource = createNodePgDatabase(resolveDatabaseUrl(env));
+      await resource.client.connect();
       return resource;
-    }).scoped().disposer(async (resource) => { await resource.client.end(); }),
-    auth: asFunction(({ db, env }: { db: any; env: ApiBindings }) => createAuth(db, env)).scoped(),
-    membershipRepository: asFunction(({ db }: { db: any }) => new MembershipRepository(db)).scoped(),
-    listOrganizations: asFunction(({ membershipRepository }: { membershipRepository: MembershipRepository }) => new ListOrganizations(membershipRepository)).scoped(),
+    }).scoped().disposer(async (resource: Promise<Awaited<ReturnType<typeof createNodePgDatabase>>>) => { (await resource).client.end(); }),
+    auth: asFunction(({ databaseResource, env }: { databaseResource: Awaited<ReturnType<typeof createNodePgDatabase>>; env: ApiBindings }) => createAuth(databaseResource.database, env)).scoped(),
+    membershipRepository: asFunction(({ databaseResource }: { databaseResource: Awaited<ReturnType<typeof createNodePgDatabase>> }) => new MembershipRepository(databaseResource.database)).scoped(),
+    listOrganizationMembershipsForUser: asFunction(({ membershipRepository }: { membershipRepository: MembershipRepository }) => new ListOrganizationMembershipsForUser(membershipRepository)).scoped(),
   });
 
   try {
