@@ -35,3 +35,5 @@ git diff --check
 - 390px 幅で長い日本語の氏名が rail からはみ出さないよう、モバイル時のみ relationship rail / Todo card rail を縦積みに変更し、ラベルと責任の流れを保ったまま自然に折り返す CSS を追加した（デスクトップレイアウトは不変）。
 - 空状態のフォーカス先を安定した `todo-title` id に変更し、未使用の ref を削除した。
 - 修正後も Web tsc/build、monorepo build、`git diff --check` を再実行する。
+
+レビュー追加修正: `document` のグローバル検索を廃止し、Page が所有する `RefObject` を Composer に渡して空状態 action から title input に focus する構造へ変更した。
