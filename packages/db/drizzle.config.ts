@@ -1,8 +1,10 @@
 import { loadEnvFile } from 'node:process';
 import { defineConfig } from 'drizzle-kit';
-import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
 
-try { loadEnvFile(resolve(process.cwd(), 'apps/api/.dev.vars')); } catch { /* optional for config inspection */ }
+const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+try { loadEnvFile(resolve(repositoryRoot, 'apps/api/.dev.vars')); } catch { /* optional for config inspection */ }
 
 export default defineConfig({
   schema: './src/schema/index.ts',
