@@ -1,6 +1,6 @@
 import { and, desc, eq, or } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
-import { membership, organization, relationship, todo } from '@amidala/db/schema';
+import { membership, organization, relationship, todo, todoHandoff } from '@amidala/db/schema';
 import type { AmidalaDatabase } from '@amidala/db/client';
 import { relationshipKindSchema, type RelationshipKind } from '@amidala/contracts';
 import type { CurrentMembershipContext } from '../../domain/identity';
@@ -48,11 +48,16 @@ export class TodoRepositoryDrizzle implements TodoRepositoryPort {
     if (!row) throw new Error('Todo insert returned no row.');
     const creator = alias(membership, 'todo_creator');
     const assignee = alias(membership, 'todo_assignee');
+    const handoffRequester = alias(membership, 'todo_handoff_requester');
+    const handoffRecipient = alias(membership, 'todo_handoff_recipient');
     const [joined] = await this.database
-      .select({ todo: todo, creatorName: creator.displayName, creatorTitle: creator.title, assigneeName: assignee.displayName, assigneeTitle: assignee.title })
+      .select({ todo: todo, creatorName: creator.displayName, creatorTitle: creator.title, assigneeName: assignee.displayName, assigneeTitle: assignee.title, handoffId: todoHandoff.id, handoffRequesterId: todoHandoff.requesterMembershipId, handoffRequesterName: handoffRequester.displayName, handoffRequesterTitle: handoffRequester.title, handoffRecipientId: todoHandoff.recipientMembershipId, handoffRecipientName: handoffRecipient.displayName, handoffRecipientTitle: handoffRecipient.title, handoffMessage: todoHandoff.requestMessage, handoffRequestedAt: todoHandoff.requestedAt })
       .from(todo)
       .leftJoin(creator, and(eq(creator.id, row.creatorMembershipId), eq(creator.organizationId, row.organizationId)))
       .leftJoin(assignee, and(eq(assignee.id, row.assigneeMembershipId), eq(assignee.organizationId, row.organizationId)))
+      .leftJoin(todoHandoff, and(eq(todoHandoff.todoId, row.id), eq(todoHandoff.organizationId, row.organizationId), eq(todoHandoff.status, 'requested')))
+      .leftJoin(handoffRequester, and(eq(handoffRequester.id, todoHandoff.requesterMembershipId), eq(handoffRequester.organizationId, row.organizationId)))
+      .leftJoin(handoffRecipient, and(eq(handoffRecipient.id, todoHandoff.recipientMembershipId), eq(handoffRecipient.organizationId, row.organizationId)))
       .where(and(eq(todo.id, row.id), eq(todo.organizationId, row.organizationId)));
     return this.toTodoSummary(row, joined);
   }
@@ -62,6 +67,8 @@ export class TodoRepositoryDrizzle implements TodoRepositoryPort {
     const context = alias(membership, 'workspace_context');
     const creator = alias(membership, 'workspace_creator');
     const assignee = alias(membership, 'workspace_assignee');
+    const handoffRequester = alias(membership, 'workspace_handoff_requester');
+    const handoffRecipient = alias(membership, 'workspace_handoff_recipient');
     const [organizationRow] = await this.database.select({ organizationId: organization.id, name: organization.name }).from(organization).where(eq(organization.id, query.organizationId)).limit(1);
     const [memberRow] = await this.database
       .select({ currentName: current.displayName, currentTitle: current.title, contextName: context.displayName, contextTitle: context.title })
@@ -70,10 +77,13 @@ export class TodoRepositoryDrizzle implements TodoRepositoryPort {
       .where(and(eq(current.id, query.currentMembershipId), eq(current.organizationId, query.organizationId)))
       .limit(1);
     const rows = await this.database
-      .select({ todo, creatorName: creator.displayName, creatorTitle: creator.title, assigneeName: assignee.displayName, assigneeTitle: assignee.title })
+      .select({ todo, creatorName: creator.displayName, creatorTitle: creator.title, assigneeName: assignee.displayName, assigneeTitle: assignee.title, handoffId: todoHandoff.id, handoffRequesterId: todoHandoff.requesterMembershipId, handoffRequesterName: handoffRequester.displayName, handoffRequesterTitle: handoffRequester.title, handoffRecipientId: todoHandoff.recipientMembershipId, handoffRecipientName: handoffRecipient.displayName, handoffRecipientTitle: handoffRecipient.title, handoffMessage: todoHandoff.requestMessage, handoffRequestedAt: todoHandoff.requestedAt })
       .from(todo)
       .leftJoin(creator, and(eq(creator.id, todo.creatorMembershipId), eq(creator.organizationId, query.organizationId)))
       .leftJoin(assignee, and(eq(assignee.id, todo.assigneeMembershipId), eq(assignee.organizationId, query.organizationId)))
+      .leftJoin(todoHandoff, and(eq(todoHandoff.todoId, todo.id), eq(todoHandoff.organizationId, query.organizationId), eq(todoHandoff.status, 'requested')))
+      .leftJoin(handoffRequester, and(eq(handoffRequester.id, todoHandoff.requesterMembershipId), eq(handoffRequester.organizationId, query.organizationId)))
+      .leftJoin(handoffRecipient, and(eq(handoffRecipient.id, todoHandoff.recipientMembershipId), eq(handoffRecipient.organizationId, query.organizationId)))
       .where(and(eq(todo.organizationId, query.organizationId), or(and(eq(todo.creatorMembershipId, query.currentMembershipId), eq(todo.contextMembershipId, query.contextMembershipId)), and(eq(todo.creatorMembershipId, query.contextMembershipId), eq(todo.contextMembershipId, query.currentMembershipId)))))
       .orderBy(desc(todo.createdAt), desc(todo.id));
     const relationshipKinds = await this.relationshipKinds(query.organizationId, query.currentMembershipId, query.contextMembershipId);
@@ -92,9 +102,10 @@ export class TodoRepositoryDrizzle implements TodoRepositoryPort {
     return [...new Set(rows.map((row) => relationshipKindSchema.safeParse(row.kind).data).filter((kind): kind is RelationshipKind => kind !== undefined))].sort((a, b) => relationshipOrder[a] - relationshipOrder[b]);
   }
 
-  private toTodoSummary(row: TodoRow, names?: { creatorName?: string | null; creatorTitle?: string | null; assigneeName?: string | null; assigneeTitle?: string | null }) {
+  private toTodoSummary(row: TodoRow, names?: { creatorName?: string | null; creatorTitle?: string | null; assigneeName?: string | null; assigneeTitle?: string | null; handoffId?: string | null; handoffRequesterId?: string | null; handoffRequesterName?: string | null; handoffRequesterTitle?: string | null; handoffRecipientId?: string | null; handoffRecipientName?: string | null; handoffRecipientTitle?: string | null; handoffMessage?: string | null; handoffRequestedAt?: Date | null }) {
     const member = (membershipId: string, name: string | null | undefined, title: string | null | undefined): TodoMemberSummary => ({ membershipId, name: name ?? '', title: title ?? null });
-    return { todoId: row.id, organizationId: row.organizationId, contextMembershipId: row.contextMembershipId, title: row.title, description: row.description, status: row.status as 'open' | 'completed', creator: member(row.creatorMembershipId, names?.creatorName, names?.creatorTitle), assignee: member(row.assigneeMembershipId, names?.assigneeName, names?.assigneeTitle), createdAt: row.createdAt.toISOString(), updatedAt: row.updatedAt.toISOString(), pendingHandoff: null };
+    const pendingHandoff = names?.handoffId && names.handoffRequesterId && names.handoffRecipientId && names.handoffRequestedAt ? { handoffId: names.handoffId, requester: member(names.handoffRequesterId, names.handoffRequesterName, names.handoffRequesterTitle), recipient: member(names.handoffRecipientId, names.handoffRecipientName, names.handoffRecipientTitle), requestMessage: names.handoffMessage ?? null, requestedAt: names.handoffRequestedAt.toISOString() } : null;
+    return { todoId: row.id, organizationId: row.organizationId, contextMembershipId: row.contextMembershipId, title: row.title, description: row.description, status: row.status as 'open' | 'completed', creator: member(row.creatorMembershipId, names?.creatorName, names?.creatorTitle), assignee: member(row.assigneeMembershipId, names?.assigneeName, names?.assigneeTitle), createdAt: row.createdAt.toISOString(), updatedAt: row.updatedAt.toISOString(), pendingHandoff };
   }
 }
 
