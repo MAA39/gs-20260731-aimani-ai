@@ -464,12 +464,62 @@ deploy前に必要:
 
 ## 15. 残課題と推奨順序
 
+### Claudeへの最重要プロダクト判断
+
+2026-07-27にユーザーがローカル画面を実際に見た時点の率直な評価は、次のとおり。
+
+> 技術的には簡単なCRUD以上のものが動いているが、これが良いプロダクト体験なのか、未実装機能を足せば面白くなるのか、現画面からは判断できない。
+
+現在は、認証、Organization境界、People、Todo作成・閲覧、Todo Handoffの依頼・承認・見送り・取消、transactionalな担当変更まで成立している。したがって「技術的に縦切りが成立する」ことは確認できた。一方で、ユーザーが「なぜ普通のタスク管理ではなくAmidalaを使うのか」を感じる体験にはまだ届いていない。
+
+不足しているCRUDを一覧順に追加してはいけない。Todo編集・削除・検索を増やせば便利にはなるが、プロダクトが面白くなる保証はない。次は機能充足ではなく、次の物語を3分で理解・操作できるかを検証する。
+
+```text
+誰かとの約束が生まれる
+  → 次に誰が動くか明確になる
+  → 相手へ背景ごと渡す
+  → 相手が引き受ける
+  → チーム全体が「いま誰のボールか」を理解できる
+```
+
+この体験を成立させるための優先候補:
+
+1. integration fixtureを除いた少数の意味あるdemo dataへ整理する
+2. logout / actor switchを画面から行い、田中が依頼して森が受け取る往復を一人で体験できるようにする
+3. People一覧より先に「今日、自分が動くもの」「受け取った依頼」「止まっている約束」を見せる
+4. Handoffへ背景、期待する結果、期限または確認事項を短く添える
+5. accept後に担当者名が変わるだけでなく、「次に誰が何をするか」が変化したことを一画面で強く示す
+
+この優先順位も仮説である。Claude Codeは実装前に既存Amidala/BYARDのUXと競合体験を再調査し、ユーザーへ触れる小さな提案として具体化すること。一般的なCRUD backlogへ分解して消化しない。
+
+### 2026-07-27 ローカル実機確認
+
+Codexが`main`を`http://localhost:5173/`で起動し、既存の森ハルsessionで次を確認した。
+
+- Organization選択、People一覧: 表示成功
+- 佐藤花子との共有Todo画面とTodo作成form: 表示成功
+- 森ハルのAssigned Todo一覧: 表示成功
+- Handoffのincoming / recent / accepted / canceled表示: 表示成功
+- Handoff依頼Dialog: 開閉成功。田中彩・佐藤花子の候補取得成功
+- この確認ではDBを変えるsubmit/accept/reject/cancelは実行していない
+- 過去のbrowser journeyとPostgreSQL integration testではrequest→accept等の状態遷移を確認済み
+
+同時に次のUX阻害を確認した。
+
+- local DBに`handoff-<timestamp>-<random>`形式のintegration fixtureが多数残り、Todo/Handoff一覧が価値を判断しにくいほど散らかっている
+- React consoleに`<div>`が`<html>`直下にあるというhydration warningが1件出る。画面は描画されるが修正対象
+- 現在のlogin表示は「ログイン中 / アカウント」だけで、誰として操作しているか・actorをどう切り替えるかが画面から理解しにくい
+
+この実機確認を受け、Codexは以降のプロダクト実装を進めない。次の設計・実装主体はClaude Codeとする。
+
 ### 次に推奨する小さな作業
 
-1. localで主要journeyを一度触り、次に欲しい画面をユーザーと決める
-2. 最新`main`から新しいfeature branch/worktreeを作る
-3. 価値が確認できたら、最小のCloudflare preview + PostgreSQL/Hyperdriveを作る
-4. PlaywrightでLogin → People → Todo → Handoff → Acceptの1本だけを自動化する
+1. demo dataを整理し、田中→森の一つの物語だけを触れる状態にする
+2. actor switchを含む3分の体験案をユーザーへ提示する
+3. 合意後、最新`main`から新しいfeature branch/worktreeを作る
+4. browserで価値を確認してから、必要なCRUDまたはUIだけを追加する
+5. 価値が確認できたら、最小のCloudflare preview + PostgreSQL/Hyperdriveを作る
+6. PlaywrightでLogin → People → Todo → Handoff → Acceptの1本だけを自動化する
 
 ### UX優先で次候補
 
