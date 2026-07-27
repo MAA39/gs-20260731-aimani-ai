@@ -1,3 +1,3 @@
-DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala
+DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo
 BETTER_AUTH_SECRET=local-development-secret-change-before-preview
 BETTER_AUTH_URL=http://localhost:5173

@@ -27,6 +27,17 @@
 14. [Person SharedTodo 縦切り設計](superpowers/specs/2026-07-27-relationship-todo-slice-design.md)
 15. [Todo Handoff 縦切り設計](superpowers/specs/2026-07-27-todo-handoff-slice-design.md)
 
+## ローカル起動
+
+```text
+pnpm db:up
+pnpm db:demo:reset
+cp apps/api/.dev.vars.example apps/api/.dev.vars  # 初回だけ
+pnpm dev
+```
+
+既存の `apps/api/.dev.vars` を利用している場合は、`DATABASE_URL` のデータベース名を `amidala_demo` に変更する。資格情報はこのDocsへ追加しない。
+
 ## 判断の優先順位
 
 矛盾した場合は次の順に扱う。
