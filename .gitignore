@@ -1,0 +1,7 @@
+node_modules
+dist
+.turbo
+.wrangler
+.output
+.worktrees/
+apps/api/.dev.vars

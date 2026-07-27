@@ -1,0 +1,2 @@
+CREATE INDEX "relationship_organization_source_kind_idx" ON "relationship" USING btree ("organization_id","source_membership_id","kind");--> statement-breakpoint
+CREATE INDEX "relationship_organization_target_kind_idx" ON "relationship" USING btree ("organization_id","target_membership_id","kind");
