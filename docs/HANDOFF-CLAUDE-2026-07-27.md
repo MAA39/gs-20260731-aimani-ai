@@ -573,4 +573,53 @@ Identity → People (`ccff02e`) と Person SharedTodo (`9d260a9`) は、統合�
 
 ## 20. Codex完了記録
 
-最終統合後に、PR #1/#2の状態、`main` SHA、worktree一覧、最終検証結果をここへ追記する。以後はClaudeがこの文書を入口に作業を再開する。
+完了日時: 2026-07-27（Asia/Tokyo）
+
+### 統合結果
+
+| 対象 | 結果 |
+|---|---|
+| Todo Handoff PR #1 | `MERGED`。`impl/todo-handoff` → `feat/touchable-mvp`。merge commit `5b5b819e3501ebc1be913b4887b09c6a985b4e14` |
+| Touchable MVP PR #2 | `MERGED`。`feat/touchable-mvp` → `main`。merge commit `d88213c368ab17febb5b88c8106793ea4e11ddf6` |
+| ユーザー旧local差分 | `archive/pre-todo-handoff-local-20260727` / `98e8a2a`としてprivate remoteへ保存。`main`へ未merge |
+| feature remote branch | `impl/todo-handoff`、`feat/touchable-mvp`を統合後に削除 |
+| feature local branch | `impl/identity-people`、`impl/relationship-todo`、`impl/todo-handoff`、`feat/touchable-mvp`を通常の`git branch -d`で削除 |
+
+### 統合後のfresh検証
+
+`feat/touchable-mvp`へPR #1をmergeした結果をrootで検証した。
+
+```text
+pnpm install --frozen-lockfile: PASS
+Web presentation tests: 7/7 PASS
+API unit tests: 2/2 PASS
+PostgreSQL integration tests: 6/6 PASS
+Web TypeScript: PASS
+full monorepo build: PASS
+git diff --check: PASS
+git status: clean
+```
+
+既知の警告は`@amidala/db#build`のTurbo outputs未設定だけで、buildは成功している。
+
+### Claude監査
+
+- Claude Opusによる実装reviewは最終`APPROVED`
+- 引き継ぎ文書のOpus監査再実行はAnthropic側`529 Overloaded`で完了しなかった
+- Claude Sonnetが文書を実repo/Git状態と照合し、dirty記述、archive保存、絶対パス、commit-before-remove、Ready化、merge commit方式、ancestor確認の不足を指摘
+- 指摘をすべて本書と実行手順へ反映した
+- 最終2指摘だった「PR #1 Ready化」と「PR #1/#2をmerge commit方式に固定」も実施済み
+
+### 最終workspace状態
+
+```text
+root: /Users/maa/Projects/gs/000_参照用/amidala-v2
+branch: main
+main integration SHA: d88213c368ab17febb5b88c8106793ea4e11ddf6
+worktrees: root 1件だけ
+feature worktrees: すべて撤去済み
+apps/api/.dev.vars: rootへlocal-only/permission 600で移設済み、Git管理外
+archive branch: origin/archive/pre-todo-handoff-local-20260727 に保存
+```
+
+この完了記録自体を追加する最終Docs commitが`origin/main`へpushされた後は、`git rev-parse HEAD`と`git rev-parse origin/main`が一致することを確認する。以後はClaudeが本書を入口に、最新`main`から新しいfeature worktreeを作って再開する。
