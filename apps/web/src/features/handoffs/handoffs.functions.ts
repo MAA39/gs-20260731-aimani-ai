@@ -1,0 +1,11 @@
+import { createServerFn } from '@tanstack/react-start';
+import { acceptTodoHandoff, cancelTodoHandoff, getTodoHandoffWorkspace, rejectTodoHandoff, requestTodoHandoff } from './handoffs.server';
+import { acceptTodoHandoffInputSchema, cancelTodoHandoffInputSchema, rejectTodoHandoffInputSchema, requestTodoHandoffInputSchema } from './handoff-schema';
+import { z } from 'zod';
+const organizationInputSchema = z.object({ organizationId: z.string().min(1) });
+export const getTodoHandoffWorkspaceFn = createServerFn({ method: 'GET' }).validator(organizationInputSchema).handler(({ data }) => getTodoHandoffWorkspace(data));
+export const requestTodoHandoffFn = createServerFn({ method: 'POST' }).validator(requestTodoHandoffInputSchema).handler(({ data }) => requestTodoHandoff(data));
+export const acceptTodoHandoffFn = createServerFn({ method: 'POST' }).validator(acceptTodoHandoffInputSchema).handler(({ data }) => acceptTodoHandoff(data));
+export const rejectTodoHandoffFn = createServerFn({ method: 'POST' }).validator(rejectTodoHandoffInputSchema).handler(({ data }) => rejectTodoHandoff(data));
+export const cancelTodoHandoffFn = createServerFn({ method: 'POST' }).validator(cancelTodoHandoffInputSchema).handler(({ data }) => cancelTodoHandoff(data));
+export { getTodoHandoffWorkspaceFn as getTodoHandoffWorkspace, requestTodoHandoffFn as requestTodoHandoff, acceptTodoHandoffFn as acceptTodoHandoff, rejectTodoHandoffFn as rejectTodoHandoff, cancelTodoHandoffFn as cancelTodoHandoff };

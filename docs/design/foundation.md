@@ -185,6 +185,10 @@ Button は結果を表す。「送信」ではなく「引き継ぎを依頼」�
 
 ## 実画面レビュー記録
 
+### Todo Handoff 検証（2026-07-27）
+
+1280×720でaccepted HandoffがincomingからRecentへ即時移るrailと、Assigned Todoで森 ハルへ責任が移ることを確認した。390×844ではrequest Dialogのrecipient初期focus、未選択時submit disabled、Close `80×48.4` / submit `144×50.4`、`clientWidth=390` / `scrollWidth=375`を確認した。warn/error logsは空。reduced-motionは未エミュレートのためpending。実画面は[desktop](../assets/todo-handoff/accepted-recent-desktop.png) / [mobile](../assets/todo-handoff/request-or-incoming-mobile.png)に保存した。
+
 2026-07-27 に Identity → People の最初の縦切りを実ブラウザで確認した。
 
 - 1280×900: Login、組織選択、Acme Studio / Northstar Lab の People、組織切替を確認。

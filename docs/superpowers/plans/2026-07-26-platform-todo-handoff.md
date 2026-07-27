@@ -147,15 +147,19 @@ DB / Auth / Peopleは水平分割せず、[Identity → People縦切り計画](.
 
 **Produces:** The assignee can request a Handoff; the recipient can accept/reject it; acceptance updates the visible Todo assignee.
 
-- [ ] Research current transaction, command idempotency, concurrent decision, action-state, and accessible Dialog practices; add the selected primitives to this task brief.
-- [ ] Implement requested/accepted/rejected state and the single acceptance transaction.
+- [x] Research current transaction, command idempotency, concurrent decision, action-state, and accessible Dialog practices; add the selected primitives to this task brief.
+- [x] Implement requested/accepted/rejected state and the single acceptance transaction.
 - [ ] Give Handoff an explicit `organization_id`, composite FKs to Todo/from/to Membership, and one requested Handoff per Todo.
-- [ ] Add one focused unit test for request → recipient accept → assignee changed.
-- [ ] Add one API integration test proving a session from another Organization cannot decide the Handoff.
-- [ ] Build a Base UI Dialog for choosing the recipient and an Inbox card with Accept/Reject actions.
-- [ ] Show a lightweight timeline using the Handoff row; do not add a generic audit/event system.
-- [ ] Run the two tests and manually complete both accept and reject flows in the browser.
-- [ ] Commit `feat: add interactive Todo handoff`.
+- [x] Add one focused unit test for request → recipient accept → assignee changed.
+- [x] Add one API integration test proving a session from another Organization cannot decide the Handoff.
+- [x] Build a Base UI Dialog for choosing the recipient and an Inbox card with Accept/Reject actions.
+- [x] Show a lightweight timeline using the Handoff row; do not add a generic audit/event system.
+- [x] Run the two tests and manually complete both accept and reject flows in the browser (Task 4 desktop/mobile verification recorded; reduced-motion remains pending).
+- [x] Commit `feat: add interactive Todo handoff`.
+
+Task 4 verification completed against disposable `amidala_handoff`; desktop/mobile browser evidence and screenshots are recorded in `docs/research/2026-07-27-todo-handoff-verification.md`. Recipient role used the latest local Better Auth session row because logout UI is not implemented. Reduced-motion remains pending.
+
+Final review fixes `9108967` / `7527f41` scope Inbox read models to Membership parties, apply terminal `resolvedAt DESC` + SQL limit 20, keep Assigned Todo open-only and reactive through `useSuspenseQuery`, restrict accepted CTA to recipient/current assignee, and show Recent `resolvedAt`. Final API unit 2/2, integration 6/6, Web typecheck, full build, and diff-check pass. These structural/query fixes were not browser-rerun; independent review judged a rerun unnecessary.
 
 ### Task 7: One user-journey E2E and preview handoff
 

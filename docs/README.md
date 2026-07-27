@@ -11,20 +11,21 @@
 
 ## 最初に読む順番
 
-1. [再利用可能なプロダクト基準](standards/reusable-product-baseline.md)
-2. [実装前 Research Gate](standards/research-before-build.md)
-3. [React 19 / TanStack 実装プラクティス](standards/react-tanstack-practices.md)
-4. [Domain Language / 命名基準](standards/domain-language-and-naming.md)
-5. [Auth / PostgreSQL / DI Research Gate](research/2026-07-26-auth-postgres-di.md)
-6. [技術選定記録](decisions/0001-technology-selection-2026-07-26.md)
-7. [既存プロダクト UX 監査](product/legacy-ux-audit.md)
-8. [デザイン基盤](design/foundation.md)
-9. [Amidala v2 UX-first プラットフォーム設計](superpowers/specs/2026-07-26-amidala-v2-platform-design.md)
-10. [Touchable MVP 実装計画](superpowers/plans/2026-07-26-platform-todo-handoff.md)
-11. [Identity → People 縦切り設計](superpowers/specs/2026-07-27-identity-people-vertical-slice-design.md)
-12. [Identity → People 実装計画](superpowers/plans/2026-07-27-identity-people-vertical-slice.md)
-13. [Person SharedTodo 縦切り設計](superpowers/specs/2026-07-27-relationship-todo-slice-design.md)
-14. [Todo Handoff 縦切り設計](superpowers/specs/2026-07-27-todo-handoff-slice-design.md)
+1. [Claude 作業移管 — 2026-07-27](HANDOFF-CLAUDE-2026-07-27.md)
+2. [再利用可能なプロダクト基準](standards/reusable-product-baseline.md)
+3. [実装前 Research Gate](standards/research-before-build.md)
+4. [React 19 / TanStack 実装プラクティス](standards/react-tanstack-practices.md)
+5. [Domain Language / 命名基準](standards/domain-language-and-naming.md)
+6. [Auth / PostgreSQL / DI Research Gate](research/2026-07-26-auth-postgres-di.md)
+7. [技術選定記録](decisions/0001-technology-selection-2026-07-26.md)
+8. [既存プロダクト UX 監査](product/legacy-ux-audit.md)
+9. [デザイン基盤](design/foundation.md)
+10. [Amidala v2 UX-first プラットフォーム設計](superpowers/specs/2026-07-26-amidala-v2-platform-design.md)
+11. [Touchable MVP 実装計画](superpowers/plans/2026-07-26-platform-todo-handoff.md)
+12. [Identity → People 縦切り設計](superpowers/specs/2026-07-27-identity-people-vertical-slice-design.md)
+13. [Identity → People 実装計画](superpowers/plans/2026-07-27-identity-people-vertical-slice.md)
+14. [Person SharedTodo 縦切り設計](superpowers/specs/2026-07-27-relationship-todo-slice-design.md)
+15. [Todo Handoff 縦切り設計](superpowers/specs/2026-07-27-todo-handoff-slice-design.md)
 
 ## 判断の優先順位
 
