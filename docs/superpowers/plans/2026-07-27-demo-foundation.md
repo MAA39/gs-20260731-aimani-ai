@@ -376,7 +376,7 @@ git commit -m "feat: reset a deterministic local demo database"
 - Consumes: Tasks 1-4の完成物。
 - Produces: review可能なclean branchと、PR本文に転載できる検証証跡。
 
-- [ ] **Step 1: 全DB-free checksを実行する**
+- [x] **Step 1: 全DB-free checksを実行する**
 
 ```bash
 pnpm --filter @amidala/api test -- --run
@@ -387,7 +387,9 @@ git diff --check
 
 Expected: すべてPASS。
 
-- [ ] **Step 2: fresh demo DBを確認する**
+実測 (2026-07-28): `pnpm --filter @amidala/api test -- --run` (13/13 PASS)、`pnpm --filter @amidala/web test` (7/7 PASS)、`pnpm build` (turbo 3 tasks PASS)、`git diff --check` (exit 0)。
+
+- [x] **Step 2: fresh demo DBを確認する**
 
 ```bash
 pnpm db:demo:reset
@@ -397,18 +399,22 @@ TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo \
 
 Expected: story test PASS。
 
-- [ ] **Step 3: SSRとconsoleを確認する**
+実測 (2026-07-28): `pnpm db:demo:reset` が `Demo database reset complete: amidala_demo` で終了。指定の integration command は 4 files / 7 tests PASS。
+
+- [x] **Step 3: SSRとconsoleを確認する**
 
 `pnpm dev`を起動し、`/`がStart redirect、`/login`がfull documentであることをcurlで確認する。許可されたin-app browserでfresh navigationとdirect reloadを行い、console warning/error 0件を確認する。browser policyでlocalhost inspectionが拒否される場合は、curl結果とbuildを証跡にし、最終3分journeyでbrowser確認を必須pendingとして残す。
 
-- [ ] **Step 4: 計画へ実測結果を記録してcommitする**
+実測 (2026-07-28): `curl /` は `HTTP/1.1 307 Temporary Redirect` と `location: /organizations`、legacy marker 0件。`curl /login` は `200 OK` かつ `<!DOCTYPE html><html lang="ja">`。ブラウザ console の localhost inspection は本検証指示により実行せず、fresh navigation/direct reload の console 0件確認は必須 pending。
+
+- [x] **Step 4: 計画へ実測結果を記録してcommitする**
 
 ```bash
 git add docs/superpowers/plans/2026-07-27-demo-foundation.md
 git commit -m "docs: record demo foundation verification"
 ```
 
-- [ ] **Step 5: branchがcleanか確認する**
+- [x] **Step 5: branchがcleanか確認する**
 
 Run: `git status --short --branch`
 

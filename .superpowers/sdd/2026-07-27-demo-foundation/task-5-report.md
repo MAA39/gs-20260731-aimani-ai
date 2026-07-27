@@ -1,0 +1,18 @@
+# Task 5 検証レポート
+
+Status: DONE_WITH_CONCERNS
+Date: 2026-07-28
+
+## 実測
+
+- API DB-free tests: `pnpm --filter @amidala/api test -- --run` — 2 files / 13 tests PASS。
+- Web tests: `pnpm --filter @amidala/web test` — 7 tests PASS。
+- Build: `pnpm build` — turbo 3 tasks PASS。
+- Diff check: `git diff --check` — exit 0。
+- Demo reset: `pnpm db:demo:reset` — `amidala_demo` reset complete。
+- Story integration: 指定の `TEST_DATABASE_URL=...amidala_demo pnpm --filter @amidala/api test:integration -- demo-seed.integration.test.ts --run` — 4 files / 7 tests PASS。
+- SSR curl: `/` は 307 redirect (`location: /organizations`)、legacy entry marker 0件。`/login` は 200 full document (`<!DOCTYPE html><html lang="ja">`)。
+
+## Concern / pending
+
+許可された in-app browser の localhost inspection は本検証指示により実行していないため、fresh navigation/direct reload における browser console warning/error 0件確認は必須 pending。curl と production build の証跡は取得済み。
