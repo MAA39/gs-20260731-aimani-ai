@@ -4,18 +4,14 @@ import { redirect } from '@tanstack/react-router';
 import { env } from 'cloudflare:workers';
 import { assignedTodoWorkspaceSchema, todoHandoffResponseSchema, todoHandoffWorkspaceSchema } from '@amidala/contracts';
 import type { AssignedTodoWorkspaceResult, TodoHandoffMutationResult, TodoHandoffWorkspaceResult, RequestTodoHandoffInput, AcceptTodoHandoffInput, RejectTodoHandoffInput, CancelTodoHandoffInput } from './handoff-schema';
+import { classifyTodoHandoffFailure } from './handoff-error-presentation';
 
-const unavailable = () => ({ status: 'error' as const, error: { code: 'service_unavailable' as const, message: 'Todo Handoff data is temporarily unavailable.' } });
-const messageOf = (body: unknown, fallback: string) => typeof body === 'object' && body !== null && 'error' in body && typeof (body as { error?: { message?: unknown }}).error?.message === 'string' ? (body as { error: { message: string }}).error.message : fallback;
+const unavailable = () => ({ status: 'error' as const, error: { code: 'service_unavailable' as const, message: '引き継ぎ情報を取得できませんでした。時間をおいてもう一度お試しください。' } });
 async function bodyOf(response: Response) { try { return await response.json(); } catch { return undefined; } }
 function fetcher(cookie: string): typeof fetch { return async (input, init) => { const headers = new Headers(init?.headers); if (cookie) headers.set('cookie', cookie); return env.API.fetch(new Request(input, { ...init, headers })); }; }
 function classify(response: Response, body: unknown) {
   if (response.status === 401) throw redirect({ to: '/login' });
-  if (response.status === 403) return { status: 'forbidden' as const, error: { code: 'forbidden' as const, message: messageOf(body, 'この組織では操作できません。') } };
-  if (response.status === 404) return { status: 'not_found' as const, error: { code: 'not_found' as const, message: messageOf(body, '対象の引き継ぎが見つかりません。') } };
-  if (response.status === 409) return { status: 'conflict' as const, error: { code: 'conflict' as const, message: messageOf(body, '引き継ぎの状態が更新されています。') } };
-  if (response.status === 400) return { status: 'error' as const, error: { code: 'validation_error' as const, message: messageOf(body, '入力内容を確認してください。') } };
-  return null;
+  return classifyTodoHandoffFailure(response.status, body);
 }
 async function call(input: RequestTodoHandoffInput | AcceptTodoHandoffInput | RejectTodoHandoffInput | CancelTodoHandoffInput, verb?: 'accept' | 'reject' | 'cancel') {
   const cookie = getRequestHeader('cookie') ?? '';
