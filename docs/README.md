@@ -31,8 +31,8 @@
 
 ```text
 pnpm db:up
-pnpm db:demo:reset
 cp apps/api/.dev.vars.example apps/api/.dev.vars  # 初回だけ
+pnpm db:demo:reset
 pnpm dev
 ```
 

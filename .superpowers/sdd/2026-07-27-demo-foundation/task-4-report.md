@@ -30,3 +30,9 @@
 ## Concerns
 
 Drizzleのmigration journalは `drizzle` schemaに保持されるため、reset再実行時にも全migrationを適用できるよう、target DB内の `drizzle` schemaも削除している。remote/通常DB URLはderive/assertで到達前に拒否される。
+
+## Round 1 fix
+
+Fresh cloneでは `--env-file=apps/api/.dev.vars` が必要なため、Docsの起動順を `.dev.vars` コピー→`db:demo:reset` に修正した。
+
+確認: `test -f apps/api/.dev.vars.example && awk '/^cp apps\/api\/\.dev\.vars\.example/{cp=NR} /^pnpm db:demo:reset/{reset=NR} END{exit !(cp && reset && cp < reset)}' docs/README.md`（PASS）、`git diff --check`（PASS）。
