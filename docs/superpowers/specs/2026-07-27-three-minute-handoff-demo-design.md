@@ -67,7 +67,10 @@ P0が残る間は、Today画面を作ってもプロダクト価値を判断で�
 `import.meta.env.DEV`でのみ表示する`DemoActorSwitcher`を作る。Better Authの`signOut()`、`signIn.email()`、`useSession()`を公式APIどおり使う。
 
 - 表示対象: 田中 彩、森 ハル
-- credential: 既存local seed accounts。production bundleにはdemo passwordを含めない
+- credential: 既存local seed accounts。passwordはignoredな`apps/web/.env.development.local`の`VITE_DEMO_ACTOR_PASSWORD`からdevelopment buildだけへ渡す
+- `LoginForm.tsx`にあるpassword初期値とcredential表示は削除し、通常loginは空のpassword入力に戻す
+- `DemoActorSwitcher`は`import.meta.env.DEV && import.meta.env.VITE_DEMO_ACTOR_PASSWORD`の両方が成立するときだけ表示する
+- production buildはdemo passwordを設定せず作り、生成artifactにdemo email/passwordが存在しないことを検査する
 - 動作: sign out → selected demo accountでsign in → current organizationのTodayへ遷移
 - pending中は操作をdisabled
 - 失敗時は固定日本語を表示し、内部messageを出さない
@@ -84,8 +87,8 @@ Better Auth公式はReact clientの`useSession`をreactive session正本とし�
 
 新しい汎用dashboard APIは作らない。route loaderが既存の次のquery optionsを並列に`ensureQueryData`し、Pageが同じqueryを`useSuspenseQuery`で読む。
 
-- `assignedTodoQueryOptions(organizationId)`
-- `todoHandoffWorkspaceQueryOptions(organizationId)`
+- `assignedTodoWorkspaceQuery(organizationId)`
+- `todoHandoffWorkspaceQuery(organizationId)`
 
 TanStack Router/Query公式のloader prefetch + `useSuspenseQuery`をそのまま使い、独自cacheや`useEffect`同期を追加しない。
 
@@ -121,7 +124,7 @@ resetは`public` schemaを作り直し、全migrationとdeterministic demo seed�
 
 ## 5. Hydration修正
 
-TanStack Start公式どおり、root routeのdocument shellを次の構造に固定する。
+TanStack Start公式どおり、root route componentがdocument全体を返し、clientはTanStack Start既定entryが`document`をhydrateする構造に固定する。
 
 ```tsx
 function RootComponent() {
@@ -142,7 +145,13 @@ function RootDocument({ children }: { children: ReactNode }) {
 }
 ```
 
-構造自体は現コードと近いため、warningの原因を推測で直さない。SSR HTMLとclient hydrate時DOMを再現するfailing browser checkを先に作り、invalid descendantを特定してから最小修正する。
+現コードの`RootDocument`はこの公式構造と一致している。一方、`apps/web/index.html`と`apps/web/src/main.tsx`には、`#root`へ`createRoot`する旧Vite SPA entryが残っている。TanStack Start既定entryは`hydrateRoot(document, <StartClient />)`を使うため、2つのclient entryを共存させない。
+
+- `apps/web/index.html`と`apps/web/src/main.tsx`を削除する
+- direct requestのSSR HTMLが`<!DOCTYPE html><html>`から始まり、`#root`を含まないことを確認する
+- fresh navigation / direct reloadの両方でReact hydration warningとconsole errorが0件であることを確認する
+
+導入済み`@tanstack/react-router@1.170.18`には`createRootRoute`の`shellComponent` optionがなく、現行公式例もroot componentから`html/head/body`を返す。この版には存在しないAPIを設計へ導入しない。
 
 公式root route:
 
