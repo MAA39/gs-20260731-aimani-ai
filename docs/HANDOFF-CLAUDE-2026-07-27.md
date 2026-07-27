@@ -546,15 +546,16 @@ blockingではない。
 
 1. Todo Handoff worktreeで全テストとbuildを実行する
 2. 本書と`docs/README.md`を`impl/todo-handoff`へcommit・pushする
-3. PR #1を`feat/touchable-mvp`へmergeする
-4. `feat/touchable-mvp`の統合結果で検証する
-5. PR #2を作り、`feat/touchable-mvp`を`main`へmergeする
-6. rootを`main`へ切り替え、`origin/main`へfast-forwardする
-7. 本書へ実際のPR状態、main SHA、検証結果を追記して`main`へcommit・pushする
-8. `identity-people`、`relationship-todo`、`todo-handoff`がすべて`main`のancestorであることを`git merge-base --is-ancestor`で確認する
-9. 3つのfeature worktreeをrootの外側から削除し、`git worktree prune`する
-10. 統合済みlocal feature branchを通常の`git branch -d`で削除する。force deleteは使わない
-11. rootが`main`、clean、`origin/main`と同じSHA、worktree 1件であることを確認する
+3. PR #1をReady for reviewへ変更する
+4. PR #1を`feat/touchable-mvp`へmerge commit方式でmergeする。squash/rebaseは使わない
+5. `feat/touchable-mvp`の統合結果で検証する
+6. PR #2を作り、`feat/touchable-mvp`を`main`へmerge commit方式でmergeする。squash/rebaseは使わない
+7. rootを`main`へ切り替え、`origin/main`へfast-forwardする
+8. 本書へ実際のPR状態、main SHA、検証結果を追記して`main`へcommit・pushする
+9. `identity-people`、`relationship-todo`、`todo-handoff`がすべて`main`のancestorであることを`git merge-base --is-ancestor`で確認する
+10. 3つのfeature worktreeをrootの外側から削除し、`git worktree prune`する
+11. 統合済みlocal feature branchを通常の`git branch -d`で削除する。force deleteは使わない
+12. rootが`main`、clean、`origin/main`と同じSHA、worktree 1件であることを確認する
 
 Identity → People (`ccff02e`) と Person SharedTodo (`9d260a9`) は、統合前の調査時点ですでに`feat/touchable-mvp`のancestorだった。remote feature branchがなくても内容は統合先commitに保全されている。削除直前にもancestor確認を再実行する。
 
