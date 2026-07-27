@@ -10,7 +10,7 @@ export function assertLocalDemoDatabaseUrl(target: string): URL {
     throw new Error('Refusing reset: target must be the local demo database.')
   }
 
-  if (!LOCAL_HOSTS.has(url.hostname) || decodeURIComponent(url.pathname.slice(1)) !== DEMO_DATABASE_NAME) {
+  if (url.protocol !== 'postgresql:' || !LOCAL_HOSTS.has(url.hostname) || decodeURIComponent(url.pathname.slice(1)) !== DEMO_DATABASE_NAME) {
     throw new Error('Refusing reset: target must be the local demo database.')
   }
 
@@ -25,7 +25,7 @@ export function deriveLocalDemoDatabaseUrl(source: string): string {
     throw new Error('Refusing reset: source must be a local PostgreSQL URL.')
   }
 
-  if (!LOCAL_HOSTS.has(url.hostname)) {
+  if (url.protocol !== 'postgresql:' || !LOCAL_HOSTS.has(url.hostname)) {
     throw new Error('Refusing reset: source must be a local demo database.')
   }
 

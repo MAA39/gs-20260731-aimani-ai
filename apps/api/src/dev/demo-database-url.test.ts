@@ -13,6 +13,8 @@ describe('assertLocalDemoDatabaseUrl', () => {
     'postgresql://amidala:amidala@127.0.0.1:54329/amidala',
     'postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff',
     'postgresql://user:pass@example.com:5432/amidala_demo',
+    'http://localhost:54329/amidala_demo',
+    'postgres://localhost:54329/amidala_demo',
     'not-a-url',
   ])('rejects an unsafe target: %s', (value) => {
     expect(() => assertLocalDemoDatabaseUrl(value)).toThrow(/local demo database/i)
@@ -27,6 +29,11 @@ describe('deriveLocalDemoDatabaseUrl', () => {
 
   it('does not derive a target from a remote connection', () => {
     expect(() => deriveLocalDemoDatabaseUrl('postgresql://user:pass@example.com/db'))
+      .toThrow(/local demo database/i)
+  })
+
+  it('does not derive a target from a non-PostgreSQL URL', () => {
+    expect(() => deriveLocalDemoDatabaseUrl('http://localhost:54329/amidala'))
       .toThrow(/local demo database/i)
   })
 })
