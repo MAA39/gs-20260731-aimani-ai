@@ -15,8 +15,9 @@ export function HandoffRequestCard({ handoff, kind, currentMembershipId, onAnnou
     setResultMessage(''); onAnnounce('引き継ぎを処理中です。');
     try {
       const result = await mutation.mutateAsync(action);
-      await Promise.all([client.invalidateQueries({ queryKey: todoHandoffWorkspaceKey(handoff.organizationId), exact: true }), client.invalidateQueries({ queryKey: assignedTodoWorkspaceKey(handoff.organizationId), exact: true }), client.invalidateQueries({ queryKey: sharedTodoWorkspaceOrganizationPrefix(handoff.organizationId), exact: false })]);
-      if (result.status === 'conflict') { setResultMessage('この依頼はすでに処理されています。'); onAnnounce('この依頼はすでに処理されています。'); mutation.reset(); return; }
+      const invalidate = () => Promise.all([client.invalidateQueries({ queryKey: todoHandoffWorkspaceKey(handoff.organizationId), exact: true }), client.invalidateQueries({ queryKey: assignedTodoWorkspaceKey(handoff.organizationId), exact: true }), client.invalidateQueries({ queryKey: sharedTodoWorkspaceOrganizationPrefix(handoff.organizationId), exact: false })]);
+      if (result.status === 'conflict') { setResultMessage(result.error.message); onAnnounce(result.error.message); await invalidate().catch(() => undefined); mutation.reset(); return; }
+      await invalidate();
       if (result.status !== 'ok') { setResultMessage(result.error.message); onAnnounce(result.error.message); return; }
       const message = action === 'accept' ? '引き継ぎを受け入れました。' : action === 'reject' ? '引き継ぎを見送りました。' : '引き継ぎ依頼を取り消しました。'; setResultMessage(message); onAnnounce(message);
     } catch { const message = '引き継ぎの処理に失敗しました。再試行してください。'; setResultMessage(message); onAnnounce(message); }
