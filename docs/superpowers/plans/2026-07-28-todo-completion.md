@@ -561,11 +561,13 @@ MinorはUX価値を損なわないものだけhandoff Docsへ記録する。
 
 Critical / Importantの修正対象はなし。MinorだったWeb側completion input schemaの重複は`completeTodoPathSchema`のaliasへ一本化し、scoped再review APPROVED、Web 14/14、TypeScript、全体fresh checkを通した。ignored SDD task reportの古いcommit/style記載だけは製品成果物に影響しないため未修正。
 
-- [ ] **Step 5: branchをpushしsmall PRを作る**
+- [x] **Step 5: branchをpushしsmall PRを作る**
 
 PR title: `feat: complete assigned Todo`
 
 PR bodyにdesign link、behavior、integration counts、runtime result、Cloudflare未deployを記載する。
+
+実測: `feat/todo-completion`をpushし、small PR [#10](https://github.com/MAA39/amidala-v2/pull/10) `feat: complete assigned Todo`を作成した。Cloudflare deployは未実施。
 
 - [ ] **Step 6: GitHub checks後にmerge commit方式でmergeする**
 
