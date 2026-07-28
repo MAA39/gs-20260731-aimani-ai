@@ -40,7 +40,7 @@
 - Produces: `deriveStepAvailability(steps, dependencies): Record<string, 'ready' | 'waiting' | 'completed'>`
 - Produces: `topologicallySortSteps(steps, dependencies): ProcessStep[]`
 
-- [ ] **Step 1: Write failing tests for graph behavior**
+- [x] **Step 1: Write failing tests for graph behavior**
 
 ```ts
 import { describe, expect, it } from 'vitest';
@@ -72,13 +72,13 @@ describe('process graph', () => {
 });
 ```
 
-- [ ] **Step 2: Run the unit test and observe RED**
+- [x] **Step 2: Run the unit test and observe RED**
 
 Run: `pnpm --filter @amidala/api exec vitest run src/features/process-lab/process-graph.test.ts`
 
 Expected: FAIL because `process-graph.ts` does not exist.
 
-- [ ] **Step 3: Add schemas and minimal pure graph functions**
+- [x] **Step 3: Add schemas and minimal pure graph functions**
 
 Define Zod schemas for the workspace and mutations:
 
@@ -97,13 +97,13 @@ export const connectProcessStepsBodySchema = z.object({ predecessorStepId: z.str
 
 Implement graph traversal with `Map<string, string[]>` and Kahn's algorithm. `validateDependencyChange` must return literal reasons: `self_dependency | duplicate | missing_step | cross_board | cycle`.
 
-- [ ] **Step 4: Run unit tests and package builds**
+- [x] **Step 4: Run unit tests and package builds**
 
 Run: `pnpm --filter @amidala/api exec vitest run src/features/process-lab/process-graph.test.ts && pnpm --filter @amidala/contracts exec tsc -p tsconfig.json`
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit the contract and invariant slice**
+- [x] **Step 5: Commit the contract and invariant slice**
 
 ```bash
 git add packages/contracts apps/api/src/features/process-lab
@@ -127,17 +127,17 @@ git commit -m "feat: define Process Lab graph contract"
 - Produces: `processLabBoard`, `processLabStep`, `processLabDependency`, `processLabStepLayout` Drizzle tables.
 - Produces deterministic board `process-lab-acme-product-launch` with six connected steps for `org_acme_studio`.
 
-- [ ] **Step 1: Extend the demo seed integration test first**
+- [x] **Step 1: Extend the demo seed integration test first**
 
 Add assertions that after seeding Acme has one board, six steps, at least five dependencies, no isolated step, and one layout row per step. Query the real database via Drizzle; do not assert on seed source text.
 
-- [ ] **Step 2: Run the demo test and observe RED**
+- [x] **Step 2: Run the demo test and observe RED**
 
-Run: `TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_test pnpm --filter @amidala/api test:demo -- --run src/dev/demo-seed.integration.test.ts`
+Run: `TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo pnpm --filter @amidala/api test:demo -- --run src/dev/demo-seed.integration.test.ts`
 
 Expected: FAIL because Process Lab tables do not exist.
 
-- [ ] **Step 3: Add the four tables and migration**
+- [x] **Step 3: Add the four tables and migration**
 
 Use these database identities and constraints:
 
@@ -150,7 +150,7 @@ processLabStepLayout: boardId, organizationId, stepId, x doublePrecision, y doub
 
 Add composite foreign keys so every step, edge endpoint, assignee, and layout belongs to the same organization/board. Add SQL checks for status values, trimmed title/name lengths, non-self edges, finite coordinates, and unique `(board_id, predecessor_step_id, successor_step_id)`. The directed-cycle rule remains transactional application logic because PostgreSQL CHECK constraints cannot inspect other rows.
 
-- [ ] **Step 4: Seed the connected Acme launch flow**
+- [x] **Step 4: Seed the connected Acme launch flow**
 
 Seed six domain-named steps with stable IDs and positions:
 
@@ -163,13 +163,13 @@ Seed six domain-named steps with stable IDs and positions:
 
 Connect 1→2→3, 3→4, 3→5, 4→6, 5→6. Give every step a layout row.
 
-- [ ] **Step 5: Reset the local demo DB and observe GREEN**
+- [x] **Step 5: Reset the local demo DB and observe GREEN**
 
-Run: `pnpm db:demo:reset && TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_test pnpm --filter @amidala/api test:demo -- --run src/dev/demo-seed.integration.test.ts`
+Run: `pnpm db:demo:reset && TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo pnpm --filter @amidala/api test:demo -- --run src/dev/demo-seed.integration.test.ts`
 
 Expected: PASS and the development database contains the Process Lab board.
 
-- [ ] **Step 6: Commit the persistence slice**
+- [x] **Step 6: Commit the persistence slice**
 
 ```bash
 git add packages/db apps/api/src/dev
@@ -196,7 +196,7 @@ git commit -m "feat: persist and seed Process Lab board"
 - Produces: `DELETE /organizations/:organizationId/process-lab/dependencies/:predecessorStepId/:successorStepId`
 - Every mutation returns the complete updated `ProcessLabWorkspace` and increments `board.revision` exactly once.
 
-- [ ] **Step 1: Write API integration tests against real PostgreSQL**
+- [x] **Step 1: Write API integration tests against real PostgreSQL**
 
 Cover only these user-visible boundaries:
 
@@ -211,13 +211,13 @@ it('connects and disconnects a valid dependency without leaving an isolated step
 
 Use the existing Better Auth test helper and real test database pattern from `todo-handoffs.integration.test.ts`.
 
-- [ ] **Step 2: Run the integration test and observe RED**
+- [x] **Step 2: Run the integration test and observe RED**
 
-Run: `TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_test pnpm --filter @amidala/api test:integration -- --run src/features/process-lab/process-lab.integration.test.ts`
+Run: `TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo pnpm --filter @amidala/api test:integration -- --run src/features/process-lab/process-lab.integration.test.ts`
 
 Expected: FAIL with 404 because routes are not mounted.
 
-- [ ] **Step 3: Implement repository transactions**
+- [x] **Step 3: Implement repository transactions**
 
 `ProcessLabRepository` must expose:
 
@@ -231,19 +231,19 @@ disconnectSteps(userId: string, organizationId: string, input: ConnectProcessSte
 
 Lock the board row with `FOR UPDATE` for mutations, load the graph in the same transaction, validate it through Task 1 functions, apply one mutation, increment revision once, and return a fresh workspace. Use organization membership in every read/write predicate.
 
-- [ ] **Step 4: Implement a thin service and thin Hono adapters**
+- [x] **Step 4: Implement a thin service and thin Hono adapters**
 
 The service converts domain violations to `ApiError('conflict', message)` and authorization misses to `ApiError('forbidden', ...)`. The Hono file performs only session lookup, Zod parsing, service resolution, and HTTP response selection.
 
-- [ ] **Step 5: Mount the slice in DI and app, then observe GREEN**
+- [x] **Step 5: Mount the slice in DI and app, then observe GREEN**
 
 Register `processLabRepository` and `processLabService` as request-scoped dependencies and mount `createProcessLabRoutes()` once in `app.ts`.
 
-Run: `TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_test pnpm --filter @amidala/api test:integration -- --run src/features/process-lab/process-lab.integration.test.ts`
+Run: `TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo pnpm --filter @amidala/api test:integration -- --run src/features/process-lab/process-lab.integration.test.ts`
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit the API slice**
+- [x] **Step 6: Commit the API slice**
 
 ```bash
 git add apps/api/src/features/process-lab apps/api/src/composition/request-scope.ts apps/api/src/app.ts
@@ -267,27 +267,27 @@ git commit -m "feat: expose Process Lab API"
 - Produces: `processLabQuery(organizationId)`
 - Produces Server Functions `getProcessLab`, `updateProcessStepStatus`, `moveProcessStep`, `connectProcessSteps`, `disconnectProcessSteps`.
 
-- [ ] **Step 1: Write a failing schema boundary test**
+- [x] **Step 1: Write a failing schema boundary test**
 
 Assert that a complete API workspace parses, while a dependency pointing at an absent step is rejected by the web presenter schema refinement. Keep expected error behavior literal.
 
-- [ ] **Step 2: Run the web test and observe RED**
+- [x] **Step 2: Run the web test and observe RED**
 
 Run: `pnpm --filter @amidala/web test -- src/features/process-lab/process-lab-schema.test.ts`
 
 Expected: FAIL because the schema module is missing.
 
-- [ ] **Step 3: Implement the BFF modules**
+- [x] **Step 3: Implement the BFF modules**
 
 Follow the existing `features/work` split. `process-lab-query-key.ts` must import no Server Function or server-only module. The server adapter forwards cookies through `createApiFetcher`, redirects 401 to `/login`, maps 403/404/409 to Japanese user-facing results, validates all 200 responses with `processLabWorkspaceSchema`, and treats malformed responses as `service_unavailable`.
 
-- [ ] **Step 4: Run the focused web test and typecheck**
+- [x] **Step 4: Run the focused web test and typecheck**
 
 Run: `pnpm --filter @amidala/web test -- src/features/process-lab/process-lab-schema.test.ts && pnpm --filter @amidala/web exec tsc --noEmit -p tsconfig.json`
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit the BFF slice**
+- [x] **Step 5: Commit the BFF slice**
 
 ```bash
 git add apps/web/src/features/process-lab
@@ -315,13 +315,13 @@ git commit -m "feat: add Process Lab BFF boundary"
 - Produces: `toFlowNodes(workspace, selectedStepId)` and `toFlowEdges(workspace, selectedStepId)`.
 - Produces: `ProcessLabPage({ organizationId, result, retry })`.
 
-- [ ] **Step 1: Add the exact React Flow dependency**
+- [x] **Step 1: Add the exact React Flow dependency**
 
 Run: `pnpm --filter @amidala/web add @xyflow/react@12.11.2`
 
 Expected: only `apps/web/package.json` and `pnpm-lock.yaml` change.
 
-- [ ] **Step 2: Write failing presenter tests**
+- [x] **Step 2: Write failing presenter tests**
 
 Test hand-derived fixtures for:
 
@@ -331,13 +331,13 @@ it('highlights the selected node and its upstream and downstream responsibility 
 it('orders the mobile list predecessor-first');
 ```
 
-- [ ] **Step 3: Run presenter tests and observe RED**
+- [x] **Step 3: Run presenter tests and observe RED**
 
 Run: `pnpm --filter @amidala/web test -- src/features/process-lab/process-lab-presenter.test.ts`
 
 Expected: FAIL because presenter functions do not exist.
 
-- [ ] **Step 4: Implement presenter and accessible visual components**
+- [x] **Step 4: Implement presenter and accessible visual components**
 
 The desktop node shows title, assignee avatar/name, due date, status, and a compact progress cue. Handles have visible connection affordances. Edges use directional arrows and distinct selected/upstream/downstream styles. Node and edge selection synchronize with the right inspector. Set React Flow `nodesFocusable`, `edgesFocusable`, `ariaLabelConfig`, keyboard delete only for a selected edge, and Japanese `aria-label` values.
 
@@ -356,17 +356,17 @@ Use event-driven updates only:
 
 Mutation calls are serialized per board. While saving, show `保存中`; on success replace query data with the returned full workspace; on failure show an inline retryable message and keep the local canvas visible.
 
-- [ ] **Step 5: Implement responsive, Amidala-native styling**
+- [x] **Step 5: Implement responsive, Amidala-native styling**
 
 Use existing color/spacing tokens and Manrope / Noto Sans JP. Desktop layout is canvas plus 320px inspector; mobile under 760px hides canvas and shows the topologically ordered stacked list. Avoid gradients, dashboard-card grids, ornamental metrics, and oversized titles. Include a small `実験機能` badge and one-sentence explanation so the page reads as a disposable lab.
 
-- [ ] **Step 6: Run presenter tests and web typecheck**
+- [x] **Step 6: Run presenter tests and web typecheck**
 
 Run: `pnpm --filter @amidala/web test -- src/features/process-lab/process-lab-presenter.test.ts && pnpm --filter @amidala/web exec tsc --noEmit -p tsconfig.json`
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit the interaction slice**
+- [x] **Step 7: Commit the interaction slice**
 
 ```bash
 git add apps/web/package.json pnpm-lock.yaml apps/web/src/features/process-lab
@@ -386,25 +386,25 @@ git commit -m "feat: build interactive Process Lab canvas"
 - Produces route `/$organizationId/process-lab` with loader-prefetched data.
 - Keeps existing five-item desktop/bottom navigation unchanged.
 
-- [ ] **Step 1: Add the route adapter**
+- [x] **Step 1: Add the route adapter**
 
 Use `ensureQueryData(processLabQuery(organizationId))`, a skeleton `pendingComponent`, and `useSuspenseQuery` in the route. Render `ProcessLabPage` and pass refetch only for the failed initial read. Import `@xyflow/react/dist/style.css` and `process-lab.css` from the Process Lab route/component boundary.
 
-- [ ] **Step 2: Extend the shell's organization-route recognition**
+- [x] **Step 2: Extend the shell's organization-route recognition**
 
 Add `process-lab` to the root route regex and page-title mapping so authentication, organization context, and the Amidala shell apply. Do not add it to main navigation arrays.
 
-- [ ] **Step 3: Add one contextual link from Team Work**
+- [x] **Step 3: Add one contextual link from Team Work**
 
 Add a subdued link labelled `工程のつながりを試す` with supporting copy `誰の仕事が、次の誰を待たせているかを線で確認できます。` targeting `/$organizationId/process-lab`.
 
-- [ ] **Step 4: Generate route tree and build**
+- [x] **Step 4: Generate route tree and build**
 
 Run: `pnpm --filter @amidala/web build`
 
 Expected: TanStack route generation includes `process-lab`, build succeeds, and no server-only code leaks into the client bundle.
 
-- [ ] **Step 5: Commit route integration**
+- [x] **Step 5: Commit route integration**
 
 ```bash
 git add apps/web/src/routes apps/web/src/features/work/TeamWorkPage.tsx
@@ -422,26 +422,27 @@ git commit -m "feat: link Process Lab into Amidala"
 **Interfaces:**
 - Produces a complete deletion manifest for source, route mount, DI registrations, schema exports, migration implications, seed rows, package dependency, and navigation link.
 
-- [ ] **Step 1: Write the removal manifest**
+- [x] **Step 1: Write the removal manifest**
 
 List every Process Lab-owned directory/file and every integration seam outside it. State that removing an already-applied migration requires a new forward migration that drops the four tables; never edit migration history after shared deployment. State that `@xyflow/react` can be removed when no other feature imports it.
 
-- [ ] **Step 2: Run the complete local verification suite**
+- [x] **Step 2: Run the complete local verification suite**
 
 Run:
 
 ```bash
 pnpm db:demo:reset
 pnpm --filter @amidala/api test
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_test pnpm --filter @amidala/api test:integration
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_test pnpm --filter @amidala/api test:demo
+TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo pnpm --filter @amidala/api test:integration
+pnpm db:demo:reset
+TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo pnpm --filter @amidala/api test:demo
 pnpm --filter @amidala/web test
 pnpm build
 ```
 
 Expected: all commands exit 0 with no test warnings or build errors.
 
-- [ ] **Step 3: Start the actual app and verify the desktop journey**
+- [x] **Step 3: Start the actual app and verify the desktop journey**
 
 Run `pnpm dev`, log in with the existing local demo account, then verify in the in-app browser:
 
@@ -453,11 +454,11 @@ Run `pnpm dev`, log in with the existing local demo account, then verify in the 
 6. Try to start a waiting step and confirm the UI explains why it cannot start.
 7. Complete the blocking predecessor and confirm the successor becomes ready.
 
-- [ ] **Step 4: Verify the mobile journey**
+- [x] **Step 4: Verify the mobile journey**
 
 Resize below 760px. Confirm the graph becomes a predecessor-first list, details and valid status changes remain usable, and drag/connect controls are absent.
 
-- [ ] **Step 5: Inspect the repository for accidental coupling and secrets**
+- [x] **Step 5: Inspect the repository for accidental coupling and secrets**
 
 Run:
 
@@ -470,10 +471,9 @@ rg -n "process-lab|ProcessLab|processLab" apps packages docs/research/2026-07-28
 
 Expected: diff check is clean, secret scan finds no newly committed credential, and every integration seam appears in the removal manifest.
 
-- [ ] **Step 6: Commit verification documentation**
+- [x] **Step 6: Commit verification documentation**
 
 ```bash
 git add docs/research/2026-07-28-process-lab-removal.md docs/superpowers/plans/2026-07-28-process-lab.md
 git commit -m "docs: record Process Lab removal and verification"
 ```
-

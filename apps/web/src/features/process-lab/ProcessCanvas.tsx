@@ -22,6 +22,7 @@ import { processLabKey } from './process-lab-query-key';
 import type { ProcessLabResult } from './process-lab-schema';
 import {
   canConnectProcessSteps,
+  orderProcessSteps,
   toFlowEdges,
   toFlowNodes,
 } from './process-lab-presenter';
@@ -37,7 +38,7 @@ export function ProcessCanvas({
   organizationId: string;
   workspace: ProcessLabWorkspace;
 }) {
-  const firstStepId = workspace.steps[0]?.stepId ?? null;
+  const firstStepId = orderProcessSteps(workspace)[0]?.stepId ?? null;
   const [selectedStepId, setSelectedStepId] = useState<string | null>(firstStepId);
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(
@@ -175,7 +176,7 @@ export function ProcessCanvas({
           nodesFocusable
           edgesFocusable
           fitView
-          fitViewOptions={{ padding: 0.16, minZoom: 0.5, maxZoom: 1 }}
+          fitViewOptions={{ padding: 0.14, minZoom: 0.35, maxZoom: 1 }}
           minZoom={0.35}
           maxZoom={1.4}
           proOptions={{ hideAttribution: true }}

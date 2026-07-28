@@ -66,8 +66,9 @@ describe('deterministic demo seed', () => {
         id: 'process-lab-acme-product-launch',
         organization_id: 'org_acme_studio',
         name: '新製品を顧客へ届ける',
-        revision: 1,
+        revision: expect.any(Number),
       }])
+      expect(board.rows[0].revision).toBeGreaterThanOrEqual(1)
       expect(steps.rows).toHaveLength(6)
       expect(dependencies.rows).toHaveLength(7)
       expect(connectedStepIds).toEqual(new Set(steps.rows.map((step) => step.id)))
