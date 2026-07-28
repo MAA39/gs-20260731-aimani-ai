@@ -115,10 +115,10 @@ it('does not complete a Todo while its Handoff is waiting for a decision', async
 
 it('does not disclose a Todo through another Organization path', async () => {
   const ownerCookie = await signIn('owner@amidala.local');
-  const northstarCookie = await signIn('owner@northstar.local');
+  const northstarCookie = await signIn('suzuki@amidala.local');
   const todo = await createTodo(ownerCookie);
 
-  expect((await completeTodo(northstarCookie, todo.todoId, 'org_northstar_labs')).status).toBe(404);
+  expect((await completeTodo(northstarCookie, todo.todoId, 'org_northstar_lab')).status).toBe(404);
   expect((await completeTodo(northstarCookie, todo.todoId, 'org_acme_studio')).status).toBe(403);
 });
 ```
