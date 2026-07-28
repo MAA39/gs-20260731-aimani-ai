@@ -186,7 +186,7 @@ git commit -m "feat: switch local demo actors"
 - Consumes: production Web build artifactとignored local env。
 - Produces: 新規cloneでcredentialをGitへ入れずActor Switchを有効にする手順、production artifact absence証跡。
 
-- [ ] **Step 1: env templateとignoreを書く**
+- [x] **Step 1: env templateとignoreを書く**
 
 `apps/web/.env.development.local.example`:
 
@@ -196,11 +196,11 @@ VITE_DEMO_ACTOR_PASSWORD=
 
 `.gitignore`へ`apps/web/.env.development.local`を追加する。
 
-- [ ] **Step 2: Docsへlocal設定を追加する**
+- [x] **Step 2: Docsへlocal設定を追加する**
 
 初回のみtemplateを`.env.development.local`へcopyし、local seed passwordを値に設定することを記載する。値そのものはDocs/exampleへ書かない。
 
-- [ ] **Step 3: production artifact gateを実行する**
+- [x] **Step 3: production artifact gateを実行する**
 
 実際の`.env.development.local`を作業用に置いても、production buildはdevelopment local envを読まない。
 
@@ -211,11 +211,15 @@ if rg -n 'owner@amidala\.local|mori@amidala\.local|amidala-demo-2026|VITE_DEMO_A
 
 Expected: grep hit 0、exit 0。
 
-- [ ] **Step 4: local dev compileを確認する**
+実測: `pnpm --filter @amidala/web build` 成功後、指定パターンの `rg` はhit 0（否定条件のgateはexit 0）。
+
+- [x] **Step 4: local dev compileを確認する**
 
 `.env.development.local`へlocal seed passwordを設定し、`pnpm --filter @amidala/web dev`の起動ログにcompile errorがないことを確認して終了する。ブラウザinspectionがURL policyで拒否される場合は迂回しない。
 
-- [ ] **Step 5: full verification**
+実測: ignoredな`.env.development.local`へseed passwordを設定し、dev起動ログでVite ready／compile errorなしを確認した（ブラウザinspectionは実施していない）。
+
+- [x] **Step 5: full verification**
 
 ```bash
 pnpm --filter @amidala/api test -- --run
@@ -227,10 +231,11 @@ git status --short --branch
 
 Expected: tests/build/diff PASS、branch cleanはcommit後に確認。
 
-- [ ] **Step 6: 実測をplanへ記録してCommit**
+実測: API test、Web test、`pnpm build`、`git diff --check` がすべて成功。
+
+- [x] **Step 6: 実測をplanへ記録してCommit**
 
 ```bash
 git add .gitignore apps/web/.env.development.local.example docs/README.md docs/superpowers/plans/2026-07-28-demo-actor-switch.md
 git commit -m "docs: secure the local actor switch setup"
 ```
-

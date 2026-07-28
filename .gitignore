@@ -5,3 +5,4 @@ dist
 .output
 .worktrees/
 apps/api/.dev.vars
+apps/web/.env.development.local
