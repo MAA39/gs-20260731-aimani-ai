@@ -20,7 +20,7 @@
 - open groupは更新の新しいworkを持つmember順、member内は`updatedAt desc, todoId desc`。
 - completedは`updatedAt desc, todoId desc`で最大20件。filter/order/limitはDBで行う。
 - Overviewはread-only。完了/Handoff actionを重複させない。
-- inactive assigneeが残したopen Todoの棚卸し・再割当は別sliceとし、このoverviewには表示しない。
+- activeでないassignee（現行schemaでは`suspended`）が残したopen Todoの棚卸し・再割当は別sliceとし、このoverviewには表示しない。
 - 新しい`useEffect`、new dependency、chart、kanban、table、Cloudflare deployを追加しない。
 - UIは既存content / section heading / TodoCard / navigation / mobile 1-columnを踏襲する。
 
@@ -93,14 +93,14 @@ it('shows every Acme open Todo to an Acme Member without leaking Northstar work'
 });
 
 it('returns forbidden when a Northstar Member requests the Acme overview', async () => {
-  expect((await getTeamWork(await signIn('owner@northstar.local'), 'org_acme_studio')).status).toBe(403);
+  expect((await getTeamWork(await signIn('suzuki@amidala.local'), 'org_acme_studio')).status).toBe(403);
 });
 
-it('omits active Members without open work and work assigned to an inactive Member', async () => {
+it('omits active Members without open work and work assigned to a suspended Member', async () => {
   const overview = teamWorkOverviewSchema.parse((await getTeamWork(await signIn('owner@amidala.local'))).body);
   const membershipIds = overview.members.map((group) => group.member.membershipId);
   expect(membershipIds).not.toContain(emptyActiveMembershipId);
-  expect(membershipIds).not.toContain(inactiveMembershipId);
+  expect(membershipIds).not.toContain(suspendedMembershipId);
 });
 
 it('orders open work by updatedAt then Todo ID descending', async () => {
@@ -117,7 +117,7 @@ it('returns only the latest 20 completed Todos in stable order', async () => {
 });
 ```
 
-`acmeOwnerTodoId`等は各testのArrangeでinsertして得たIDとし、同時刻tie fixtureだけ明示IDを使う。inactive fixtureはtest内transactionでMembership statusを`inactive`にし、`finally`で元へ戻す。21 completed fixtureの`updatedAt`は1分ずつずらし、同時刻の2件だけID降順を期待する。
+`acmeOwnerTodoId`等は各testのArrangeでinsertして得たIDとし、同時刻tie fixtureだけ明示IDを使う。activeでないassigneeのfixtureは既存memberを書き換えず、test専用のsynthetic User / `suspended` Membershipを作り、`finally`で削除する。21 completed fixtureの`updatedAt`は1分ずつずらし、同時刻の2件だけID降順を期待する。
 
 DB fixture insertは既存testのparameterized query patternを使い、title以外をstring interpolationしない。
 
@@ -191,7 +191,7 @@ export interface TeamWorkOverviewQuery {
 
 - [x] **Step 3: DB queryを実装する**
 
-`getTeamWorkOverview`は次を並列取得する。
+`getTeamWorkOverview`は次のqueryを組み立て、単一`pg.Client`上で順次`await`する。並列実行はnode-postgresの非推奨警告を生むため行わない。
 
 1. Organization summary
 2. current Membership summary
@@ -223,7 +223,7 @@ open rowsはquery順を保って`Map<membershipId, group>`へ一度だけgroupin
 ))
 ```
 
-これによりinactive/deleted assigneeのTodoはoverviewから除外する。
+これによりactiveでない（現行schemaでは`suspended`）/ deleted assigneeのTodoはoverviewから除外する。
 
 既存`toTodoSummary`の第2引数をnamed typeへ抽出し、open/completedの両queryで再利用する。
 

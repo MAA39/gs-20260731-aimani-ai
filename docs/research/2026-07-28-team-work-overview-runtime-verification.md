@@ -80,4 +80,3 @@ cold restart後の同一認証条件で次へ復帰した。
 worktreeのignored `.dev.vars`をsymlinkしたままWeb buildすると、auxiliary API bundleが`dist/amidala_api/.dev.vars`を含む場合がある。さらにTurbo cacheがそのartifactを復元し得る。
 
 最終buildではworktreeのenv symlinkを外し、`pnpm clean:web:build && pnpm exec turbo run build --force`を実行した。その後、local env file名がdistに0件であることとdemo marker 0件を確認した。値をlogやDocsへ出してはいけない。
-
