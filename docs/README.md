@@ -38,6 +38,16 @@ pnpm dev
 
 既存の `apps/api/.dev.vars` を利用している場合は、`DATABASE_URL` のデータベース名を `amidala_demo` に変更する。資格情報はこのDocsへ追加しない。
 
+### 開発用 Demo Actor Switch
+
+ローカル開発時に田中 彩／森 ハルを切り替える場合は、初回のみ次の手順でignoredな環境ファイルを作成する。
+
+```bash
+cp apps/web/.env.development.local.example apps/web/.env.development.local
+```
+
+`apps/web/.env.development.local` の `VITE_DEMO_ACTOR_PASSWORD` に、開発用seedで使用するローカルseed passwordを設定する。この値はGitへコミットせず、Docsやexampleにも記載しない。設定後に `pnpm dev` を起動すると、development buildでのみActor Switchが表示される。
+
 ## 判断の優先順位
 
 矛盾した場合は次の順に扱う。

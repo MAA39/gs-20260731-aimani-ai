@@ -1,15 +1,19 @@
 /// <reference types="vite/client" />
 import { HeadContent, Link, Outlet, Scripts, createRootRouteWithContext, useLocation } from '@tanstack/react-router';
 import type { QueryClient } from '@tanstack/react-query';
-import type { ReactNode } from 'react';
+import { lazy, Suspense, type ReactNode } from 'react';
 import { CheckSquare, Inbox, Users } from 'lucide-react';
 import appCss from '../styles.css?url';
+import { authClient } from '../features/auth/auth-client';
 
 const links = [
   { to: 'people', label: 'People', icon: Users },
   { to: 'todos', label: '自分のTodo', icon: CheckSquare },
   { to: 'handoffs', label: '引き継ぎ', icon: Inbox },
 ] as const;
+const DemoActorSwitcher = import.meta.env.DEV
+  ? lazy(() => import('../features/auth/DemoActorSwitcher.dev'))
+  : null;
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -27,14 +31,20 @@ export function RootRoute() {
 }
 
 function ApplicationShell() {
+  const session = authClient.useSession();
   const pathname = useLocation({ select: (location) => location.pathname });
   if (pathname === '/login' || pathname === '/organizations') return <Outlet />;
   const pageTitle = /^\/[^/]+\/people\/[^/]+\/todos$/.test(pathname) ? '共有Todo' : /\/todos$/.test(pathname) ? '自分のTodo' : /\/handoffs$/.test(pathname) ? '引き継ぎ' : 'People';
   const personTodoMatch = pathname.match(/^\/([^/]+)\/people\/([^/]+)\/todos$/);
   const organizationId = personTodoMatch?.[1] ?? pathname.match(/^\/([^/]+)\/(?:people|todos|handoffs)/)?.[1];
+  const identityPending = session.isPending;
+  const name = session.data?.user.name?.trim() || session.data?.user.email?.trim() || '';
+  const initial = identityPending ? '…' : name.slice(0, 1) || '?';
+  const accountName = identityPending ? '…' : session.data?.user.name || 'ログイン中';
+  const accountEmail = identityPending ? '…' : session.data?.user.email || 'アカウント';
   return <div className="app-shell">
-    <aside className="side-nav" aria-label="メインナビゲーション"><div className="brand"><span className="brand-mark">A</span><span>Amidala</span></div><p className="org-label">組織</p><Link className="org-switcher" to="/organizations">{organizationId ? '組織を切り替える' : '組織を選ぶ'} <span>⌄</span></Link><nav>{links.map((item) => <NavItem key={item.label} item={item} organizationId={organizationId} pathname={pathname} />)}</nav><div className="side-account"><div className="avatar small">?</div><div><strong>ログイン中</strong><span>アカウント</span></div></div></aside>
-    <main className="main-area"><header className="top-bar"><div><span className="eyebrow">{organizationId ? '現在の組織' : 'Amidala'}</span><h1>{pageTitle}</h1></div><span className="account-name">ログイン中</span></header><Outlet /></main>
+    <aside className="side-nav" aria-label="メインナビゲーション"><div className="brand"><span className="brand-mark">A</span><span>Amidala</span></div><p className="org-label">組織</p><Link className="org-switcher" to="/organizations">{organizationId ? '組織を切り替える' : '組織を選ぶ'} <span>⌄</span></Link><nav>{links.map((item) => <NavItem key={item.label} item={item} organizationId={organizationId} pathname={pathname} />)}</nav><div className="side-account"><div className="avatar small">{initial}</div><div><strong>{accountName}</strong><span>{accountEmail}</span></div></div></aside>
+    <main className="main-area"><header className="top-bar"><div><span className="eyebrow">{organizationId ? '現在の組織' : 'Amidala'}</span><h1>{pageTitle}</h1></div><div className="actor-controls"><div className="account-name"><strong>{accountName}</strong><span>{accountEmail}</span></div>{import.meta.env.DEV && import.meta.env.VITE_DEMO_ACTOR_PASSWORD && organizationId && DemoActorSwitcher ? <Suspense fallback={null}><DemoActorSwitcher organizationId={organizationId} /></Suspense> : null}</div></header><Outlet /></main>
     <nav className="bottom-nav" aria-label="モバイルナビゲーション">{links.map((item) => <NavItem key={item.label} item={item} organizationId={organizationId} pathname={pathname} />)}</nav>
   </div>;
 }
