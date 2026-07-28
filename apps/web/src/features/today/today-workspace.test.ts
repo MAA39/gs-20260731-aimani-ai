@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { AssignedTodoWorkspace, TodoHandoffWorkspace } from '@amidala/contracts';
-import { composeTodayWorkspace } from './today-workspace';
+import { composeTodayWorkspace, isTodoWaitingOnRecipient } from './today-workspace';
 
 const member = (membershipId: string, name: string) => ({ membershipId, name, title: null });
 const todo = (todoId: string, pendingHandoff: AssignedTodoWorkspace['todos'][number]['pendingHandoff']) => ({
@@ -60,4 +60,6 @@ test('Todayは受信・自分のボール・相手待ち・直近の責任移動
   assert.deepEqual(result.outgoingRequests.map((item) => item.handoffId), ['handoff-outgoing']);
   assert.deepEqual(result.recentHandoffs.map((item) => item.handoffId), ['handoff-accepted']);
   assert.equal(result.currentMember.membershipId, 'membership-tanaka');
+  assert.equal(isTodoWaitingOnRecipient(assignedWorkspace.todos[1]), true);
+  assert.equal(isTodoWaitingOnRecipient(assignedWorkspace.todos[0]), false);
 });

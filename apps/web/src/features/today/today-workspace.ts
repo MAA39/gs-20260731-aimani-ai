@@ -9,6 +9,10 @@ export type TodayWorkspace = {
   recentHandoffs: TodoHandoffWorkspace['recentHandoffs'];
 };
 
+export function isTodoWaitingOnRecipient(todo: AssignedTodoWorkspace['todos'][number]) {
+  return todo.pendingHandoff !== null;
+}
+
 export function composeTodayWorkspace(
   assignedWorkspace: AssignedTodoWorkspace,
   handoffWorkspace: TodoHandoffWorkspace,
@@ -17,7 +21,7 @@ export function composeTodayWorkspace(
     organization: assignedWorkspace.organization,
     currentMember: assignedWorkspace.currentMember,
     incomingRequests: handoffWorkspace.incomingRequests,
-    ownedTodos: assignedWorkspace.todos.filter((todo) => todo.pendingHandoff === null),
+    ownedTodos: assignedWorkspace.todos.filter((todo) => !isTodoWaitingOnRecipient(todo)),
     outgoingRequests: handoffWorkspace.outgoingRequests,
     recentHandoffs: handoffWorkspace.recentHandoffs,
   };
