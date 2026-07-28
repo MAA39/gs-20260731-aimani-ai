@@ -35,6 +35,15 @@ const assignedWorkspaceSchema = z.object({
   currentMember: memberSchema,
   todos: z.array(todoSummarySchema),
 });
+const teamWorkOverviewSchema = z.object({
+  organization: z.object({ organizationId: z.string(), name: z.string() }),
+  currentMember: memberSchema,
+  members: z.array(z.object({
+    member: memberSchema,
+    openTodos: z.array(todoSummarySchema),
+  })),
+  recentlyCompletedTodos: z.array(todoSummarySchema),
+});
 
 type Resource = z.infer<typeof resourceSchema>;
 type AssignedWorkspace = z.infer<typeof assignedWorkspaceSchema>;
@@ -177,6 +186,42 @@ describe('Todo Handoff API', () => {
     const response = await app.fetch(new Request('http://localhost:8787/organizations/org_acme_studio/people/acme-studio-sato/todos', { headers: { cookie } }), env);
     expect(response.status).toBe(200);
     return sharedTodoWorkspaceSchema.parse(await response.json());
+  };
+
+  const getTeamWork = async (cookie: string, organizationId = 'org_acme_studio') => {
+    const response = await app.fetch(new Request(
+      `http://localhost:8787/organizations/${organizationId}/work`,
+      { headers: { cookie } },
+    ), env);
+    const body = response.headers.get('content-type')?.includes('application/json')
+      ? await response.json()
+      : await response.text();
+    return { status: response.status, body };
+  };
+
+  const insertTeamWorkTodo = async (db: pg.Client, input: {
+    todoId: string;
+    organizationId?: string;
+    contextMembershipId?: string;
+    creatorMembershipId?: string;
+    assigneeMembershipId: string;
+    status?: 'open' | 'completed';
+    updatedAt: Date;
+  }) => {
+    await db.query(
+      `insert into todo (id, organization_id, context_membership_id, creator_membership_id, assignee_membership_id, title, description, status, created_at, updated_at)
+       values ($1, $2, $3, $4, $5, $6, null, $7, $8, $8)`,
+      [
+        input.todoId,
+        input.organizationId ?? 'org_acme_studio',
+        input.contextMembershipId ?? 'acme-studio-sato',
+        input.creatorMembershipId ?? 'acme-studio-owner',
+        input.assigneeMembershipId,
+        input.todoId,
+        input.status ?? 'open',
+        input.updatedAt,
+      ],
+    );
   };
 
   it('lets only the current assignee complete an open Todo and removes it from assigned work', async () => {
@@ -476,5 +521,222 @@ describe('Todo Handoff API', () => {
 
     const assigned = await getAssignedTodos(ownerCookie);
     expect(assigned.todos.map((todo) => todo.todoId)).not.toContain(completedTodo.todoId);
+  });
+
+  it('groups open work under the current assignee and keeps pending Handoff with its requester', async () => {
+    const fixtureId = randomUUID();
+    const prefix = `todo-team-work-${fixtureId}-`;
+    const ownerTodoId = `${prefix}owner-pending`;
+    const moriTodoId = `${prefix}mori-open`;
+    const db = new pg.Client({ connectionString: env.DATABASE_URL });
+    await db.connect();
+    try {
+      await insertTeamWorkTodo(db, {
+        todoId: ownerTodoId,
+        assigneeMembershipId: 'acme-studio-owner',
+        updatedAt: new Date('2099-01-01T00:02:00.000Z'),
+      });
+      await insertTeamWorkTodo(db, {
+        todoId: moriTodoId,
+        assigneeMembershipId: 'acme-studio-mori',
+        updatedAt: new Date('2099-01-01T00:01:00.000Z'),
+      });
+      await db.query(
+        `insert into todo_handoff (id, organization_id, todo_id, requester_membership_id, recipient_membership_id, request_message, status, requested_at, resolved_at)
+         values ($1, 'org_acme_studio', $2, 'acme-studio-owner', 'acme-studio-mori', null, 'requested', $3, null)`,
+        [`handoff-team-work-${fixtureId}`, ownerTodoId, new Date('2099-01-01T00:03:00.000Z')],
+      );
+
+      const response = await getTeamWork(await signIn('mori@amidala.local'));
+      expect(response.status).toBe(200);
+      const overview = teamWorkOverviewSchema.parse(response.body);
+      expect(overview.currentMember.membershipId).toBe('acme-studio-mori');
+      const ownerTodo = overview.members
+        .find((group) => group.member.membershipId === 'acme-studio-owner')
+        ?.openTodos.find((todo) => todo.todoId === ownerTodoId);
+      expect(ownerTodo?.pendingHandoff?.recipient.membershipId).toBe('acme-studio-mori');
+      expect(overview.members
+        .find((group) => group.member.membershipId === 'acme-studio-mori')
+        ?.openTodos.map((todo) => todo.todoId)).toContain(moriTodoId);
+    } finally {
+      await db.query('delete from todo where id like $1', [`${prefix}%`]);
+      await db.end();
+    }
+  });
+
+  it('shows every Acme open Todo to an Acme Member without leaking Northstar work', async () => {
+    const fixtureId = randomUUID();
+    const prefix = `todo-team-work-${fixtureId}-`;
+    const acmeOwnerTodoId = `${prefix}acme-owner`;
+    const acmeMoriTodoId = `${prefix}acme-mori`;
+    const northstarTodoId = `${prefix}northstar-owner`;
+    const db = new pg.Client({ connectionString: env.DATABASE_URL });
+    await db.connect();
+    try {
+      await insertTeamWorkTodo(db, {
+        todoId: acmeOwnerTodoId,
+        assigneeMembershipId: 'acme-studio-owner',
+        updatedAt: new Date('2099-01-02T00:03:00.000Z'),
+      });
+      await insertTeamWorkTodo(db, {
+        todoId: acmeMoriTodoId,
+        assigneeMembershipId: 'acme-studio-mori',
+        updatedAt: new Date('2099-01-02T00:02:00.000Z'),
+      });
+      await insertTeamWorkTodo(db, {
+        todoId: northstarTodoId,
+        organizationId: 'org_northstar_lab',
+        contextMembershipId: 'northstar-lab-suzuki',
+        creatorMembershipId: 'northstar-lab-owner',
+        assigneeMembershipId: 'northstar-lab-owner',
+        updatedAt: new Date('2099-01-02T00:01:00.000Z'),
+      });
+
+      const response = await getTeamWork(await signIn('mori@amidala.local'));
+      expect(response.status).toBe(200);
+      const overview = teamWorkOverviewSchema.parse(response.body);
+      const ids = overview.members.flatMap((group) => group.openTodos.map((todo) => todo.todoId));
+      expect(ids).toEqual(expect.arrayContaining([acmeOwnerTodoId, acmeMoriTodoId]));
+      expect(ids).not.toContain(northstarTodoId);
+    } finally {
+      await db.query('delete from todo where id like $1', [`${prefix}%`]);
+      await db.end();
+    }
+  });
+
+  it('returns forbidden when a Northstar Member requests the Acme overview', async () => {
+    const response = await getTeamWork(await signIn('suzuki@amidala.local'), 'org_acme_studio');
+    expect(response.status).toBe(403);
+  });
+
+  it('omits active Members without open work and work assigned to an inactive Member', async () => {
+    const fixtureId = randomUUID();
+    const prefix = `todo-team-work-${fixtureId}-`;
+    const emptyUserId = `user-team-work-${fixtureId}`;
+    const emptyActiveMembershipId = `membership-team-work-${fixtureId}`;
+    const suspendedUserId = `user-team-work-suspended-${fixtureId}`;
+    const suspendedMembershipId = `membership-team-work-suspended-${fixtureId}`;
+    const suspendedTodoId = `${prefix}suspended-assignee`;
+    const db = new pg.Client({ connectionString: env.DATABASE_URL });
+    await db.connect();
+    try {
+      await db.query(
+        `insert into "user" (id, name, email, email_verified, image, created_at, updated_at)
+         values ($1, $2, $3, true, null, $4, $4)`,
+        [emptyUserId, 'Team Work Empty', `team-work-${fixtureId}@example.local`, new Date('2099-01-03T00:00:00.000Z')],
+      );
+      await db.query(
+        `insert into membership (id, user_id, organization_id, display_name, title, role, status, created_at, updated_at)
+         values ($1, $2, 'org_acme_studio', $3, null, 'member', 'active', $4, $4)`,
+        [emptyActiveMembershipId, emptyUserId, 'Team Work Empty', new Date('2099-01-03T00:00:00.000Z')],
+      );
+      await db.query(
+        `insert into "user" (id, name, email, email_verified, image, created_at, updated_at)
+         values ($1, $2, $3, true, null, $4, $4)`,
+        [suspendedUserId, 'Team Work Suspended', `team-work-suspended-${fixtureId}@example.local`, new Date('2099-01-03T00:00:00.000Z')],
+      );
+      await db.query(
+        `insert into membership (id, user_id, organization_id, display_name, title, role, status, created_at, updated_at)
+         values ($1, $2, 'org_acme_studio', $3, null, 'member', 'suspended', $4, $4)`,
+        [suspendedMembershipId, suspendedUserId, 'Team Work Suspended', new Date('2099-01-03T00:00:00.000Z')],
+      );
+      await insertTeamWorkTodo(db, {
+        todoId: suspendedTodoId,
+        assigneeMembershipId: suspendedMembershipId,
+        updatedAt: new Date('2099-01-03T00:01:00.000Z'),
+      });
+
+      const response = await getTeamWork(await signIn('owner@amidala.local'));
+      expect(response.status).toBe(200);
+      const overview = teamWorkOverviewSchema.parse(response.body);
+      const membershipIds = overview.members.map((group) => group.member.membershipId);
+      expect(membershipIds).not.toContain(emptyActiveMembershipId);
+      expect(membershipIds).not.toContain(suspendedMembershipId);
+    } finally {
+      await db.query('delete from todo where id like $1', [`${prefix}%`]);
+      await db.query('delete from "user" where id = any($1::text[])', [[emptyUserId, suspendedUserId]]);
+      await db.end();
+    }
+  });
+
+  it('orders open work by updatedAt then Todo ID descending', async () => {
+    const fixtureId = randomUUID();
+    const prefix = `todo-team-work-${fixtureId}-`;
+    const newerTodoId = `${prefix}owner-newer`;
+    const sameTimestampHigherId = `${prefix}owner-tie-b`;
+    const sameTimestampLowerId = `${prefix}owner-tie-a`;
+    const moriTodoId = `${prefix}mori`;
+    const db = new pg.Client({ connectionString: env.DATABASE_URL });
+    await db.connect();
+    try {
+      await insertTeamWorkTodo(db, {
+        todoId: sameTimestampLowerId,
+        assigneeMembershipId: 'acme-studio-owner',
+        updatedAt: new Date('2099-01-04T00:02:00.000Z'),
+      });
+      await insertTeamWorkTodo(db, {
+        todoId: newerTodoId,
+        assigneeMembershipId: 'acme-studio-owner',
+        updatedAt: new Date('2099-01-04T00:04:00.000Z'),
+      });
+      await insertTeamWorkTodo(db, {
+        todoId: sameTimestampHigherId,
+        assigneeMembershipId: 'acme-studio-owner',
+        updatedAt: new Date('2099-01-04T00:02:00.000Z'),
+      });
+      await insertTeamWorkTodo(db, {
+        todoId: moriTodoId,
+        assigneeMembershipId: 'acme-studio-mori',
+        updatedAt: new Date('2099-01-04T00:03:00.000Z'),
+      });
+
+      const response = await getTeamWork(await signIn('owner@amidala.local'));
+      expect(response.status).toBe(200);
+      const overview = teamWorkOverviewSchema.parse(response.body);
+      expect(overview.members.slice(0, 2).map((group) => group.member.membershipId))
+        .toEqual(['acme-studio-owner', 'acme-studio-mori']);
+      const ownerFixtureIds = overview.members
+        .find((group) => group.member.membershipId === 'acme-studio-owner')
+        ?.openTodos.map((todo) => todo.todoId)
+        .filter((todoId) => todoId.startsWith(prefix));
+      expect(ownerFixtureIds).toEqual([newerTodoId, sameTimestampHigherId, sameTimestampLowerId]);
+    } finally {
+      await db.query('delete from todo where id like $1', [`${prefix}%`]);
+      await db.end();
+    }
+  });
+
+  it('returns only the latest 20 completed Todos in stable order', async () => {
+    const fixtureId = randomUUID();
+    const prefix = `todo-team-work-${fixtureId}-completed-`;
+    const completedTodoIds = Array.from({ length: 21 }, (_, sequence) => `${prefix}${String(sequence).padStart(2, '0')}`);
+    const db = new pg.Client({ connectionString: env.DATABASE_URL });
+    await db.connect();
+    try {
+      for (const [sequence, todoId] of completedTodoIds.entries()) {
+        const minute = sequence === 19 ? 20 : sequence;
+        await insertTeamWorkTodo(db, {
+          todoId,
+          assigneeMembershipId: 'acme-studio-owner',
+          status: 'completed',
+          updatedAt: new Date(Date.UTC(2099, 0, 5, 0, minute)),
+        });
+      }
+
+      const expectedLatest20Ids = [
+        completedTodoIds[20],
+        completedTodoIds[19],
+        ...completedTodoIds.slice(1, 19).reverse(),
+      ];
+      const response = await getTeamWork(await signIn('owner@amidala.local'));
+      expect(response.status).toBe(200);
+      const overview = teamWorkOverviewSchema.parse(response.body);
+      expect(overview.recentlyCompletedTodos).toHaveLength(20);
+      expect(overview.recentlyCompletedTodos.map((todo) => todo.todoId)).toEqual(expectedLatest20Ids);
+      expect(overview.recentlyCompletedTodos.map((todo) => todo.todoId)).not.toContain(completedTodoIds[0]);
+    } finally {
+      await db.query('delete from todo where id like $1', [`${prefix}%`]);
+      await db.end();
+    }
   });
 });
