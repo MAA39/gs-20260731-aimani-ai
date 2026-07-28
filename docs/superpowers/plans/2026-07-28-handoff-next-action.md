@@ -388,7 +388,7 @@ git commit -m "feat: declare next action when accepting Handoff"
 - Produces: reviewed Handoff Next Action PR
 - Base: Todo Completion merge後のlatest `main`
 
-- [ ] **Step 1: full verificationを実行する**
+- [x] **Step 1: full verificationを実行する**
 
 ```bash
 pnpm --filter @amidala/api test
@@ -400,7 +400,19 @@ pnpm build
 git diff --check
 ```
 
-- [ ] **Step 2: local runtime journeyを実行する**
+実測（2026-07-28、worktree `handoff-next-action`、HEAD `ff48046`）:
+
+- API unit: 13/13 PASS（約1.1s）
+- Web test: 14/14 PASS（約0.64s）
+- PostgreSQL integration（`127.0.0.1:54329/amidala_handoff`）: 18/18 PASS（約4.55s）
+- demo seed（`127.0.0.1:54329/amidala_demo`、reset後）: 1/1 PASS（約0.67s）
+- `pnpm build`: 3/3 package tasks PASS（約10.1s）
+- production artifact marker scan（`apps/web/dist`）: 0 matches
+- `git diff --check`: PASS
+
+demo seedはブラウザjourney後のDB状態で一度不一致となったため、`pnpm db:demo:reset`（`amidala_demo`のみ）後に再実行してPASSを確認した。
+
+- [x] **Step 2: local runtime journeyを実行する**
 
 demo reset後、田中→森へHandoff、森が`インタビュー仮説を3点にまとめる`を入力してacceptする。
 
@@ -410,15 +422,23 @@ demo reset後、田中→森へHandoff、森が`インタビュー仮説を3点�
 - 空nextAction acceptも従来どおり成功する
 - direct reload、desktop 1280x720、mobile 390x844、console 0を確認する
 
-- [ ] **Step 3: independent reviewを依頼する**
+browser実測はcontrollerの`task-5-browser-results.md`を正とする。田中→森のaccept（次の一手入力）、森/田中TodayとHandoff recentへの投影、direct reload保持、desktop 1280x720 / mobile 390x844のoverflowなし、console warning/error 0を確認済み。空nextActionはPostgreSQL integration suiteで確認済み。
+
+- [x] **Step 3: independent reviewを依頼する**
 
 transaction atomicity、idempotent retry non-overwrite、nullable migration、240文字validation、requestMessageとの混同、raw error leak、Dialog focus/mobileをreview対象にする。
 
-- [ ] **Step 4: Critical/ImportantをTDDで修正し再検証する**
+実測: base `7244f7f` / head `fa031c6`の独立reviewはCritical / Important 0件でAPPROVED。transaction/lock順序、retry非上書き、全projection、BFF固定error、Dialog/actor switch/useEffectなしを確認した。
 
-- [ ] **Step 5: small PRを作る**
+- [x] **Step 4: Critical/ImportantをTDDで修正し再検証する**
+
+runtimeでActor Switch直後に旧principalのquery projectionが残る問題を検出し、typed Today URLへのhard replaceでclient stateを再生成する`ff48046`を追加。実ブラウザで再読込なしの切替を再確認し、scoped reviewもAPPROVED。既知Minorはaccept routeが認証前にbody validationする既存順序で、未認証＋不正bodyが400になり得る点。raw data leakや通常UX影響がないため本sliceでは変更しない。
+
+- [x] **Step 5: small PRを作る**
 
 PR title: `feat: record Handoff next action`
+
+実測: `feat/handoff-next-action`をpushし、small PR [#11](https://github.com/MAA39/amidala-v2/pull/11) `feat: record Handoff next action`を作成。Cloudflare deployは未実施。
 
 - [ ] **Step 6: GitHub checks後にmerge commit方式でmergeする**
 

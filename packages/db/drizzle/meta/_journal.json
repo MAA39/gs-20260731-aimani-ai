@@ -29,6 +29,13 @@
       "when": 1785095259760,
       "tag": "0003_todo_handoff",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1785223738574,
+      "tag": "0004_handoff_next_action",
+      "breakpoints": true
     }
   ]
 }

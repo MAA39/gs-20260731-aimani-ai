@@ -1,13 +1,10 @@
 import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { useNavigate, useRouter } from '@tanstack/react-router';
+import { useRouter } from '@tanstack/react-router';
 import { authClient } from './auth-client';
 import { DEMO_ACTORS, demoActorSwitchFailureMessage } from './demo-actors.dev';
 
 export function DemoActorSwitcher({ organizationId }: { organizationId: string }) {
   const session = authClient.useSession();
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const router = useRouter();
   const [pendingActorId, setPendingActorId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -22,9 +19,8 @@ export function DemoActorSwitcher({ organizationId }: { organizationId: string }
       if (signOutResult.error) throw new Error('sign out failed');
       const signInResult = await authClient.signIn.email({ email: actor.email, password });
       if (signInResult.error) throw new Error('sign in failed');
-      queryClient.clear();
-      await navigate({ to: '/$organizationId/today', params: { organizationId }, replace: true });
-      await router.invalidate();
+      const todayLocation = router.buildLocation({ to: '/$organizationId/today', params: { organizationId } });
+      window.location.replace(todayLocation.href);
     } catch {
       setError(demoActorSwitchFailureMessage());
     } finally {
