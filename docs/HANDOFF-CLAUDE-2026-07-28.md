@@ -4,7 +4,7 @@
 - 正本の絶対パス: `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/HANDOFF-CLAUDE-2026-07-28.md`
 - repository: `/Users/maa/Projects/gs/000_参照用/amidala-v2`
 - GitHub: <https://github.com/MAA39/amidala-v2>
-- コード基準SHA: `ff48046`（Handoff next action runtime fix後、Task 5検証基準）
+- コード基準SHA: `6b7da4f`（Team Work Overview runtime fix後、Docs更新前）
 - deploy: Cloudflareへ未deploy。production DB mutationも未実施
 - 移管方針: Codexは本書をmergeしてworkspaceをcleanにした後、機能開発を停止する
 
@@ -12,7 +12,7 @@
 
 次を新しいClaude Codeセッションの最初の依頼として使う。
 
-> `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/HANDOFF-CLAUDE-2026-07-28.md` を最初から最後まで読み、必読資料を指定順に読んでください。この文書を現在状態の正本としてください。まずread-onlyでrootが`main`、clean、単一worktree、`origin/main`と同じSHAであることを確認し、`archive/pre-todo-handoff-local-20260727`をmerge・削除しないと確認してください。次にローカルserverを起動または継続利用し、`http://localhost:5173/org_acme_studio/today`をdesktop 1280x720とmobile 390x844で実際に操作してください。田中→森のActor Switch、Handoff依頼、森の受信・承認、田中の完了通知、browser console/hydrationを最初に確認してください。現在のCRUD/Handoffだけでは価値が伝わるか判断しづらかったというユーザー評価を出発点に、一般的なCRUDを増やさず、Todayが「いま誰のボールか」を3分で理解できるかをユーザーと判断してください。既存Amidala/BYARDは読み取り専用です。変更は最新`main`から分離worktreeを切り、小さいPRでreview・mergeしてください。実装直前に利用技術の最新公式資料を調査し、ドメイン語で命名し、不要な`useEffect`を避け、触れるUXへ時間を使ってください。
+> `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/HANDOFF-CLAUDE-2026-07-28.md` を最初から最後まで読み、必読資料を指定順に読んでください。この文書を現在状態の正本としてください。まずread-onlyでrootが`main`、clean、単一worktreeであることと、local `main`が`origin/main` (`ee9b567`)よりTeam Work OverviewとDocsのcommit分だけaheadであることを確認してください。ユーザーの明示指示によりこの差分はpushしていません。`archive/pre-todo-handoff-local-20260727`をmerge・削除しないでください。次に`http://localhost:5173/org_acme_studio/work`と`/today`をdesktop 1280x720 / mobile 390x844で操作し、田中groupの対応中→森の確認待ち→森groupへ責任移動→最近完了のjourneyを確認してください。「誰の作業が今どこでどうなっているか」が本当に素早く分かるかをユーザーと評価し、一般的なCRUDや管理ダッシュボードを増やさないでください。既存Amidala/BYARDは読み取り専用です。変更は必要とユーザーが合意した一つのjourneyに絞り、実装前に公式資料と現行コードを調査してください。
 
 ## 1. ユーザーの期待値
 
@@ -67,7 +67,11 @@ coverage、テスト数、形式的完全性、細部だけのレビューは成
 | [#5](https://github.com/MAA39/amidala-v2/pull/5) | development-only Actor Switch | merged |
 | [#6](https://github.com/MAA39/amidala-v2/pull/6) | stale Web build artifact除去 | merged / `344ae3d` |
 | [#7](https://github.com/MAA39/amidala-v2/pull/7) | Today responsibility workspace | merged / `18366d9` |
-| [#8](https://github.com/MAA39/amidala-v2/pull/8) | 本書とlocal runtime証跡 | 最終Docs review / integration record |
+| [#8](https://github.com/MAA39/amidala-v2/pull/8) | 本書とlocal runtime証跡 | merged / `b4adc51` |
+| [#9](https://github.com/MAA39/amidala-v2/pull/9) | Work lifecycle visibility設計 | merged / `8461e8a` |
+| [#10](https://github.com/MAA39/amidala-v2/pull/10) | Todo Completion | merged / `7244f7f` |
+| [#11](https://github.com/MAA39/amidala-v2/pull/11) | Handoff Next Action | merged / `ee9b567` |
+| local only | Team Work Overview | reviewed / runtime PASS / push・PRなし |
 
 PR #6ではTurbo cache hit時に既存`apps/web/dist`へ古いhashed assetが残り、過去のdemo credential bundleが復元される問題を修正した。root buildが明示的にWeb distをpruneしてからTurbo restoreする。
 
@@ -75,7 +79,7 @@ PR #7の独立reviewはCritical 0 / Important 0。CodeRabbit checkはsuccess。�
 
 PR #8のDocs差分は独立Codex reviewerがrepo、GitHub、local runtime、DB状態、絶対パス、資格情報patternと照合した。旧7/27文書が自分自身を正本と呼ぶ矛盾をImportantとして検出し、7/28正本への転送だけに修正後、再reviewで`APPROVED`となった。ローカルClaude CLIにも同じread-only reviewを依頼したが、数分間出力がなく打ち切った。無応答を承認とは扱っていない。
 
-この最終Docs PRのmerge commitは、本書のコード基準SHAより新しくなる。移管開始時は`git rev-parse HEAD`を正とする。
+Team Work Overviewとこの最終Docsはユーザー指示によりlocal mergeだけ行う。移管開始時は`git rev-parse HEAD`を正とし、`origin/main`との差を勝手にpushしない。
 
 ## 4. 実装済みの触れる体験
 
@@ -85,6 +89,7 @@ PR #8のDocs差分は独立Codex reviewerがrepo、GitHub、local runtime、DB�
 /login
 /organizations
 /$organizationId/today
+/$organizationId/work
 /$organizationId/people
 /$organizationId/people/$contextMembershipId/todos
 /$organizationId/todos
@@ -105,6 +110,9 @@ PR #8のDocs差分は独立Codex reviewerがrepo、GitHub、local runtime、DB�
 - development-onlyの田中 彩 / 森 ハル Actor Switch
 - 決定論的な専用`amidala_demo` DB reset
 - `Today`責任ワークスペース
+- current assigneeによるTodo Completion
+- Handoff accept時の受領者の`次の一手`
+- Organization全体のread-only `TeamWorkOverview`（UI: `チームのボール`）
 
 `Today`は既存read modelを合成し、追加API・追加DB・追加cacheを持たない。
 
@@ -153,6 +161,27 @@ controller実測（2026-07-28、`task-5-browser-results.md`）では、Todo完�
 
 HTTP runtimeが通ったことを、視覚・操作・価値仮説の検証済みとは扱わない。
 
+## 6.1 Team Work OverviewのUI実測
+
+詳細証跡:
+
+- `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/research/2026-07-28-team-work-overview-runtime-verification.md`
+
+local `amidala_demo`をreset後、田中から森へHandoff依頼、森が次の一手付きでaccept、森がTodo完了までを実ブラウザで完走した。
+
+- 初期: 田中group / `対応中`
+- Handoff requested: 田中groupのまま / `森 ハルさんの確認待ち`
+- accepted: 森groupへ移動 / `対応中`
+- completed: open groupから消え、`最近完了`へ移動
+- Northstar path: 403でAcme Todo非表示
+- desktop 1280x720 / mobile 390x844: 横overflowなし
+- mobile bottom nav: 5項目、各56px高、nowrap
+- console warning / error: 0件
+
+実装はchart/Kanban/tableではなく、既存TodoCardと責任railを担当者ごとに縦積みするread-only画面である。操作はToday/自分のTodoに置き、Organization俯瞰画面にmutationを重複させていない。
+
+runtimeで、Query keyだけが必要なclient componentからServer Functionを含むquery moduleをimportすると、authenticated SSRがTTFB前でstuckする問題を検出した。`team-work-query-key.ts`へside-effect-free leaf分離し、cold restart後にWork/Today/Todo/HandoffがすべてHTTP 200 / 34〜56msへ復帰した。このルールは他製品でも再利用する。
+
 ## 7. ローカル起動と再現
 
 ```bash
@@ -179,7 +208,7 @@ pnpm dev
 
 初期状態へ戻す時だけ`pnpm db:demo:reset`を使う。scriptはDB名が`amidala_demo`であることを検証する。既存・production DBを対象にしない。
 
-移管時点ではlocal serverを停止せず、ユーザーがin-app browserを手動Reloadできる状態で残す。直前のruntime journey後なのでDBは「森が引き受け済み」の状態である。最初から触る場合はresetする。
+移管時点ではlocal serverをroot `main`から起動し、ユーザーがin-app browserをReloadできる状態で残す。`amidala_demo`は最終journey後にresetし、田中の初期Todoがopenな状態に戻す。
 
 ## 8. 検証済みコマンド
 
@@ -236,7 +265,24 @@ git diff --check: PASS
 
 demo seedはcontrollerのbrowser journey後に一度だけ既存のaccepted状態を検出したため、`pnpm db:demo:reset`でローカル`amidala_demo`を初期化して再実行した。browser Step 2はcontrollerの`task-5-browser-results.md`を正とし再実行していない。次の一手のaccept、Today/Handoff recent投影、direct reload保持、desktop 1280x720 / mobile 390x844のoverflowなし、console warning/error 0が記録されている。空のnextAction acceptはintegration suiteで確認済み。
 
-独立review、PR、merge、worktree cleanupはcontroller責任としてdeferred。Cloudflare deployは未実施。
+独立review、PR #11、merge commit `ee9b567`、worktree cleanupまで完了済み。Cloudflare deployは未実施。
+
+### Team Work Overview fresh verification（2026-07-28）
+
+local branch `feat/team-work-overview`の`6b7da4f`とDocs差分で次を確認した。
+
+```text
+API unit: 13/13 PASS
+Web tests: 17/17 PASS
+PostgreSQL integration: 24/24 PASS
+demo seed: 1/1 PASS（amidala_demo reset後）
+full monorepo build: 3/3 PASS
+production artifact demo marker scan: 0 matches
+production artifact local env file scan: 0 files（cache bypass rebuild後）
+git diff --check: PASS
+```
+
+独立reviewでAPIはCritical / Important 0、BFF/presenterは0、UIは「再試行がcached failureを再取得しない」Important 1件を検出し、`refetch()`へ修正後にtests/buildを再実行した。runtimeではquery key importからServer Function graphがclient SSRへ逆流するstuckを検出し、side-effect-free key moduleに分離した。
 
 ## 9. アーキテクチャと配置
 
@@ -270,6 +316,7 @@ Browser
 - `createServerFn` wrapperは薄く保つ
 - route loaderは`ensureQueryData`、Pageは同じquery optionsを読む
 - server stateの正本はTanStack Query
+- query keyだけを使うclient componentはside-effect-free `*-query-key.ts`へ依存し、Server Function/queryFnを含むmoduleをimportしない
 - ユーザー操作はevent handler、派生値はrenderで表し、状態同期だけの`useEffect`を避ける
 - APIはdomain → application use case → repository → Hono adapterの向きを守る
 
@@ -283,6 +330,8 @@ Browser
 - `Relationship`: 同一Organization内のMembership間関係
 - `Todo`: creatorとcurrent assigneeを分けたwork item
 - `TodoHandoff`: current assigneeが別Membershipへ責任移管を依頼した記録
+- `nextAction`: Handoff受領者がaccept時に宣言する次の一手。依頼者の`requestMessage`と混ぜない
+- `TeamWorkOverview`: Organization内のactive current assigneeごとにopen Todoを束ね、最近完了を最大20件返すCQRS read model
 
 Organization内の業務actorはUser IDでなくMembership IDを使う。「UserはOrganizationから独立し、Membershipで所属する」はBYARD系から継承した新製品の核である。
 
@@ -295,6 +344,14 @@ Todo Handoffの不変条件:
 - Handoff終端化と担当変更は同一transaction
 - party scopeを越えた履歴を返さない
 - UIへupstream raw errorやsnake_caseを漏らさない
+
+Team Work Overviewの不変条件:
+
+- active Membershipは同じOrganizationのactive assigneeが持つopen Todoを閲覧できる
+- requested Handoff中もacceptまでTodoはcurrent assignee groupに置く
+- openは`updatedAt desc, todoId desc`、memberは最新open Todo順
+- completedはDBで`updatedAt desc, todoId desc`にし、最大20件
+- suspended assigneeのopen Todoは現在の担当俯瞰から除外し、棚卸し/再割当は別sliceとする
 
 ## 11. デザイン / UX基準
 
@@ -330,6 +387,9 @@ Todo Handoffの不変条件:
 8. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/superpowers/specs/2026-07-27-three-minute-handoff-demo-design.md`
 9. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/superpowers/plans/2026-07-28-today-workspace.md`
 10. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/research/2026-07-28-today-runtime-verification.md`
+11. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/superpowers/specs/2026-07-28-work-lifecycle-visibility-design.md`
+12. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/superpowers/plans/2026-07-28-team-work-overview.md`
+13. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/research/2026-07-28-team-work-overview-runtime-verification.md`
 
 横断調査:
 
@@ -345,7 +405,9 @@ Todo Handoffの不変条件:
 
 - 通常契約にない極端に長い改行なしTodo名・人名はshared cardでoverflowし得る
 - Today section keyに、契約必須IDが欠落した場合だけindex fallbackがある
-- reduced-motionとToday追加後のresponsive visualは未確認
+- Team Workはsuspended assigneeが残したopen Todoを表示しない。棚卸し・再割当は未実装
+- Team Workのfilter/search、稼働率、工程status、期限は意図的に未実装
+- reduced-motionの専用エミュレートは未確認
 - CI / preview workflowは未作成
 - production PostgreSQL / Hyperdrive resourceは未作成
 - Cloudflare deployは未実施
@@ -356,18 +418,17 @@ Todo Handoffの不変条件:
 
 最優先:
 
-1. ユーザーがin-app browserをReloadする
-2. Claude Codeがdesktop/mobileで田中→森の3分journeyを操作する
-3. UXとして「いま誰のボールか」が伝わるか、ユーザーと判断する
-4. 次の一つの価値仮説だけを提案する
-5. 合意後、最新`main`から分離worktreeを切り、小PRで実装・review・mergeする
+1. ユーザーが`/org_acme_studio/work`をReloadする
+2. Claude Codeがdesktop/mobileで田中→森の責任移動と完了を操作する
+3. `Today`と`チームのボール`の役割が分かれ、誰の作業がどこにあるかを素早く読めるかをユーザーと判断する
+4. 現画面で分からない一つの問いだけを特定する
+5. 実装はユーザー合意後に行い、push/deployは明示指示があるまでしない
 
 候補は仮説であり、実装確定ではない。
 
-- Todayの情報優先度・空状態・CTA改善
-- Handoff後の「次に何をするか」をさらに強く示す
-- 背景、期待、期限・確認事項のうち、本当に必要な文脈だけを補う
-- 通知を作る前に、Todayの気づきやすさを確認する
+- 完了済みカードが最近20件で十分か、古い実績を見たいか
+- 確認待ちの理由と次の一手がTeam Work上でどこまで必要か
+- suspended assigneeの残Todoを誰が棚卸し、再割当するか
 
 一般的なCRUD backlog、full ES、generic workflow、Queue/Webhook Worker、RLS、汎用policy engine、網羅テスト、大規模design systemは必要になるまで作らない。
 
@@ -375,12 +436,12 @@ Todo Handoffの不変条件:
 
 ```text
 [ ] この文書を最後まで読んだ
-[ ] rootがmain / clean / origin/main一致 / 単一worktreeである
+[ ] rootがmain / clean / 単一worktreeで、local mainがorigin/mainより意図したcommit分だけaheadである
 [ ] archive branchをmerge・削除しないと確認した
-[ ] PR #1〜#7と最終Docs PRの状態を確認した
+[ ] PR #1〜#11とlocal-only Team Work差分の状態を確認した
 [ ] ignored local envの存在だけを確認し、値を表示していない
 [ ] local serverとPostgreSQLの状態を確認した
-[ ] desktop/mobile/browser consoleでTodayを操作した
+[ ] desktop/mobile/browser consoleでTodayとTeam Workを操作した
 [ ] HTTP runtime PASSと視覚UX未証明を混同していない
 [ ] 次の作業を一つの触れるjourneyへ絞った
 [ ] 現行公式Docsを調査してから実装する
@@ -393,13 +454,13 @@ Todo Handoffの不変条件:
 Codexは次を満たした後に停止し、以降をClaude Codeへ移管する。
 
 ```text
-- PR #1〜#7がmainへ統合済み
-- 3分間Handoff runtime journeyがlocalでPASS
-- 本書とruntime証跡がDocs PRでmainへ統合済み
-- Docs PRのreview/checkが完了
-- Docs worktreeとbranchを削除済み
+- PR #1〜#11がmainへ統合済み
+- Todo Completion / Handoff Next Action / Team Work Overview runtime journeyがlocalでPASS
+- Team Work実装、本書、runtime証跡がlocal mainへ統合済み
+- 複数の独立reviewとfresh checksが完了
+- Team Work worktreeとlocal branchを削除済み
 - git worktree listはroot 1件だけ
-- rootはmain、clean、origin/mainと一致
+- rootはmain、clean、origin/mainよりlocal-only Team Work/Docs commit分ahead（ユーザー指示により未push）
 - open PRは0件
 - archive branchはremoteに保存されmainへ未merge
 - local dev serverはユーザーがReloadできるよう稼働を維持

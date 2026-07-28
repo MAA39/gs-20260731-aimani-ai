@@ -440,6 +440,8 @@ PR title: `feat: record Handoff next action`
 
 実測: `feat/handoff-next-action`をpushし、small PR [#11](https://github.com/MAA39/amidala-v2/pull/11) `feat: record Handoff next action`を作成。Cloudflare deployは未実施。
 
-- [ ] **Step 6: GitHub checks後にmerge commit方式でmergeする**
+- [x] **Step 6: GitHub checks後にmerge commit方式でmergeする**
 
 root mainでfresh verification後、next-action worktree、local/remote branchを削除する。
+
+実測: PR [#11](https://github.com/MAA39/amidala-v2/pull/11)はmerge commit `ee9b567`で`main`へ統合済み。merge後rootでAPI 13/13、Web 14/14、build 3/3、artifact marker 0をfresh確認し、worktreeとlocal/remote branchを削除した。Cloudflare deployは行っていない。

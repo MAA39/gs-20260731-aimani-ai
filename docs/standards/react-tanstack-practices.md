@@ -21,6 +21,7 @@ Effect は「React の外にある system と、画面表示を同期する」�
 | SHOULD | filter/sort/page は typed URL search params に置き、render で導出する |
 | SHOULD | mutation 後は所有する Query または Router を明示的に invalidate する |
 | SHOULD | Query mutationの`onSuccess`で対象query keyの`invalidateQueries`をawaitし、再取得完了後にformをresetする |
+| MUST | Query keyだけを使うclient componentは、Server Function/queryFnをimportするmoduleではなくside-effect-free key moduleに依存する |
 | SHOULD | form の pending/error は action state に置き、`aria-live` で結果を伝える |
 | MUST | SSRされる日時はproduct timezoneを明示し、server/client runtimeのtimezoneへ依存しない |
 | MUST | 子routeを持つfile routeは`Outlet`を描画するか、componentなしlayout + exact index routeへ分ける |
@@ -106,6 +107,7 @@ DOM widget、subscription、analytics表示など外部systemとの同期?
 - InboxはOrganization内のrequestedをrecipient Membership、terminalをrequester/recipient partyでscopeする。terminalは`resolvedAt DESC`で並べ、scope/filter後にSQLでlimitする。Assigned queryはopen Todoだけを返す。
 - loaderでprefetchしたrouteもPageは同じqueryOptionsの`useSuspenseQuery`を読む。CTAはstatusだけでなくactorとcurrent assigneeを確認し、terminal日時は`resolvedAt`を表示する。
 - 実ブラウザ確認では、focus/overflow/SSR/consoleを画面サイズ別に記録する。Todo Handoffではdesktop 1280×720、mobile 390×844で確認し、warn/error logsは空だった。reduced-motionだけは未エミュレートでpendingとする。
+- Query keyのみが必要なmutation componentから`*-queries.ts`をimportすると、そのquery moduleがServer Function/server-only adapterを含む場合、TanStack Startのauthenticated SSRがTTFB前でstuckすることがある。keyは`*-query-key.ts`のようなside-effect-free leafへ分離し、direct SSRでToday/Todo/Handoffも確認する。実測は`docs/research/2026-07-28-team-work-overview-runtime-verification.md`。
 
 - `useEffect`、derived state、不要なmemoはまだ存在しない。
 - pathnameからpage titleを計算する実装はrender derivationであり妥当。
