@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { TeamWorkPage } from '../../features/work/TeamWorkPage';
 import { teamWorkOverviewQuery } from '../../features/work/team-work-queries';
 
@@ -11,14 +11,13 @@ export const Route = createFileRoute('/$organizationId/work')({
 });
 
 function TeamWorkRoute() {
-  const router = useRouter();
   const { organizationId } = Route.useParams();
-  const { data: result } = useSuspenseQuery(teamWorkOverviewQuery(organizationId));
+  const { data: result, refetch } = useSuspenseQuery(teamWorkOverviewQuery(organizationId));
   return (
     <TeamWorkPage
       organizationId={organizationId}
       result={result}
-      retry={() => router.invalidate()}
+      retry={() => { void refetch(); }}
     />
   );
 }
