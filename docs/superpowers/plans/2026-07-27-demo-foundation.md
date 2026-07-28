@@ -401,11 +401,11 @@ Expected: story test PASS。
 
 実測 (2026-07-28): `pnpm db:demo:reset` が `Demo database reset complete: amidala_demo` で終了。指定の integration command は 4 files / 7 tests PASS。
 
-- [x] **Step 3: SSRとconsoleを確認する**
+- [ ] **Step 3: SSRとconsoleを確認する**
 
 `pnpm dev`を起動し、`/`がStart redirect、`/login`がfull documentであることをcurlで確認する。許可されたin-app browserでfresh navigationとdirect reloadを行い、console warning/error 0件を確認する。browser policyでlocalhost inspectionが拒否される場合は、curl結果とbuildを証跡にし、最終3分journeyでbrowser確認を必須pendingとして残す。
 
-実測 (2026-07-28): `curl /` は `HTTP/1.1 307 Temporary Redirect` と `location: /organizations`、legacy marker 0件。`curl /login` は `200 OK` かつ `<!DOCTYPE html><html lang="ja">`。ブラウザ console の localhost inspection は本検証指示により実行せず、fresh navigation/direct reload の console 0件確認は必須 pending。
+実測 (2026-07-28): `curl /` は `HTTP/1.1 307 Temporary Redirect` と `location: /organizations`、legacy marker 0件。`curl /login` は `200 OK` かつ `<!DOCTYPE html><html lang="ja">`。既存の in-app local tab を claim → reload し `dev.logs` の error/warn が空であることは観測したが、DOM snapshot は `Browser Use rejected this action ... localhost URL blocked by Browser use URL policy` と拒否された。迂回は行わず、fresh navigation/direct reload の console 全体 0件は証明できないため、browser 確認を必須 pending とする。
 
 - [x] **Step 4: 計画へ実測結果を記録してcommitする**
 

@@ -15,4 +15,4 @@ Date: 2026-07-28
 
 ## Concern / pending
 
-許可された in-app browser の localhost inspection は本検証指示により実行していないため、fresh navigation/direct reload における browser console warning/error 0件確認は必須 pending。curl と production build の証跡は取得済み。
+既存の in-app local tab を claim → reload し `dev.logs` (error/warn) が空であることは観測したが、DOM snapshot は `Browser Use rejected this action ... localhost URL blocked by Browser use URL policy` と拒否された。迂回は禁止し、fresh navigation/direct reload における browser console 全体の warning/error 0件は証明できないため、browser 確認を必須 pending とする。curl と production build の証跡は取得済み。
