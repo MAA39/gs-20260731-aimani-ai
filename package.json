@@ -4,7 +4,8 @@
   "packageManager": "pnpm@11.17.0",
   "scripts": {
     "dev": "pnpm --filter @amidala/web dev",
-    "build": "turbo run build",
+    "build": "pnpm clean:web:build && turbo run build",
+    "clean:web:build": "node --eval \"require('node:fs').rmSync('apps/web/dist', { recursive: true, force: true })\"",
     "db:up": "docker compose up -d postgres",
     "db:migrate": "node --env-file=apps/api/.dev.vars --import tsx packages/db/src/migrate.ts",
     "db:demo:reset": "node --env-file=apps/api/.dev.vars --import tsx apps/api/src/dev/reset-demo-database.ts",
