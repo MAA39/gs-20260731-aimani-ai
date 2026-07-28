@@ -67,10 +67,13 @@ coverage、テスト数、形式的完全性、細部だけのレビューは成
 | [#5](https://github.com/MAA39/amidala-v2/pull/5) | development-only Actor Switch | merged |
 | [#6](https://github.com/MAA39/amidala-v2/pull/6) | stale Web build artifact除去 | merged / `344ae3d` |
 | [#7](https://github.com/MAA39/amidala-v2/pull/7) | Today responsibility workspace | merged / `18366d9` |
+| [#8](https://github.com/MAA39/amidala-v2/pull/8) | 本書とlocal runtime証跡 | 最終Docs review / integration record |
 
 PR #6ではTurbo cache hit時に既存`apps/web/dist`へ古いhashed assetが残り、過去のdemo credential bundleが復元される問題を修正した。root buildが明示的にWeb distをpruneしてからTurbo restoreする。
 
 PR #7の独立reviewはCritical 0 / Important 0。CodeRabbit checkはsuccess。機能branch/worktreeはmerge後に削除済み。
+
+PR #8のDocs差分は独立Codex reviewerがrepo、GitHub、local runtime、DB状態、絶対パス、資格情報patternと照合した。旧7/27文書が自分自身を正本と呼ぶ矛盾をImportantとして検出し、7/28正本への転送だけに修正後、再reviewで`APPROVED`となった。ローカルClaude CLIにも同じread-only reviewを依頼したが、数分間出力がなく打ち切った。無応答を承認とは扱っていない。
 
 この最終Docs PRのmerge commitは、本書のコード基準SHAより新しくなる。移管開始時は`git rev-parse HEAD`を正とする。
 
