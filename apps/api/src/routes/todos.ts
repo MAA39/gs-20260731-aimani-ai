@@ -21,18 +21,14 @@ export function createTodoRoutes() {
       if (!path.success) throw new ApiError('validation_error', 'Invalid path.');
       const body = createTodoBodySchema.safeParse(await context.req.json());
       if (!body.success) throw new ApiError('validation_error', 'Invalid Todo.');
-      const session = await (await context.get('scope').resolve('auth')).api.getSession({ headers: context.req.raw.headers });
-      if (!session?.user) throw new ApiError('unauthorized', 'Authentication required');
       const useCase = await context.get('scope').resolve<CreateSharedTodo>('createSharedTodo');
-      return context.json({ todo: await useCase.execute(session.user.id, { ...path.data, ...body.data }) }, 201);
+      return context.json({ todo: await useCase.execute(await currentUserId(context), { ...path.data, ...body.data }) }, 201);
     })
     .get('/organizations/:organizationId/people/:contextMembershipId/todos', async (context) => {
       const path = personTodoPathSchema.safeParse(context.req.param());
       if (!path.success) throw new ApiError('validation_error', 'Invalid path.');
-      const session = await (await context.get('scope').resolve('auth')).api.getSession({ headers: context.req.raw.headers });
-      if (!session?.user) throw new ApiError('unauthorized', 'Authentication required');
       const useCase = await context.get('scope').resolve<GetSharedTodoWorkspace>('getSharedTodoWorkspace');
-      return context.json(await useCase.execute(session.user.id, path.data));
+      return context.json(await useCase.execute(await currentUserId(context), path.data));
     })
     .post('/organizations/:organizationId/todos/:todoId/complete', async (context) => {
       const path = completeTodoPathSchema.safeParse(context.req.param());
