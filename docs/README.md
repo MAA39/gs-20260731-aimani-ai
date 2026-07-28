@@ -11,7 +11,7 @@
 
 ## 最初に読む順番
 
-1. [Claude 作業移管 — 2026-07-27](HANDOFF-CLAUDE-2026-07-27.md)
+1. [Claude Code 作業移管 — 2026-07-28 最終正本](HANDOFF-CLAUDE-2026-07-28.md)
 2. [再利用可能なプロダクト基準](standards/reusable-product-baseline.md)
 3. [実装前 Research Gate](standards/research-before-build.md)
 4. [React 19 / TanStack 実装プラクティス](standards/react-tanstack-practices.md)
@@ -26,6 +26,9 @@
 13. [Identity → People 実装計画](superpowers/plans/2026-07-27-identity-people-vertical-slice.md)
 14. [Person SharedTodo 縦切り設計](superpowers/specs/2026-07-27-relationship-todo-slice-design.md)
 15. [Todo Handoff 縦切り設計](superpowers/specs/2026-07-27-todo-handoff-slice-design.md)
+16. [Today / Todo Handoff ローカルruntime検証](research/2026-07-28-today-runtime-verification.md)
+
+2026-07-27版の引き継ぎ文書はTouchable MVP統合時の履歴資料として残している。作業再開には2026-07-28最終正本を使う。
 
 ## ローカル起動
 

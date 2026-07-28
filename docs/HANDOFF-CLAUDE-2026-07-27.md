@@ -1,17 +1,20 @@
 # Claude 作業移管 — Amidala v2
 
+> [!IMPORTANT]
+> この文書は2026-07-27時点の統合履歴である。現在状態の正本は `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/HANDOFF-CLAUDE-2026-07-28.md`。Claude Codeは先に新正本を読むこと。
+
 - 作成日: 2026-07-27（Asia/Tokyo）
-- 正本の絶対パス: `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/HANDOFF-CLAUDE-2026-07-27.md`
+- 履歴資料の絶対パス: `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/HANDOFF-CLAUDE-2026-07-27.md`
 - GitHub: <https://github.com/MAA39/amidala-v2>
 - Todo Handoff review archive: <https://github.com/MAA39/amidala-v2/pull/1>
 - 引き継ぎ時点の branch: `main`（最終SHAは本書末尾の完了記録を正本とする）
 - 状態: Touchable MVPを`main`へ統合し、feature worktreeを撤去してから移管。Cloudflare deploy は未実施
 
-## Claude への最初の指示
+## Claude への転送指示
 
-次の文章を新しい Claude セッションの最初の依頼として使う。
+この履歴資料から作業を再開しない。次の文章だけを新しいClaude Codeセッションへ渡す。
 
-> `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/HANDOFF-CLAUDE-2026-07-27.md` を最初から最後まで読み、そこからリンクされる必読資料を読んでください。この文書を作業状態の正本とし、既存 Amidala / BYARD は読み取り専用、新規実装は Amidala v2 から新しく切った分離worktreeだけで進めてください。退避branch `archive/pre-todo-handoff-local-20260727` は過去のユーザー変更を保存する記録なので、明示依頼なしにmerge・削除しないでください。まずrootが`main`、clean、単一worktreeであること、現在SHA、統合済みPR #1/#2、検証コマンドをread-onlyで確認し、次の小さなユーザージャーニーを提案してください。金融系のような過剰hardeningやテスト量を目的化せず、触れるUXを優先してください。実装前には利用技術の現行公式資料を調べ、ドメイン語で命名し、Reactの不要な`useEffect`を避けてください。
+> `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/HANDOFF-CLAUDE-2026-07-28.md` を現在状態の正本として最初から最後まで読み、同文書の「Claude Codeへの最初の依頼」に従ってください。この2026-07-27文書は統合履歴としてのみ参照してください。
 
 ## 1. 最重要の意図
 
