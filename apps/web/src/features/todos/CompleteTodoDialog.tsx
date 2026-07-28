@@ -7,7 +7,7 @@ import { todoFailureMessage } from './todo-error-presentation';
 import { completeTodoSuccessMessage } from './complete-todo-presentation';
 import { assignedTodoWorkspaceKey } from './assigned-todo-queries';
 import { todoHandoffWorkspaceKey } from '../handoffs/handoff-queries';
-import { teamWorkOverviewKey } from '../work/team-work-queries';
+import { teamWorkOverviewKey } from '../work/team-work-query-key';
 import { sharedTodoWorkspaceOrganizationPrefix } from './todo-queries';
 
 type Props = { organizationId: string; todo: TodoSummary; onCompleted: (message: string) => void };

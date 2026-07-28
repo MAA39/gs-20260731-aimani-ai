@@ -1,8 +1,8 @@
 import { queryOptions } from '@tanstack/react-query';
 import { getTeamWorkOverview } from './team-work.functions';
+import { teamWorkOverviewKey } from './team-work-query-key';
 
-export const teamWorkOverviewKey = (organizationId: string) =>
-  ['teamWork', organizationId] as const;
+export { teamWorkOverviewKey } from './team-work-query-key';
 
 export const teamWorkOverviewQuery = (organizationId: string) =>
   queryOptions({

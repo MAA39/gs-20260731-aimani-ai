@@ -7,7 +7,7 @@ import type { TodoHandoffMutationResult } from './handoff-schema';
 import { todoHandoffWorkspaceKey } from './handoff-queries';
 import { assignedTodoWorkspaceKey } from '../todos/assigned-todo-queries';
 import { sharedTodoWorkspaceOrganizationPrefix } from '../todos/todo-queries';
-import { teamWorkOverviewKey } from '../work/team-work-queries';
+import { teamWorkOverviewKey } from '../work/team-work-query-key';
 import { useState } from 'react';
 import { acceptedHandoffAnnouncement } from '../today/today-workspace';
 

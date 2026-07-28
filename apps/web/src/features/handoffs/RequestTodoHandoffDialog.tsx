@@ -7,7 +7,7 @@ import { peopleQuery } from '../people/people-queries';
 import { requestTodoHandoff } from './handoffs.functions';
 import { assignedTodoWorkspaceKey } from '../todos/assigned-todo-queries';
 import { todoHandoffWorkspaceKey } from './handoff-queries';
-import { teamWorkOverviewKey } from '../work/team-work-queries';
+import { teamWorkOverviewKey } from '../work/team-work-query-key';
 import { sharedTodoWorkspaceOrganizationPrefix } from '../todos/todo-queries';
 
 type Props = { organizationId: string; todo: TodoSummary; currentMembershipId: string; onRequested: () => void };
