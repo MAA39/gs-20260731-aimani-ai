@@ -16,6 +16,7 @@ import { Route as OrganizationIdHandoffsRouteImport } from './routes/$organizati
 import { Route as OrganizationIdPeopleRouteImport } from './routes/$organizationId/people'
 import { Route as OrganizationIdTodayRouteImport } from './routes/$organizationId/today'
 import { Route as OrganizationIdTodosRouteImport } from './routes/$organizationId/todos'
+import { Route as OrganizationIdWorkRouteImport } from './routes/$organizationId/work'
 import { Route as OrganizationIdPeopleIndexRouteImport } from './routes/$organizationId/people/index'
 import { Route as OrganizationIdPeopleContextMembershipIdTodosRouteImport } from './routes/$organizationId/people/$contextMembershipId/todos'
 
@@ -54,6 +55,11 @@ const OrganizationIdTodosRoute = OrganizationIdTodosRouteImport.update({
   path: '/$organizationId/todos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrganizationIdWorkRoute = OrganizationIdWorkRouteImport.update({
+  id: '/$organizationId/work',
+  path: '/$organizationId/work',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrganizationIdPeopleIndexRoute =
   OrganizationIdPeopleIndexRouteImport.update({
     id: '/',
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/$organizationId/people': typeof OrganizationIdPeopleRouteWithChildren
   '/$organizationId/today': typeof OrganizationIdTodayRoute
   '/$organizationId/todos': typeof OrganizationIdTodosRoute
+  '/$organizationId/work': typeof OrganizationIdWorkRoute
   '/$organizationId/people/': typeof OrganizationIdPeopleIndexRoute
   '/$organizationId/people/$contextMembershipId/todos': typeof OrganizationIdPeopleContextMembershipIdTodosRoute
 }
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/$organizationId/handoffs': typeof OrganizationIdHandoffsRoute
   '/$organizationId/today': typeof OrganizationIdTodayRoute
   '/$organizationId/todos': typeof OrganizationIdTodosRoute
+  '/$organizationId/work': typeof OrganizationIdWorkRoute
   '/$organizationId/people': typeof OrganizationIdPeopleIndexRoute
   '/$organizationId/people/$contextMembershipId/todos': typeof OrganizationIdPeopleContextMembershipIdTodosRoute
 }
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/$organizationId/people': typeof OrganizationIdPeopleRouteWithChildren
   '/$organizationId/today': typeof OrganizationIdTodayRoute
   '/$organizationId/todos': typeof OrganizationIdTodosRoute
+  '/$organizationId/work': typeof OrganizationIdWorkRoute
   '/$organizationId/people/': typeof OrganizationIdPeopleIndexRoute
   '/$organizationId/people/$contextMembershipId/todos': typeof OrganizationIdPeopleContextMembershipIdTodosRoute
 }
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/$organizationId/people'
     | '/$organizationId/today'
     | '/$organizationId/todos'
+    | '/$organizationId/work'
     | '/$organizationId/people/'
     | '/$organizationId/people/$contextMembershipId/todos'
   fileRoutesByTo: FileRoutesByTo
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/$organizationId/handoffs'
     | '/$organizationId/today'
     | '/$organizationId/todos'
+    | '/$organizationId/work'
     | '/$organizationId/people'
     | '/$organizationId/people/$contextMembershipId/todos'
   id:
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/$organizationId/people'
     | '/$organizationId/today'
     | '/$organizationId/todos'
+    | '/$organizationId/work'
     | '/$organizationId/people/'
     | '/$organizationId/people/$contextMembershipId/todos'
   fileRoutesById: FileRoutesById
@@ -143,6 +155,7 @@ export interface RootRouteChildren {
   OrganizationIdPeopleRoute: typeof OrganizationIdPeopleRouteWithChildren
   OrganizationIdTodayRoute: typeof OrganizationIdTodayRoute
   OrganizationIdTodosRoute: typeof OrganizationIdTodosRoute
+  OrganizationIdWorkRoute: typeof OrganizationIdWorkRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -196,6 +209,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrganizationIdTodosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$organizationId/work': {
+      id: '/$organizationId/work'
+      path: '/$organizationId/work'
+      fullPath: '/$organizationId/work'
+      preLoaderRoute: typeof OrganizationIdWorkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$organizationId/people/': {
       id: '/$organizationId/people/'
       path: '/'
@@ -235,6 +255,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrganizationIdPeopleRoute: OrganizationIdPeopleRouteWithChildren,
   OrganizationIdTodayRoute: OrganizationIdTodayRoute,
   OrganizationIdTodosRoute: OrganizationIdTodosRoute,
+  OrganizationIdWorkRoute: OrganizationIdWorkRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
