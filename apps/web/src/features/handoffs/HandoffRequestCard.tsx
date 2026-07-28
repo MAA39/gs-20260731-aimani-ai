@@ -6,6 +6,7 @@ import { todoHandoffWorkspaceKey } from './handoff-queries';
 import { assignedTodoWorkspaceKey } from '../todos/assigned-todo-queries';
 import { sharedTodoWorkspaceOrganizationPrefix } from '../todos/todo-queries';
 import { useState } from 'react';
+import { acceptedHandoffAnnouncement } from '../today/today-workspace';
 
 export function HandoffRequestCard({ handoff, kind, currentMembershipId, onAnnounce }: { handoff: TodoHandoffSummary; kind: 'incoming' | 'outgoing' | 'recent'; currentMembershipId: string; onAnnounce: (message: string) => void }) {
   const mutation = useMutation({ mutationFn: async (action: 'accept' | 'reject' | 'cancel') => action === 'accept' ? acceptTodoHandoff({ data: { organizationId: handoff.organizationId, handoffId: handoff.handoffId } }) : action === 'reject' ? rejectTodoHandoff({ data: { organizationId: handoff.organizationId, handoffId: handoff.handoffId } }) : cancelTodoHandoff({ data: { organizationId: handoff.organizationId, handoffId: handoff.handoffId } }) });
@@ -19,7 +20,7 @@ export function HandoffRequestCard({ handoff, kind, currentMembershipId, onAnnou
       if (result.status === 'conflict') { setResultMessage(result.error.message); onAnnounce(result.error.message); await invalidate().catch(() => undefined); mutation.reset(); return; }
       await invalidate();
       if (result.status !== 'ok') { setResultMessage(result.error.message); onAnnounce(result.error.message); return; }
-      const message = action === 'accept' ? '引き継ぎを受け入れました。' : action === 'reject' ? '引き継ぎを見送りました。' : '引き継ぎ依頼を取り消しました。'; setResultMessage(message); onAnnounce(message);
+      const message = action === 'accept' ? acceptedHandoffAnnouncement(handoff.recipient.name) : action === 'reject' ? '引き継ぎを見送りました。' : '引き継ぎ依頼を取り消しました。'; setResultMessage(message); onAnnounce(message);
     } catch { const message = '引き継ぎの処理に失敗しました。再試行してください。'; setResultMessage(message); onAnnounce(message); }
   }
   const displayedAt = kind === 'recent' ? handoff.resolvedAt : handoff.requestedAt;

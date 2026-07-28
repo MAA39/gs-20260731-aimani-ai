@@ -23,7 +23,7 @@ export function DemoActorSwitcher({ organizationId }: { organizationId: string }
       const signInResult = await authClient.signIn.email({ email: actor.email, password });
       if (signInResult.error) throw new Error('sign in failed');
       queryClient.clear();
-      await navigate({ to: '/$organizationId/handoffs', params: { organizationId }, replace: true });
+      await navigate({ to: '/$organizationId/today', params: { organizationId }, replace: true });
       await router.invalidate();
     } catch {
       setError(demoActorSwitchFailureMessage());

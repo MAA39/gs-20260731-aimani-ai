@@ -2,11 +2,12 @@
 import { HeadContent, Link, Outlet, Scripts, createRootRouteWithContext, useLocation } from '@tanstack/react-router';
 import type { QueryClient } from '@tanstack/react-query';
 import { lazy, Suspense, type ReactNode } from 'react';
-import { CheckSquare, Inbox, Users } from 'lucide-react';
+import { CheckSquare, CircleDot, Inbox, Users } from 'lucide-react';
 import appCss from '../styles.css?url';
 import { authClient } from '../features/auth/auth-client';
 
 const links = [
+  { to: 'today', label: '今日のボール', icon: CircleDot },
   { to: 'people', label: 'People', icon: Users },
   { to: 'todos', label: '自分のTodo', icon: CheckSquare },
   { to: 'handoffs', label: '引き継ぎ', icon: Inbox },
@@ -34,9 +35,9 @@ function ApplicationShell() {
   const session = authClient.useSession();
   const pathname = useLocation({ select: (location) => location.pathname });
   if (pathname === '/login' || pathname === '/organizations') return <Outlet />;
-  const pageTitle = /^\/[^/]+\/people\/[^/]+\/todos$/.test(pathname) ? '共有Todo' : /\/todos$/.test(pathname) ? '自分のTodo' : /\/handoffs$/.test(pathname) ? '引き継ぎ' : 'People';
+  const pageTitle = /\/today$/.test(pathname) ? '今日のボール' : /^\/[^/]+\/people\/[^/]+\/todos$/.test(pathname) ? '共有Todo' : /\/todos$/.test(pathname) ? '自分のTodo' : /\/handoffs$/.test(pathname) ? '引き継ぎ' : 'People';
   const personTodoMatch = pathname.match(/^\/([^/]+)\/people\/([^/]+)\/todos$/);
-  const organizationId = personTodoMatch?.[1] ?? pathname.match(/^\/([^/]+)\/(?:people|todos|handoffs)/)?.[1];
+  const organizationId = personTodoMatch?.[1] ?? pathname.match(/^\/([^/]+)\/(?:people|todos|handoffs|today)/)?.[1];
   const identityPending = session.isPending;
   const name = session.data?.user.name?.trim() || session.data?.user.email?.trim() || '';
   const initial = identityPending ? '…' : name.slice(0, 1) || '?';
@@ -52,6 +53,7 @@ function ApplicationShell() {
 function NavItem({ item, organizationId, pathname }: { item: (typeof links)[number]; organizationId?: string; pathname: string }) {
   const Icon = item.icon;
   if (!organizationId) return <Link to="/organizations" className="nav-link" activeOptions={{ exact: true }}><Icon size={19} aria-hidden="true"/><span>{item.label}</span></Link>;
+  if (item.to === 'today') return <Link to="/$organizationId/today" params={{ organizationId }} activeOptions={{ exact: true }} className="nav-link" activeProps={{ className: 'nav-link active' }}><Icon size={19} aria-hidden="true"/><span>{item.label}</span></Link>;
   if (item.to === 'people') return <Link to="/$organizationId/people" params={{ organizationId }} activeOptions={{ exact: true }} className="nav-link" activeProps={{ className: 'nav-link active' }}><Icon size={19} aria-hidden="true"/><span>{item.label}</span></Link>;
   if (item.to === 'todos') return <Link to="/$organizationId/todos" params={{ organizationId }} activeOptions={{ exact: true }} className={`nav-link${personTodoMatchForNav(pathname) ? ' active' : ''}`} aria-current={personTodoMatchForNav(pathname) ? 'page' : undefined} activeProps={{ className: 'nav-link active', 'aria-current': 'page' }}><Icon size={19} aria-hidden="true"/><span>{item.label}</span></Link>;
   return <Link to="/$organizationId/handoffs" params={{ organizationId }} activeOptions={{ exact: true }} className="nav-link" activeProps={{ className: 'nav-link active' }}><Icon size={19} aria-hidden="true"/><span>{item.label}</span></Link>;
