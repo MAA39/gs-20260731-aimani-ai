@@ -183,7 +183,7 @@ pnpm dev
 
 ## 8. 検証済みコマンド
 
-Todo完了branch（`e60643e`）でTask 5 Step 1をfresh実行した結果:
+Todo完了branch（`bd47a9c`）で最終review修正後にcontrollerがfresh実行した結果:
 
 ```text
 API tests: 13/13 PASS

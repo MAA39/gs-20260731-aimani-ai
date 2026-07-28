@@ -534,7 +534,7 @@ pnpm build
 git diff --check
 ```
 
-実測（2026-07-28、todo-completion worktree / e60643e）: API 13/13 PASS、Web 14/14 PASS、PostgreSQL integration 10/10 PASS、demo seed 1/1 PASS、`pnpm build` 3/3 PASS、production artifact scan 0 matches、`git diff --check` PASS。demo checkはブラウザ確認でpending Handoffが残ったため、`pnpm db:demo:reset`後に`TEST_DATABASE_URL`をローカル`amidala_demo`へ設定してfresh実行した。
+実測（2026-07-28、todo-completion worktree / bd47a9c）: API 13/13 PASS、Web 14/14 PASS、PostgreSQL integration 10/10 PASS、demo seed 1/1 PASS、`pnpm build` 3/3 PASS、production artifact scan 0 matches、`git diff --check` PASS。demo checkはブラウザ確認でpending Handoffが残ったため、`pnpm db:demo:reset`後に`TEST_DATABASE_URL`をローカル`amidala_demo`へ設定してfresh実行した。canonical completion schemaへ一本化した最終commit後にもcontrollerが全コマンドをfresh再実行した。
 
 - [x] **Step 2: demo runtime journeyを実行する**
 
@@ -549,13 +549,17 @@ git diff --check
 
 実測（controller実測、2026-07-28）: desktop 1280x720 / mobile 390x844とも横overflowなし。完了確認Dialogはviewport内（mobile rect left 32 / right 343 / top 324.6 / bottom 519.4）、cancel後に完了triggerへfocus復帰。田中のTodayからTodoが消え、live-region「Todoを完了しました。」を表示。森のshared workspaceでは「完了」として残り、完了TodoにHandoff依頼actionは表示されない。pending Handoff作成後は完了actionが非表示で、direct reload後も維持。browser console error / warning 0。
 
-- [ ] **Step 3: independent reviewを依頼する**
+- [x] **Step 3: independent reviewを依頼する**
 
 base/head SHA、design、planを渡し、assignee authority、row lock、pending Handoff conflict、idempotency、raw error leak、query invalidation、existing UI踏襲をCritical/Important対象としてreviewする。
 
-- [ ] **Step 4: Critical/ImportantをTDDで修正して再検証する**
+実測: 独立reviewはCritical / Important 0件でAPPROVED。assignee authority、row lock順序、pending Handoffの409、冪等完了、固定error copy、3系統のquery invalidation、既存Dialog/Card踏襲、新規`useEffect`なし、focus復帰とlive regionを確認した。
+
+- [x] **Step 4: Critical/ImportantをTDDで修正して再検証する**
 
 MinorはUX価値を損なわないものだけhandoff Docsへ記録する。
+
+Critical / Importantの修正対象はなし。MinorだったWeb側completion input schemaの重複は`completeTodoPathSchema`のaliasへ一本化し、scoped再review APPROVED、Web 14/14、TypeScript、全体fresh checkを通した。ignored SDD task reportの古いcommit/style記載だけは製品成果物に影響しないため未修正。
 
 - [ ] **Step 5: branchをpushしsmall PRを作る**
 
