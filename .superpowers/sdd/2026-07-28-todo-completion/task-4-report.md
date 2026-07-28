@@ -24,3 +24,11 @@
 ## Concerns
 
 - Browserでの実操作確認は未実施。
+
+## Important UX finding / fix round 1/5
+
+- Browser RED: mutation成功後にTodayからcardが消え、card内の`role=status`もunmountしたため、成功announcementのvisible待機がtimeoutした。
+- Root cause: announcement stateがunmount対象の`AssignedTodoCard`内にあった。
+- Fix: `AssignedTodoCard`をoptional `onAnnounce`通知のみとし、TodayPage既存top-level live regionへ渡した。AssignedTodoPageにもpage-level state/live regionを追加し、card消失後も`Todoを完了しました。`をDOMに保持。new useEffectなし。
+- 再検証コマンド: `pnpm --filter @amidala/web test`（14 passed）、`pnpm build`、marker scan（0件）、`git diff --check`。
+- Browser再検証は親エージェントが実施。
