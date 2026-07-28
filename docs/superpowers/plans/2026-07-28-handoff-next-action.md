@@ -434,9 +434,11 @@ transaction atomicity、idempotent retry non-overwrite、nullable migration、24
 
 runtimeでActor Switch直後に旧principalのquery projectionが残る問題を検出し、typed Today URLへのhard replaceでclient stateを再生成する`ff48046`を追加。実ブラウザで再読込なしの切替を再確認し、scoped reviewもAPPROVED。既知Minorはaccept routeが認証前にbody validationする既存順序で、未認証＋不正bodyが400になり得る点。raw data leakや通常UX影響がないため本sliceでは変更しない。
 
-- [ ] **Step 5: small PRを作る**
+- [x] **Step 5: small PRを作る**
 
 PR title: `feat: record Handoff next action`
+
+実測: `feat/handoff-next-action`をpushし、small PR [#11](https://github.com/MAA39/amidala-v2/pull/11) `feat: record Handoff next action`を作成。Cloudflare deployは未実施。
 
 - [ ] **Step 6: GitHub checks後にmerge commit方式でmergeする**
 
