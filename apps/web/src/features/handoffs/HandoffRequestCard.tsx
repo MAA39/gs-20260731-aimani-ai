@@ -7,6 +7,7 @@ import type { TodoHandoffMutationResult } from './handoff-schema';
 import { todoHandoffWorkspaceKey } from './handoff-queries';
 import { assignedTodoWorkspaceKey } from '../todos/assigned-todo-queries';
 import { sharedTodoWorkspaceOrganizationPrefix } from '../todos/todo-queries';
+import { teamWorkOverviewKey } from '../work/team-work-queries';
 import { useState } from 'react';
 import { acceptedHandoffAnnouncement } from '../today/today-workspace';
 
@@ -15,7 +16,7 @@ export function HandoffRequestCard({ handoff, kind, currentMembershipId, onAnnou
   const client = useQueryClient();
   const [resultMessage, setResultMessage] = useState('');
   const [acceptPending, setAcceptPending] = useState(false);
-  const invalidate = () => Promise.all([client.invalidateQueries({ queryKey: todoHandoffWorkspaceKey(handoff.organizationId), exact: true }), client.invalidateQueries({ queryKey: assignedTodoWorkspaceKey(handoff.organizationId), exact: true }), client.invalidateQueries({ queryKey: sharedTodoWorkspaceOrganizationPrefix(handoff.organizationId), exact: false })]);
+  const invalidate = () => Promise.all([client.invalidateQueries({ queryKey: todoHandoffWorkspaceKey(handoff.organizationId), exact: true }), client.invalidateQueries({ queryKey: assignedTodoWorkspaceKey(handoff.organizationId), exact: true }), client.invalidateQueries({ queryKey: teamWorkOverviewKey(handoff.organizationId), exact: true }), client.invalidateQueries({ queryKey: sharedTodoWorkspaceOrganizationPrefix(handoff.organizationId), exact: false })]);
   async function decide(action: 'reject' | 'cancel') {
     setResultMessage(''); onAnnounce('引き継ぎを処理中です。');
     try {
