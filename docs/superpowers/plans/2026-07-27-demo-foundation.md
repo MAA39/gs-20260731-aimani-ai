@@ -294,7 +294,7 @@ Run:
 
 ```bash
 TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo \
-  pnpm --filter @amidala/api test:integration -- demo-seed.integration.test.ts --run
+  pnpm --filter @amidala/api test:demo -- --run
 ```
 
 Expected: databaseまたはtable/storyが存在せずFAIL。
@@ -328,10 +328,10 @@ Run:
 pnpm db:up
 pnpm db:demo:reset
 TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo \
-  pnpm --filter @amidala/api test:integration -- demo-seed.integration.test.ts --run
+  pnpm --filter @amidala/api test:demo -- --run
 pnpm db:demo:reset
 TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo \
-  pnpm --filter @amidala/api test:integration -- demo-seed.integration.test.ts --run
+  pnpm --filter @amidala/api test:demo -- --run
 ```
 
 Expected: 2回ともPASSし、resetの再実行でも同じdomain storyになる。
@@ -394,12 +394,14 @@ Expected: すべてPASS。
 ```bash
 pnpm db:demo:reset
 TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo \
-  pnpm --filter @amidala/api test:integration -- demo-seed.integration.test.ts --run
+  pnpm --filter @amidala/api test:demo -- --run
 ```
 
 Expected: story test PASS。
 
-実測 (2026-07-28): `pnpm db:demo:reset` が `Demo database reset complete: amidala_demo` で終了。指定の integration command は 4 files / 7 tests PASS。
+実測 (2026-07-28): `pnpm db:demo:reset` が `Demo database reset complete: amidala_demo` で終了。専用の `test:demo` command は 1 file / 1 test PASS。
+
+実装更新: `vitest.demo.config.ts` は `TEST_DATABASE_URL` を必須化し、local `amidala_demo` URLをassertしたうえでdemo seed testのみをinclude。通常の `vitest.integration.config.ts` は `src/dev/**` をexcludeし、demo testが通常integration suiteへ混入しない。
 
 - [ ] **Step 3: SSRとconsoleを確認する**
 

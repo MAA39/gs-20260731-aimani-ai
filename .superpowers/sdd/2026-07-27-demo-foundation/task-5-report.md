@@ -10,7 +10,7 @@ Date: 2026-07-28
 - Build: `pnpm build` — turbo 3 tasks PASS。
 - Diff check: `git diff --check` — exit 0。
 - Demo reset: `pnpm db:demo:reset` — `amidala_demo` reset complete。
-- Story integration: 指定の `TEST_DATABASE_URL=...amidala_demo pnpm --filter @amidala/api test:integration -- demo-seed.integration.test.ts --run` — 4 files / 7 tests PASS。
+- Demo story integration: `TEST_DATABASE_URL=...amidala_demo pnpm --filter @amidala/api test:demo -- --run` — 1 file / 1 test PASS（demo専用config）。通常integration configから`src/dev/**`を除外。
 - SSR curl: `/` は 307 redirect (`location: /organizations`)、legacy entry marker 0件。`/login` は 200 full document (`<!DOCTYPE html><html lang="ja">`)。
 
 ## Concern / pending
