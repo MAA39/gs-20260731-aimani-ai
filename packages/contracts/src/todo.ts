@@ -7,5 +7,7 @@ export const createTodoInputSchema=createTodoBodySchema;
 export const personTodoPathSchema=z.object({organizationId:z.string().min(1),contextMembershipId:z.string().min(1)});
 export const pendingTodoHandoffSchema=z.object({handoffId:z.string(),requester:todoMemberSummarySchema,recipient:todoMemberSummarySchema,requestMessage:z.string().nullable(),requestedAt:z.string()});
 export const todoSummarySchema=z.object({todoId:z.string(),organizationId:z.string(),contextMembershipId:z.string(),title:z.string(),description:z.string().nullable(),status:todoStatusSchema,creator:todoMemberSummarySchema,assignee:todoMemberSummarySchema,createdAt:z.string(),updatedAt:z.string(),pendingHandoff:pendingTodoHandoffSchema.nullable()});
+export const completeTodoPathSchema = z.object({ organizationId: z.string().min(1), todoId: z.string().min(1) });
+export const completeTodoResponseSchema = z.object({ todo: todoSummarySchema });
 export const sharedTodoWorkspaceSchema=z.object({organization:z.object({organizationId:z.string(),name:z.string()}),currentMember:todoMemberSummarySchema,contextMember:memberSummarySchema,todos:z.array(todoSummarySchema)});
 export type TodoSummary=z.infer<typeof todoSummarySchema>; export type SharedTodoWorkspace=z.infer<typeof sharedTodoWorkspaceSchema>;

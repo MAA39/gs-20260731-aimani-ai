@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import pg from 'pg';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { sharedTodoWorkspaceSchema, todoHandoffWorkspaceSchema, todoSummarySchema } from '@amidala/contracts';
+import { completeTodoResponseSchema, sharedTodoWorkspaceSchema, todoHandoffWorkspaceSchema, todoSummarySchema } from '@amidala/contracts';
 import { createApp } from '../app';
 
 const env = {
@@ -73,6 +73,19 @@ describe('Todo Handoff API', () => {
     return body.todo;
   };
 
+  const completeTodo = async (
+    cookie: string,
+    todoId: string,
+    organizationId = 'org_acme_studio',
+  ) => {
+    const response = await app.fetch(new Request(
+      `http://localhost:8787/organizations/${organizationId}/todos/${todoId}/complete`,
+      { method: 'POST', headers: { cookie } },
+    ), env);
+    const body = await response.json();
+    return { status: response.status, body };
+  };
+
   const requestHandoff = async (
     cookie: string,
     todoId: string,
@@ -122,6 +135,45 @@ describe('Todo Handoff API', () => {
     expect(response.status).toBe(200);
     return sharedTodoWorkspaceSchema.parse(await response.json());
   };
+
+  it('lets only the current assignee complete an open Todo and removes it from assigned work', async () => {
+    const ownerCookie = await signIn('owner@amidala.local');
+    const todo = await createTodo(ownerCookie);
+    const completed = await completeTodo(ownerCookie, todo.todoId);
+    expect(completed.status).toBe(200);
+    expect(completeTodoResponseSchema.parse(completed.body).todo).toMatchObject({ todoId: todo.todoId, status: 'completed', assignee: { membershipId: 'acme-studio-owner' } });
+    expect((await getAssignedTodos(ownerCookie)).todos.map((item) => item.todoId)).not.toContain(todo.todoId);
+    expect((await getSharedTodos(ownerCookie)).todos.find((item) => item.todoId === todo.todoId)?.status).toBe('completed');
+  });
+
+  it('keeps Todo completion idempotent for the assignee and forbidden for another Member', async () => {
+    const ownerCookie = await signIn('owner@amidala.local');
+    const moriCookie = await signIn('mori@amidala.local');
+    const todo = await createTodo(ownerCookie);
+    expect((await completeTodo(moriCookie, todo.todoId)).status).toBe(403);
+    expect((await completeTodo(ownerCookie, todo.todoId)).status).toBe(200);
+    const repeated = await completeTodo(ownerCookie, todo.todoId);
+    expect(repeated.status).toBe(200);
+    expect(completeTodoResponseSchema.parse(repeated.body).todo.status).toBe('completed');
+  });
+
+  it('does not complete a Todo while its Handoff is waiting for a decision', async () => {
+    const ownerCookie = await signIn('owner@amidala.local');
+    const todo = await createTodo(ownerCookie);
+    const requested = await requestHandoff(ownerCookie, todo.todoId, { recipientMembershipId: 'acme-studio-mori' });
+    const result = await completeTodo(ownerCookie, todo.todoId);
+    expect(result.status).toBe(409);
+    expect(errorSchema.parse(result.body).error.message).toBe('handoff_pending');
+    expect((await getAssignedTodos(ownerCookie)).todos.find((item) => item.todoId === todo.todoId)?.pendingHandoff?.handoffId).toBe(requested.handoff?.handoffId);
+  });
+
+  it('does not disclose a Todo through another Organization path', async () => {
+    const ownerCookie = await signIn('owner@amidala.local');
+    const northstarCookie = await signIn('owner@northstar.local');
+    const todo = await createTodo(ownerCookie);
+    expect((await completeTodo(northstarCookie, todo.todoId, 'org_northstar_labs')).status).toBe(404);
+    expect((await completeTodo(northstarCookie, todo.todoId, 'org_acme_studio')).status).toBe(403);
+  });
 
   it('moves responsibility only when the recipient accepts the Todo Handoff', async () => {
     const ownerCookie = await signIn('owner@amidala.local');
