@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { RefreshCw } from 'lucide-react';
+import { GitBranch, RefreshCw } from 'lucide-react';
 import type { TeamWorkOverviewResult } from './team-work-schema';
 import { TeamWorkTodoCard } from './TeamWorkTodoCard';
 
@@ -24,6 +24,15 @@ export function TeamWorkPage({
           <p>誰がどの仕事を持ち、どこで止まっているかを確認できます。</p>
         </div>
       </header>
+
+      <aside className="process-lab-discovery">
+        <div className="icon-badge"><GitBranch size={19} aria-hidden="true" /></div>
+        <div>
+          <strong>工程のつながりを試す</strong>
+          <p>誰の仕事が、次の誰を待たせているかを線で確認できます。</p>
+        </div>
+        <Link className="secondary-button" to="/$organizationId/process-lab" params={{ organizationId }}>工程ラボを開く</Link>
+      </aside>
 
       {overview.members.length ? (
         <div className="team-work-groups">

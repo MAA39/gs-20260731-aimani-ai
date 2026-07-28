@@ -36,9 +36,9 @@ function ApplicationShell() {
   const session = authClient.useSession();
   const pathname = useLocation({ select: (location) => location.pathname });
   if (pathname === '/login' || pathname === '/organizations') return <Outlet />;
-  const pageTitle = /\/today$/.test(pathname) ? '今日のボール' : /\/work$/.test(pathname) ? 'チームのボール' : /^\/[^/]+\/people\/[^/]+\/todos$/.test(pathname) ? '共有Todo' : /\/todos$/.test(pathname) ? '自分のTodo' : /\/handoffs$/.test(pathname) ? '引き継ぎ' : 'People';
+  const pageTitle = /\/today$/.test(pathname) ? '今日のボール' : /\/process-lab$/.test(pathname) ? '工程ラボ' : /\/work$/.test(pathname) ? 'チームのボール' : /^\/[^/]+\/people\/[^/]+\/todos$/.test(pathname) ? '共有Todo' : /\/todos$/.test(pathname) ? '自分のTodo' : /\/handoffs$/.test(pathname) ? '引き継ぎ' : 'People';
   const personTodoMatch = pathname.match(/^\/([^/]+)\/people\/([^/]+)\/todos$/);
-  const organizationId = personTodoMatch?.[1] ?? pathname.match(/^\/([^/]+)\/(?:people|todos|handoffs|today|work)/)?.[1];
+  const organizationId = personTodoMatch?.[1] ?? pathname.match(/^\/([^/]+)\/(?:people|todos|handoffs|today|work|process-lab)/)?.[1];
   const identityPending = session.isPending;
   const name = session.data?.user.name?.trim() || session.data?.user.email?.trim() || '';
   const initial = identityPending ? '…' : name.slice(0, 1) || '?';

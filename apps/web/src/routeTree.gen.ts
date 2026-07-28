@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as OrganizationsRouteImport } from './routes/organizations'
 import { Route as OrganizationIdHandoffsRouteImport } from './routes/$organizationId/handoffs'
 import { Route as OrganizationIdPeopleRouteImport } from './routes/$organizationId/people'
+import { Route as OrganizationIdProcessLabRouteImport } from './routes/$organizationId/process-lab'
 import { Route as OrganizationIdTodayRouteImport } from './routes/$organizationId/today'
 import { Route as OrganizationIdTodosRouteImport } from './routes/$organizationId/todos'
 import { Route as OrganizationIdWorkRouteImport } from './routes/$organizationId/work'
@@ -45,6 +46,12 @@ const OrganizationIdPeopleRoute = OrganizationIdPeopleRouteImport.update({
   path: '/$organizationId/people',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrganizationIdProcessLabRoute =
+  OrganizationIdProcessLabRouteImport.update({
+    id: '/$organizationId/process-lab',
+    path: '/$organizationId/process-lab',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const OrganizationIdTodayRoute = OrganizationIdTodayRouteImport.update({
   id: '/$organizationId/today',
   path: '/$organizationId/today',
@@ -79,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/organizations': typeof OrganizationsRoute
   '/$organizationId/handoffs': typeof OrganizationIdHandoffsRoute
   '/$organizationId/people': typeof OrganizationIdPeopleRouteWithChildren
+  '/$organizationId/process-lab': typeof OrganizationIdProcessLabRoute
   '/$organizationId/today': typeof OrganizationIdTodayRoute
   '/$organizationId/todos': typeof OrganizationIdTodosRoute
   '/$organizationId/work': typeof OrganizationIdWorkRoute
@@ -90,6 +98,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/organizations': typeof OrganizationsRoute
   '/$organizationId/handoffs': typeof OrganizationIdHandoffsRoute
+  '/$organizationId/process-lab': typeof OrganizationIdProcessLabRoute
   '/$organizationId/today': typeof OrganizationIdTodayRoute
   '/$organizationId/todos': typeof OrganizationIdTodosRoute
   '/$organizationId/work': typeof OrganizationIdWorkRoute
@@ -103,6 +112,7 @@ export interface FileRoutesById {
   '/organizations': typeof OrganizationsRoute
   '/$organizationId/handoffs': typeof OrganizationIdHandoffsRoute
   '/$organizationId/people': typeof OrganizationIdPeopleRouteWithChildren
+  '/$organizationId/process-lab': typeof OrganizationIdProcessLabRoute
   '/$organizationId/today': typeof OrganizationIdTodayRoute
   '/$organizationId/todos': typeof OrganizationIdTodosRoute
   '/$organizationId/work': typeof OrganizationIdWorkRoute
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/organizations'
     | '/$organizationId/handoffs'
     | '/$organizationId/people'
+    | '/$organizationId/process-lab'
     | '/$organizationId/today'
     | '/$organizationId/todos'
     | '/$organizationId/work'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/organizations'
     | '/$organizationId/handoffs'
+    | '/$organizationId/process-lab'
     | '/$organizationId/today'
     | '/$organizationId/todos'
     | '/$organizationId/work'
@@ -140,6 +152,7 @@ export interface FileRouteTypes {
     | '/organizations'
     | '/$organizationId/handoffs'
     | '/$organizationId/people'
+    | '/$organizationId/process-lab'
     | '/$organizationId/today'
     | '/$organizationId/todos'
     | '/$organizationId/work'
@@ -153,6 +166,7 @@ export interface RootRouteChildren {
   OrganizationsRoute: typeof OrganizationsRoute
   OrganizationIdHandoffsRoute: typeof OrganizationIdHandoffsRoute
   OrganizationIdPeopleRoute: typeof OrganizationIdPeopleRouteWithChildren
+  OrganizationIdProcessLabRoute: typeof OrganizationIdProcessLabRoute
   OrganizationIdTodayRoute: typeof OrganizationIdTodayRoute
   OrganizationIdTodosRoute: typeof OrganizationIdTodosRoute
   OrganizationIdWorkRoute: typeof OrganizationIdWorkRoute
@@ -193,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/$organizationId/people'
       fullPath: '/$organizationId/people'
       preLoaderRoute: typeof OrganizationIdPeopleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$organizationId/process-lab': {
+      id: '/$organizationId/process-lab'
+      path: '/$organizationId/process-lab'
+      fullPath: '/$organizationId/process-lab'
+      preLoaderRoute: typeof OrganizationIdProcessLabRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$organizationId/today': {
@@ -253,6 +274,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrganizationsRoute: OrganizationsRoute,
   OrganizationIdHandoffsRoute: OrganizationIdHandoffsRoute,
   OrganizationIdPeopleRoute: OrganizationIdPeopleRouteWithChildren,
+  OrganizationIdProcessLabRoute: OrganizationIdProcessLabRoute,
   OrganizationIdTodayRoute: OrganizationIdTodayRoute,
   OrganizationIdTodosRoute: OrganizationIdTodosRoute,
   OrganizationIdWorkRoute: OrganizationIdWorkRoute,
