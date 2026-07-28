@@ -218,7 +218,7 @@ BYARDの`Work`語彙を参照するが、工程管理画面にはしない。
 
 - Organizationのactive Membershipは、同じOrganizationのTeam Work Overviewを閲覧できる
 - 別OrganizationのTodoは返さない
-- 現在のmodelにconfidential Todoがないため、同じOrganization内では全open Todoを見せる
+- 現在のmodelにconfidential Todoがないため、同じOrganization内ではactive assigneeが持つ全open Todoを見せる
 - 将来confidential workが必要になった場合は、推測でrole条件を足さず、visibility modelを別sliceとして設計する
 
 このvisibility拡張は、ユーザーが確認した「組織全体で誰の作業がどこでどうなっているかを見る」という要件に基づく。
@@ -237,6 +237,7 @@ type TeamWorkOverview = {
 ```
 
 - `members`はopen Todoを1件以上持つactive Membershipだけ
+- inactive assigneeが残したopen Todoは「現在の担当状況」から除外し、棚卸し・再割当は別sliceで扱う
 - memberはdisplay name昇順ではなく、最終更新の新しいopen Todoを持つ順
 - member内のTodoは`updatedAt desc, todoId desc`
 - `recentlyCompletedTodos`は`updatedAt desc, todoId desc`で最大20件
@@ -383,7 +384,7 @@ Team Work Overview:
 - pending Handoffとの矛盾を作らない
 - Handoff recipientがaccept時に次の一手を残せる
 - requesterとrecipient双方が次の一手をTodayで確認できる
-- Organization全体のopen Todoがcurrent assignee別に見える
+- Organization内のactive assigneeが持つopen Todoがcurrent assignee別に見える
 - 各Todoが対応中、確認待ち、完了のどこにいるか分かる
 - existing UI/UX patternを踏襲し、mock固有の新visual languageを持ち込まない
 - API / Web tests、build、production credential scanが通る

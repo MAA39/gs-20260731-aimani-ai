@@ -13,13 +13,14 @@
 - Design source: `docs/superpowers/specs/2026-07-28-work-lifecycle-visibility-design.md` Slice 3。
 - Routeは`/$organizationId/work`、featureは`features/work`、read modelは`TeamWorkOverview`。
 - UI label / titleは`チームのボール`。
-- 同じOrganizationのactive Membershipは全open Todoとrecently completedを読める。
+- 同じOrganizationのactive Membershipは、active assigneeが持つ全open Todoとrecently completedを読める。
 - 別OrganizationのTodoを返さない。
 - 状況は`Todo.status`と`pendingHandoff`からpureに導出し、新しいworkflow columnを追加しない。
 - pending Handoffはacceptまでcurrent assignee groupに置く。
 - open groupは更新の新しいworkを持つmember順、member内は`updatedAt desc, todoId desc`。
 - completedは`updatedAt desc, todoId desc`で最大20件。filter/order/limitはDBで行う。
 - Overviewはread-only。完了/Handoff actionを重複させない。
+- inactive assigneeが残したopen Todoの棚卸し・再割当は別sliceとし、このoverviewには表示しない。
 - 新しい`useEffect`、new dependency、chart、kanban、table、Cloudflare deployを追加しない。
 - UIは既存content / section heading / TodoCard / navigation / mobile 1-columnを踏襲する。
 

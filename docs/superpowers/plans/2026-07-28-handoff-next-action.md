@@ -98,6 +98,7 @@ it('stores the recipient next action with acceptance without overwriting it on r
 - accept bodyなしとblank `nextAction`は200 / null。
 - reject/cancelはbodyを読まず、bodyが送られても既存どおりdecisionだけを行い`nextAction`はnullのままにする。
 - 241文字のacceptは400で、Handoffはrequested、Todo assigneeはrequesterのまま。
+- malformed JSON、`null`、array bodyのacceptは400で、HandoffとTodoは変化しない。
 - non-recipient acceptは403でnextAction null。
 
 reject/cancel routeはbodyを受け取らない既存契約を維持する。testは`content-type`付きbodyを送り、status 200とterminal responseの`nextAction === null`をassertして「無視する」契約を固定する。
