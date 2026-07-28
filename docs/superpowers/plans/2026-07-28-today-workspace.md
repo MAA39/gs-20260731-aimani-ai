@@ -340,7 +340,7 @@ Reviewerへ承認spec、plan、base SHA、head SHAを渡し、特に次を確認
 
 MinorはUX価値を損なわないものだけ移管Docsへdeferする。
 
-- [ ] **Step 4: branchをpushし、小PRを作る**
+- [x] **Step 4: branchをpushし、小PRを作る**
 
 PR title: `feat: add Today responsibility workspace`
 
