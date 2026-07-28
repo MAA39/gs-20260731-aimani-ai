@@ -353,13 +353,14 @@ Team Work Overview:
 
 ### Runtime journey
 
-1. 田中がTodoを完了し、Todayから消えてshared workspaceで完了になる
-2. demo reset
-3. 田中が森へHandoffを依頼
-4. 森が次の一手付きでaccept
-5. 田中・森双方のTodayで次の一手を確認
-6. `チームのボール`で田中／森の現在配置と確認待ち／対応中を確認
-7. desktop 1280x720、mobile 390x844、direct reload、browser consoleを確認
+1. demo reset
+2. 完了確認用Todoを田中が完了し、Todayから消えてshared workspaceで完了になる
+3. 別の引き継ぎ確認用Todoを田中が森へHandoff依頼する
+4. `チームのボール`で田中groupのまま森の確認待ちになることを確認する
+5. 森が次の一手付きでacceptする
+6. 田中・森双方のTodayで次の一手を確認する
+7. `チームのボール`で森groupの対応中へ移ったことを確認する
+8. desktop 1280x720、mobile 390x844、direct reload、browser consoleを確認する
 
 ## 11. 非目標
 

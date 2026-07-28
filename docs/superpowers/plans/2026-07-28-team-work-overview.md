@@ -77,16 +77,46 @@ it('groups open work under the current assignee and keeps pending Handoff with i
 });
 ```
 
-- [ ] **Step 3: visibility / ordering / completed limit testsを書く**
+- [ ] **Step 3: visibility / active membership / ordering / completed limit testsを書く**
 
 同じtest fileでfixture prefix `todo-team-work-${fixtureId}-`を使い、`finally`でそのprefixだけ削除する。
 
-- Acme memberはAcmeの全open Todoを見られる。
-- Northstar memberがAcme pathを読むと403。
-- Acme overviewへNorthstar Todo IDが混ざらない。
-- open Todoを持たないactive member groupは返らない。
-- group内はupdatedAt desc / ID desc。
-- completed fixtureを21件作り、最新20件だけが期待順で返る。
+次のtest名とassertionを実装前に固定する。
+
+```ts
+it('shows every Acme open Todo to an Acme Member without leaking Northstar work', async () => {
+  const result = teamWorkOverviewSchema.parse((await getTeamWork(await signIn('mori@amidala.local'))).body);
+  const ids = result.members.flatMap((group) => group.openTodos.map((todo) => todo.todoId));
+  expect(ids).toEqual(expect.arrayContaining([acmeOwnerTodoId, acmeMoriTodoId]));
+  expect(ids).not.toContain(northstarTodoId);
+});
+
+it('returns forbidden when a Northstar Member requests the Acme overview', async () => {
+  expect((await getTeamWork(await signIn('owner@northstar.local'), 'org_acme_studio')).status).toBe(403);
+});
+
+it('omits active Members without open work and work assigned to an inactive Member', async () => {
+  const overview = teamWorkOverviewSchema.parse((await getTeamWork(await signIn('owner@amidala.local'))).body);
+  const membershipIds = overview.members.map((group) => group.member.membershipId);
+  expect(membershipIds).not.toContain(emptyActiveMembershipId);
+  expect(membershipIds).not.toContain(inactiveMembershipId);
+});
+
+it('orders open work by updatedAt then Todo ID descending', async () => {
+  const overview = teamWorkOverviewSchema.parse((await getTeamWork(await signIn('owner@amidala.local'))).body);
+  expect(overview.members.find((group) => group.member.membershipId === 'acme-studio-owner')?.openTodos.map((todo) => todo.todoId))
+    .toEqual([newerTodoId, sameTimestampHigherId, sameTimestampLowerId]);
+});
+
+it('returns only the latest 20 completed Todos in stable order', async () => {
+  const overview = teamWorkOverviewSchema.parse((await getTeamWork(await signIn('owner@amidala.local'))).body);
+  expect(overview.recentlyCompletedTodos).toHaveLength(20);
+  expect(overview.recentlyCompletedTodos.map((todo) => todo.todoId)).toEqual(expectedLatest20Ids);
+  expect(overview.recentlyCompletedTodos.map((todo) => todo.todoId)).not.toContain(oldestCompletedTodoId);
+});
+```
+
+`acmeOwnerTodoId`等は各testのArrangeでinsertして得たIDとし、同時刻tie fixtureだけ明示IDを使う。inactive fixtureはtest内transactionでMembership statusを`inactive`にし、`finally`で元へ戻す。21 completed fixtureの`updatedAt`は1分ずつずらし、同時刻の2件だけID降順を期待する。
 
 DB fixture insertは既存testのparameterized query patternを使い、title以外をstring interpolationしない。
 
@@ -182,7 +212,17 @@ completed query:
 .limit(20)
 ```
 
-open rowsはquery順を保って`Map<membershipId, group>`へ一度だけgroupingする。groupの初回insert順が最新Todoを持つmember順になる。active assignee joinを`innerJoin`し、inactive/deleted memberのempty projectionを返さない。
+open rowsはquery順を保って`Map<membershipId, group>`へ一度だけgroupingする。groupの初回insert順が最新Todoを持つmember順になる。assignee joinはactive条件をSQLへ含める。
+
+```ts
+.innerJoin(assignee, and(
+  eq(assignee.id, todo.assigneeMembershipId),
+  eq(assignee.organizationId, q.organizationId),
+  eq(assignee.status, 'active'),
+))
+```
+
+これによりinactive/deleted assigneeのTodoはoverviewから除外する。
 
 既存`toTodoSummary`の第2引数をnamed typeへ抽出し、open/completedの両queryで再利用する。
 
@@ -210,18 +250,7 @@ open queryはrequested Handoff joinsを`TodoProjection`へ渡す。completed que
 
 - [ ] **Step 4: DI / routeを接続する**
 
-`RequestCradle`とregisterへ`getTeamWorkOverview`を追加する。route moduleへsession helperを先に抽出する。
-
-```ts
-async function currentUserId(context: Context<ApiEnv>): Promise<string> {
-  const auth = await context.get('scope').resolve('auth');
-  const session = await auth.api.getSession({ headers: context.req.raw.headers });
-  if (!session?.user) throw new ApiError('unauthorized', 'Authentication required');
-  return session.user.id;
-}
-```
-
-`Context`は`hono`からtype importし、既存create/read routeもこのhelperを使う。
+`RequestCradle`とregisterへ`getTeamWorkOverview`を追加する。`apps/api/src/routes/todos.ts`へ`Context`、`organizationPathSchema`、`GetTeamWorkOverview`をimportし、route moduleの既存session helperをそのままwork routeでも使う。Completion PRで既に`currentUserId`へ抽出済みなので、新しいhelperは作らない。
 
 `apps/api/src/routes/todos.ts`:
 
@@ -312,7 +341,7 @@ export function teamWorkStatus(todo: TodoSummary): TeamWorkStatus {
 
 `TeamWorkOverviewResult`はok / forbidden / not_found / validation_error / service_unavailable union。
 
-`team-work.server.ts`は`env.API.fetch('http://api.internal/organizations/${organizationId}/work')`へcookieを転送し、200 bodyを`teamWorkOverviewSchema.safeParse`する。401 redirect、403/404固定日本語、その他は`チームのボールを読み込めませんでした。時間をおいてもう一度お試しください。`。
+`team-work.server.ts`はCompletion PRで作った`createApiFetcher` / `readApiBody`を`features/server/api-fetcher.server.ts`からimportする。`createApiFetcher(cookie)('http://api.internal/organizations/${organizationId}/work')`でcookieを転送し、200 bodyを`teamWorkOverviewSchema.safeParse`する。401 redirect、403/404固定日本語、その他は`チームのボールを読み込めませんでした。時間をおいてもう一度お試しください。`。独自fetch wrapperを増やさない。
 
 Query key:
 
@@ -442,10 +471,17 @@ git commit -m "feat: show Team Work overview"
 
 - [ ] **Step 1: 3 mutationへTeam Work keyを追加する**
 
-Completion、Handoff request、accept/reject/cancelの既存`Promise.all`へ次を追加する。
+Completion、Handoff request、accept/reject/cancelの既存`Promise.all`へ、それぞれ現行componentの変数名で次を追加する。
 
 ```ts
-client.invalidateQueries({ queryKey: teamWorkOverviewKey(organizationId), exact: true })
+// CompleteTodoDialog: const queryClient = useQueryClient(); props organizationId
+queryClient.invalidateQueries({ queryKey: teamWorkOverviewKey(organizationId), exact: true });
+
+// RequestTodoHandoffDialog: existing queryClient / props organizationId
+queryClient.invalidateQueries({ queryKey: teamWorkOverviewKey(organizationId), exact: true });
+
+// HandoffRequestCard: existing client / handoff.organizationId
+client.invalidateQueries({ queryKey: teamWorkOverviewKey(handoff.organizationId), exact: true });
 ```
 
 mutationがTeam Work pageから実行されるわけではないためoptimistic updateは追加しない。

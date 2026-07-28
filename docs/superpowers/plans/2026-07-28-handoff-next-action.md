@@ -96,11 +96,11 @@ it('stores the recipient next action with acceptance without overwriting it on r
 - [ ] **Step 3: empty / reject / cancel / validation testsを書く**
 
 - accept bodyなしとblank `nextAction`は200 / null。
-- reject bodyにnextActionを送ってもroute schemaで400にする。cancelも同じ。
+- reject/cancelはbodyを読まず、bodyが送られても既存どおりdecisionだけを行い`nextAction`はnullのままにする。
 - 241文字のacceptは400で、Handoffはrequested、Todo assigneeはrequesterのまま。
 - non-recipient acceptは403でnextAction null。
 
-reject/cancel routeはbodyを受け取らない既存契約を維持するため、testは`content-type`付きbodyを送って400を期待するのではなく、routeがbodyを読まない現状では無視され得る。DB結果の`nextAction`がnullであることをterminal responseからassertする。
+reject/cancel routeはbodyを受け取らない既存契約を維持する。testは`content-type`付きbodyを送り、status 200とterminal responseの`nextAction === null`をassertして「無視する」契約を固定する。
 
 - [ ] **Step 4: REDを確認する**
 
@@ -201,7 +201,7 @@ bodyなしacceptとの後方互換を維持し、malformed JSONは`undefined`と
 
 - [ ] **Step 4: repository projection / transactionを更新する**
 
-すべてのHandoff summary生成へ`nextAction: h.nextAction`を追加する。
+`TodoHandoffRepositoryDrizzle.summary()`のreturnへ`nextAction: h.nextAction`を追加する。`getTodoHandoffWorkspace()`内の手組みprojectionにも`nextAction: r.h.nextAction`を追加する。request/accept/reject/cancel responseとworkspaceの全経路をこの2箇所で覆う。
 
 `decide`のaccept updateだけに次を含める。
 
@@ -281,7 +281,7 @@ export function acceptedHandoffAnnouncement(recipientName: string, nextAction: s
 
 `acceptTodoHandoffInputSchema = todoHandoffPathSchema.and(acceptTodoHandoffBodySchema)`とし、reject/cancelはpath schemaのまま維持する。
 
-`handoffs.server.ts`の`call`はverbごとにbodyを決める。
+`handoffs.server.ts`はCompletion PRで追加した`createApiFetcher` / `readApiBody`を`features/server/api-fetcher.server.ts`からimportし、local `fetcher` / `bodyOf`を削除する。そのうえで`call`はverbごとにbodyを決める。
 
 - accept: `{ nextAction }`をJSON送信。undefinedなら`{}`。
 - reject/cancel: bodyなし。

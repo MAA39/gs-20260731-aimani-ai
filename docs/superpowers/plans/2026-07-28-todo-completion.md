@@ -227,7 +227,7 @@ async completeTodo(command: CompleteTodoCommand): Promise<CompleteTodoOutcome> {
     if (!row) return { kind: 'not_found' } as const;
     if (row.assigneeMembershipId !== command.assigneeMembershipId) return { kind: 'forbidden' } as const;
     if (row.status === 'completed') {
-      return { kind: 'already_completed' as const, todo: await this.loadTodoSummary(tx, row) };
+      return { kind: 'already_completed' as const, todo: await this.loadTodoSummary(tx as Db, row) };
     }
     const [pending] = await tx.select({ id: todoHandoff.id }).from(todoHandoff)
       .where(and(
@@ -241,20 +241,47 @@ async completeTodo(command: CompleteTodoCommand): Promise<CompleteTodoOutcome> {
       .where(and(eq(todo.id, row.id), eq(todo.organizationId, command.organizationId), eq(todo.status, 'open')))
       .returning();
     if (!completed) throw new Error('Todo completion lost its locked row.');
-    return { kind: 'completed' as const, todo: await this.loadTodoSummary(tx, completed) };
+    return { kind: 'completed' as const, todo: await this.loadTodoSummary(tx as Db, completed) };
   });
 }
 ```
 
-`createSharedTodo`に埋め込まれたcreator / assignee / pending Handoffのjoin projectionを、次のprivate helperへ抽出する。
+`type Db = AmidalaDatabase`をrepository moduleへ追加する。`createSharedTodo`に埋め込まれたcreator / assignee / pending Handoffのjoin projectionを、次のprivate helperへ抽出する。
 
 ```ts
 private async loadTodoSummary(
-  database: AmidalaDatabase,
+  database: Db,
   row: typeof todo.$inferSelect,
 ): Promise<TodoSummary> {
-  // row.id / row.organizationIdでcreator・assignee・requested Handoffを1回取得し、
-  // 既存toTodoSummary(row, names, pendingHandoff)へ渡す。
+  const creator = alias(membership, 'todo_summary_creator');
+  const assignee = alias(membership, 'todo_summary_assignee');
+  const requester = alias(membership, 'todo_summary_handoff_requester');
+  const recipient = alias(membership, 'todo_summary_handoff_recipient');
+  const [projection] = await database
+    .select({
+      creatorName: creator.displayName,
+      creatorTitle: creator.title,
+      assigneeName: assignee.displayName,
+      assigneeTitle: assignee.title,
+      handoffId: todoHandoff.id,
+      handoffRequesterId: todoHandoff.requesterMembershipId,
+      handoffRequesterName: requester.displayName,
+      handoffRequesterTitle: requester.title,
+      handoffRecipientId: todoHandoff.recipientMembershipId,
+      handoffRecipientName: recipient.displayName,
+      handoffRecipientTitle: recipient.title,
+      handoffMessage: todoHandoff.requestMessage,
+      handoffRequestedAt: todoHandoff.requestedAt,
+    })
+    .from(todo)
+    .leftJoin(creator, and(eq(creator.id, row.creatorMembershipId), eq(creator.organizationId, row.organizationId)))
+    .leftJoin(assignee, and(eq(assignee.id, row.assigneeMembershipId), eq(assignee.organizationId, row.organizationId)))
+    .leftJoin(todoHandoff, and(eq(todoHandoff.todoId, row.id), eq(todoHandoff.organizationId, row.organizationId), eq(todoHandoff.status, 'requested')))
+    .leftJoin(requester, and(eq(requester.id, todoHandoff.requesterMembershipId), eq(requester.organizationId, row.organizationId)))
+    .leftJoin(recipient, and(eq(recipient.id, todoHandoff.recipientMembershipId), eq(recipient.organizationId, row.organizationId)))
+    .where(and(eq(todo.id, row.id), eq(todo.organizationId, row.organizationId)))
+    .limit(1);
+  return this.toTodoSummary(row, projection);
 }
 ```
 
@@ -270,16 +297,25 @@ completeTodo: asFunction(async ({ todoRepository, clock }) =>
 ).scoped(),
 ```
 
-`apps/api/src/routes/todos.ts`へendpointを追加する。
+`apps/api/src/routes/todos.ts`へ`Context`、`completeTodoPathSchema`、`CompleteTodo`をimportする。同file内に次のprivate helperを追加し、create/read/completeで使う。`todo-handoffs.ts`の同名helperは別route module内privateなので変更しない。
+
+```ts
+async function currentUserId(context: Context<ApiEnv>): Promise<string> {
+  const auth = await context.get('scope').resolve('auth');
+  const session = await auth.api.getSession({ headers: context.req.raw.headers });
+  if (!session?.user) throw new ApiError('unauthorized', 'Authentication required');
+  return session.user.id;
+}
+```
+
+endpointを既存`createTodoRoutes()` chainへ追加する。
 
 ```ts
 .post('/organizations/:organizationId/todos/:todoId/complete', async (context) => {
   const path = completeTodoPathSchema.safeParse(context.req.param());
   if (!path.success) throw new ApiError('validation_error', 'Invalid Todo path.');
-  const session = await (await context.get('scope').resolve('auth')).api.getSession({ headers: context.req.raw.headers });
-  if (!session?.user) throw new ApiError('unauthorized', 'Authentication required');
   const useCase = await context.get('scope').resolve<CompleteTodo>('completeTodo');
-  const outcome = await useCase.execute(session.user.id, path.data);
+  const outcome = await useCase.execute(await currentUserId(context), path.data);
   return context.json({ todo: outcome.todo });
 })
 ```
@@ -305,6 +341,7 @@ git commit -m "feat: complete assigned Todo"
 ### Task 3: Web BFFとfixed Japanese errorをTDDで追加する
 
 **Files:**
+- Create: `apps/web/src/features/server/api-fetcher.server.ts`
 - Modify: `apps/web/src/features/todos/todo-schema.ts`
 - Modify: `apps/web/src/features/todos/todo-error-presentation.ts`
 - Modify: `apps/web/src/features/todos/todo-error-presentation.test.ts`
@@ -347,6 +384,32 @@ if (context === 'complete') return 'Todoを完了できませんでした。時�
 
 - [ ] **Step 3: schema / BFF / Server Functionを実装する**
 
+既存`todos.server.ts`のprivate fetch/body helperを共通server-only moduleへ移し、既存Todo adapterと新adapterの両方から使う。
+
+```ts
+// apps/web/src/features/server/api-fetcher.server.ts
+import '@tanstack/react-start/server-only';
+import { env } from 'cloudflare:workers';
+
+export function createApiFetcher(cookie: string): typeof fetch {
+  return async (input, init) => {
+    const headers = new Headers(init?.headers);
+    if (cookie) headers.set('cookie', cookie);
+    return env.API.fetch(new Request(input, { ...init, headers }));
+  };
+}
+
+export async function readApiBody(response: Response): Promise<unknown> {
+  try {
+    return await response.json();
+  } catch {
+    return undefined;
+  }
+}
+```
+
+`todos.server.ts`の既存`createApiFetcher` / `readBody`定義を削除し、このmoduleからimportする。既存3 operationsの挙動を変えない。
+
 `todo-schema.ts`:
 
 ```ts
@@ -358,7 +421,7 @@ export type CompleteTodoResult =
   | { status: 'error'; error: { code: 'validation_error' | 'service_unavailable'; message: string } };
 ```
 
-`todos.server.ts`へ`completeTodoFromApi`を追加し、`env.API.fetch`でprivate endpointをPOSTする。bodyを読んで401 redirect、403/404/409/400/fallbackをfixed copyへ変換し、200 bodyを`completeTodoResponseSchema`でparseする。
+`todos.server.ts`へ`completeTodoFromApi`を追加し、`createApiFetcher(cookie)`でprivate endpointをPOSTする。`readApiBody`でbodyを1回読み、401 redirect、403/404/409/400/fallbackをfixed copyへ変換し、200 bodyを`completeTodoResponseSchema`でparseする。
 
 `todos.functions.ts`:
 
@@ -380,7 +443,7 @@ Expected: error tests pass、TypeScript pass。
 - [ ] **Step 5: BFFをcommitする**
 
 ```bash
-git add apps/web/src/features/todos/todo-schema.ts apps/web/src/features/todos/todo-error-presentation.ts apps/web/src/features/todos/todo-error-presentation.test.ts apps/web/src/features/todos/todos.server.ts apps/web/src/features/todos/todos.functions.ts
+git add apps/web/src/features/server/api-fetcher.server.ts apps/web/src/features/todos/todo-schema.ts apps/web/src/features/todos/todo-error-presentation.ts apps/web/src/features/todos/todo-error-presentation.test.ts apps/web/src/features/todos/todos.server.ts apps/web/src/features/todos/todos.functions.ts
 git commit -m "feat: connect Todo completion BFF"
 ```
 
