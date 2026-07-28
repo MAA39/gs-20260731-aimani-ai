@@ -325,7 +325,7 @@ git diff --check
 git status --short --branch
 ```
 
-- [ ] **Step 2: independent reviewを依頼する**
+- [x] **Step 2: independent reviewを依頼する**
 
 Reviewerへ承認spec、plan、base SHA、head SHAを渡し、特に次を確認する。
 
@@ -336,7 +336,7 @@ Reviewerへ承認spec、plan、base SHA、head SHAを渡し、特に次を確認
 - mobile 390pxでnavとcardsが横overflowしない
 - production artifactにDemo passwordがない
 
-- [ ] **Step 3: Critical/Importantを修正して再検証する**
+- [x] **Step 3: Critical/Importantを修正して再検証する**
 
 MinorはUX価値を損なわないものだけ移管Docsへdeferする。
 
