@@ -23,6 +23,7 @@ const handoffSchema = z.object({
   requester: memberSchema,
   recipient: memberSchema,
   requestMessage: z.string().nullable(),
+  nextAction: z.string().nullable(),
   status: z.enum(['requested', 'accepted', 'rejected', 'canceled']),
   requestedAt: z.string(),
   resolvedAt: z.string().nullable(),
@@ -102,20 +103,48 @@ describe('Todo Handoff API', () => {
       : { status: response.status, handoff: parsed.handoff, todo: parsed.todo };
   };
 
+  const requestHandoffId = async (cookie: string, todoId: string): Promise<string> => {
+    const response = await app.fetch(new Request(`http://localhost:8787/organizations/org_acme_studio/todos/${todoId}/handoffs`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', cookie },
+      body: JSON.stringify({ recipientMembershipId: 'acme-studio-mori' }),
+    }), env);
+    expect(response.status).toBe(201);
+    const parsed = z.object({ handoff: z.object({ handoffId: z.string() }) }).parse(await response.json());
+    return parsed.handoff.handoffId;
+  };
+
   const decide = async (
     cookie: string,
     handoffId: string,
     action: 'accept' | 'reject' | 'cancel',
     organizationId = 'org_acme_studio',
+    body?: { nextAction?: string } | null | unknown[] | string,
   ): Promise<HandoffResponse> => {
     const response = await app.fetch(new Request(`http://localhost:8787/organizations/${organizationId}/handoffs/${handoffId}/${action}`, {
       method: 'POST',
-      headers: { cookie },
+      headers: { cookie, ...(body !== undefined ? { 'content-type': 'application/json' } : {}) },
+      body: body !== undefined ? (typeof body === 'string' ? body : JSON.stringify(body)) : undefined,
     }), env);
     const parsed = response.status >= 400 ? errorSchema.parse(await response.json()) : resourceSchema.parse(await response.json());
     return response.status >= 400
       ? { status: response.status, error: parsed.error }
       : { status: response.status, handoff: parsed.handoff, todo: parsed.todo };
+  };
+
+  const decideStatus = async (
+    cookie: string,
+    handoffId: string,
+    action: 'accept' | 'reject' | 'cancel',
+    body?: { nextAction?: string } | null | unknown[] | string,
+  ) => {
+    const response = await app.fetch(new Request(`http://localhost:8787/organizations/org_acme_studio/handoffs/${handoffId}/${action}`, {
+      method: 'POST',
+      headers: { cookie, ...(body !== undefined ? { 'content-type': 'application/json' } : {}) },
+      body: body !== undefined ? (typeof body === 'string' ? body : JSON.stringify(body)) : undefined,
+    }), env);
+    if (response.status >= 400) return { status: response.status, error: errorSchema.parse(await response.json()).error };
+    return { status: response.status };
   };
 
   const getAssignedTodos = async (cookie: string): Promise<AssignedWorkspace> => {
@@ -128,6 +157,20 @@ describe('Todo Handoff API', () => {
     const response = await app.fetch(new Request('http://localhost:8787/organizations/org_acme_studio/handoffs', { headers: { cookie } }), env);
     expect(response.status).toBe(200);
     return todoHandoffWorkspaceSchema.parse(await response.json());
+  };
+
+  const getHandoffState = async (cookie: string, handoffId: string) => {
+    const response = await app.fetch(new Request('http://localhost:8787/organizations/org_acme_studio/handoffs', { headers: { cookie } }), env);
+    expect(response.status).toBe(200);
+    const stateSchema = z.object({
+      incomingRequests: z.array(z.object({
+        handoffId: z.string(),
+        status: z.enum(['requested', 'accepted', 'rejected', 'canceled']),
+        todo: z.object({ assignee: z.object({ membershipId: z.string() }) }),
+      })),
+    });
+    const workspace = stateSchema.parse(await response.json());
+    return workspace.incomingRequests.find((handoff) => handoff.handoffId === handoffId);
   };
 
   const getSharedTodos = async (cookie: string) => {
@@ -208,6 +251,97 @@ describe('Todo Handoff API', () => {
 
     const assigned = await getAssignedTodos(moriCookie);
     expect(assigned.todos.some((item) => item.todoId === todo.todoId)).toBe(true);
+  });
+
+  it('stores the recipient next action with acceptance without overwriting it on retry', async () => {
+    const ownerCookie = await signIn('owner@amidala.local');
+    const moriCookie = await signIn('mori@amidala.local');
+    const todo = await createTodo(ownerCookie);
+    const handoffId = await requestHandoffId(ownerCookie, todo.todoId);
+
+    const accepted = await decide(moriCookie, handoffId, 'accept', 'org_acme_studio', {
+      nextAction: '  インタビュー仮説を3点にまとめる  ',
+    });
+    expect(accepted.status).toBe(200);
+    expect(accepted.handoff?.nextAction).toBe('インタビュー仮説を3点にまとめる');
+    expect(accepted.todo?.assignee.membershipId).toBe('acme-studio-mori');
+
+    const retried = await decide(moriCookie, handoffId, 'accept', 'org_acme_studio', {
+      nextAction: '後から上書きしない',
+    });
+    expect(retried.status).toBe(200);
+    expect(retried.handoff?.nextAction).toBe('インタビュー仮説を3点にまとめる');
+  });
+
+  it('stores null next action when acceptance has no body or only blanks', async () => {
+    const ownerCookie = await signIn('owner@amidala.local');
+    const moriCookie = await signIn('mori@amidala.local');
+    for (const body of [undefined, { nextAction: '   ' }]) {
+      const todo = await createTodo(ownerCookie);
+      const requested = await requestHandoff(ownerCookie, todo.todoId, { recipientMembershipId: 'acme-studio-mori' });
+      const accepted = await decide(moriCookie, requested.handoff?.handoffId ?? '', 'accept', 'org_acme_studio', body);
+      expect(accepted.status).toBe(200);
+      expect(accepted.handoff?.nextAction).toBeNull();
+    }
+  });
+
+  it('ignores next action bodies on reject and cancel', async () => {
+    const ownerCookie = await signIn('owner@amidala.local');
+    const moriCookie = await signIn('mori@amidala.local');
+
+    const rejectedTodo = await createTodo(ownerCookie);
+    const rejectedRequest = await requestHandoff(ownerCookie, rejectedTodo.todoId, { recipientMembershipId: 'acme-studio-mori' });
+    const rejected = await decide(moriCookie, rejectedRequest.handoff?.handoffId ?? '', 'reject', 'org_acme_studio', { nextAction: '保存しない' });
+    expect(rejected.status).toBe(200);
+    expect(rejected.handoff?.status).toBe('rejected');
+    expect(rejected.handoff?.nextAction).toBeNull();
+
+    const canceledTodo = await createTodo(ownerCookie);
+    const canceledRequest = await requestHandoff(ownerCookie, canceledTodo.todoId, { recipientMembershipId: 'acme-studio-mori' });
+    const canceled = await decide(ownerCookie, canceledRequest.handoff?.handoffId ?? '', 'cancel', 'org_acme_studio', { nextAction: '保存しない' });
+    expect(canceled.status).toBe(200);
+    expect(canceled.handoff?.status).toBe('canceled');
+    expect(canceled.handoff?.nextAction).toBeNull();
+  });
+
+  it.each([
+    ['241 characters', { nextAction: 'a'.repeat(241) }],
+    ['malformed JSON', '{'],
+    ['null body', null],
+    ['array body', []],
+  ])('rejects %s acceptance input without changing the pending handoff', async (_label, body) => {
+    const ownerCookie = await signIn('owner@amidala.local');
+    const moriCookie = await signIn('mori@amidala.local');
+    const todo = await createTodo(ownerCookie);
+    const handoffId = await requestHandoffId(ownerCookie, todo.todoId);
+
+    const invalid = await decideStatus(moriCookie, handoffId, 'accept', body);
+    expect(invalid.status).toBe(400);
+    expect(invalid.error?.code).toBe('validation_error');
+
+    const pending = await getHandoffState(moriCookie, handoffId);
+    expect(pending?.status).toBe('requested');
+    expect(pending?.todo.assignee.membershipId).toBe('acme-studio-owner');
+
+    const accepted = await decide(moriCookie, handoffId, 'accept', 'org_acme_studio', { nextAction: 'valid' });
+    expect(accepted.status).toBe(200);
+    expect(accepted.handoff?.nextAction).toBe('valid');
+  });
+
+  it('does not allow a non-recipient to save a next action', async () => {
+    const ownerCookie = await signIn('owner@amidala.local');
+    const moriCookie = await signIn('mori@amidala.local');
+    const todo = await createTodo(ownerCookie);
+    const requested = await requestHandoff(ownerCookie, todo.todoId, { recipientMembershipId: 'acme-studio-mori' });
+    const handoffId = requested.handoff?.handoffId ?? '';
+
+    const forbidden = await decide(ownerCookie, handoffId, 'accept', 'org_acme_studio', { nextAction: '不正保存' });
+    expect(forbidden.status).toBe(403);
+    expect(forbidden.error?.code).toBe('forbidden');
+
+    const accepted = await decide(moriCookie, handoffId, 'accept');
+    expect(accepted.status).toBe(200);
+    expect(accepted.handoff?.nextAction).toBeNull();
   });
 
   it('serializes competing decisions, rejects another Organization, and allows cancellation', async () => {
