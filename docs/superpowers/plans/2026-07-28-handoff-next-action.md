@@ -424,11 +424,15 @@ demo reset後、田中→森へHandoff、森が`インタビュー仮説を3点�
 
 browser実測はcontrollerの`task-5-browser-results.md`を正とする。田中→森のaccept（次の一手入力）、森/田中TodayとHandoff recentへの投影、direct reload保持、desktop 1280x720 / mobile 390x844のoverflowなし、console warning/error 0を確認済み。空nextActionはPostgreSQL integration suiteで確認済み。
 
-- [ ] **Step 3: independent reviewを依頼する**
+- [x] **Step 3: independent reviewを依頼する**
 
 transaction atomicity、idempotent retry non-overwrite、nullable migration、240文字validation、requestMessageとの混同、raw error leak、Dialog focus/mobileをreview対象にする。
 
-- [ ] **Step 4: Critical/ImportantをTDDで修正し再検証する**
+実測: base `7244f7f` / head `fa031c6`の独立reviewはCritical / Important 0件でAPPROVED。transaction/lock順序、retry非上書き、全projection、BFF固定error、Dialog/actor switch/useEffectなしを確認した。
+
+- [x] **Step 4: Critical/ImportantをTDDで修正し再検証する**
+
+runtimeでActor Switch直後に旧principalのquery projectionが残る問題を検出し、typed Today URLへのhard replaceでclient stateを再生成する`ff48046`を追加。実ブラウザで再読込なしの切替を再確認し、scoped reviewもAPPROVED。既知Minorはaccept routeが認証前にbody validationする既存順序で、未認証＋不正bodyが400になり得る点。raw data leakや通常UX影響がないため本sliceでは変更しない。
 
 - [ ] **Step 5: small PRを作る**
 
