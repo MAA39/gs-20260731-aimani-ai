@@ -1,5 +1,8 @@
 # Claude 作業移管 — Amidala v2
 
+> [!IMPORTANT]
+> この文書は2026-07-27時点の統合履歴である。現在状態の正本は `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/HANDOFF-CLAUDE-2026-07-28.md`。Claude Codeは先に新正本を読むこと。
+
 - 作成日: 2026-07-27（Asia/Tokyo）
 - 正本の絶対パス: `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/HANDOFF-CLAUDE-2026-07-27.md`
 - GitHub: <https://github.com/MAA39/amidala-v2>

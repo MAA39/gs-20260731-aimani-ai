@@ -346,9 +346,11 @@ PR title: `feat: add Today responsibility workspace`
 
 PR bodyに、既存read model composition、3分journey、test/build結果、Cloudflare未deployを記載する。
 
-- [ ] **Step 5: GitHub checksとreview後にmergeする**
+- [x] **Step 5: GitHub checksとreview後にmergeする**
 
 merge commit方式でmainへ統合し、main上でWeb/API tests、build、artifact scanを再実行する。成功後にToday worktree、local/remote branchを撤去する。
+
+実測: PR #7をmerge commit `18366d9`で`main`へ統合。API 13/13、Web 12/12、build 3/3、production artifact marker 0件をfresh確認し、Today worktreeとlocal/remote branchを撤去した。最終browser自動操作はCodex内browserのURL policyで実施できず、同じWeb/API WorkerとPostgreSQLを通るServer Function runtime journeyを `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/research/2026-07-28-today-runtime-verification.md` に記録した。
 
 ## Self-review record
 
