@@ -4,7 +4,7 @@
 - 正本の絶対パス: `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/HANDOFF-CLAUDE-2026-07-28.md`
 - repository: `/Users/maa/Projects/gs/000_参照用/amidala-v2`
 - GitHub: <https://github.com/MAA39/amidala-v2>
-- コード基準SHA: `6b7da4f`（Team Work Overview runtime fix後、Docs更新前）
+- コード統合merge SHA: `4f446b4`（Team Work Overviewをlocal `main`へ統合。最終Docs commitはこの後）
 - deploy: Cloudflareへ未deploy。production DB mutationも未実施
 - 移管方針: Codexは本書をmergeしてworkspaceをcleanにした後、機能開発を停止する
 
@@ -79,7 +79,7 @@ PR #7の独立reviewはCritical 0 / Important 0。CodeRabbit checkはsuccess。�
 
 PR #8のDocs差分は独立Codex reviewerがrepo、GitHub、local runtime、DB状態、絶対パス、資格情報patternと照合した。旧7/27文書が自分自身を正本と呼ぶ矛盾をImportantとして検出し、7/28正本への転送だけに修正後、再reviewで`APPROVED`となった。ローカルClaude CLIにも同じread-only reviewを依頼したが、数分間出力がなく打ち切った。無応答を承認とは扱っていない。
 
-Team Work Overviewとこの最終Docsはユーザー指示によりlocal mergeだけ行う。移管開始時は`git rev-parse HEAD`を正とし、`origin/main`との差を勝手にpushしない。
+Team Work Overviewとこの最終Docsはユーザー指示によりlocal mergeだけ行った。Team Work統合mergeは`4f446b4`。移管開始時は`git rev-parse HEAD`を正とし、`origin/main`との差を勝手にpushしない。
 
 ## 4. 実装済みの触れる体験
 
@@ -269,7 +269,7 @@ demo seedはcontrollerのbrowser journey後に一度だけ既存のaccepted状�
 
 ### Team Work Overview fresh verification（2026-07-28）
 
-local branch `feat/team-work-overview`の`6b7da4f`とDocs差分で次を確認した。
+local branch `feat/team-work-overview`の実装とDocsを確認し、`4f446b4`でlocal `main`へ統合した。
 
 ```text
 API unit: 13/13 PASS
@@ -283,6 +283,8 @@ git diff --check: PASS
 ```
 
 独立reviewでAPIはCritical / Important 0、BFF/presenterは0、UIは「再試行がcached failureを再取得しない」Important 1件を検出し、`refetch()`へ修正後にtests/buildを再実行した。runtimeではquery key importからServer Function graphがclient SSRへ逆流するstuckを検出し、side-effect-free key moduleに分離した。
+
+最終差分reviewはコードのCritical / Important 0。Docsで旧fixture名・存在しないstatus・DB query並列実行という実装不一致をImportant 1件として検出し、実装どおりの`suzuki@amidala.local`、synthetic `suspended` Membership、単一`pg.Client`上の順次`await`へ修正した。再reviewはCritical 0 / Important 0、APPROVED。
 
 ## 9. アーキテクチャと配置
 

@@ -547,11 +547,11 @@ Organization越境、all-member visibility、DB-side limit/order、pending place
 
 ユーザーの「Pushしなくていい。ローカルでの動作確認がしたい」を優先し、GitHub push / PR / Cloudflare deployは行わない。複数の独立agent reviewとlocal runtimeで代替した。
 
-- [ ] **Step 6: local mainへmerge commit方式で統合する**
+- [x] **Step 6: local mainへmerge commit方式で統合する**
 
 root mainでfresh verificationし、work overview worktreeとlocal branchを削除する。remote branchは作っていない。Cloudflare deployは行わない。
 
-### Task 6 実測（local branch `6b7da4f`）
+### Task 6 実測（実装fix `6b7da4f`、local merge `4f446b4`）
 
 - API unit 13/13、Web 17/17、PostgreSQL integration 24/24、demo seed 1/1、build 3/3 PASS
 - DB-side Organization filter / stable order / completed limit 20、pending Handoffのcurrent assignee placementをintegrationで確認
@@ -562,3 +562,5 @@ root mainでfresh verificationし、work overview worktreeとlocal branchを削�
 - runtimeでServer Functionを含むquery moduleからkeyだけをclient importしたSSR stuckを検出。side-effect-free key moduleに分離後、Work/Today/Todo/Handoffのauthenticated SSRが34〜56ms / HTTP 200へ復帰
 - env symlinkを外しcache bypass rebuild後、production distのlocal env file 0件 / demo marker 0件を確認
 - 詳細: `docs/research/2026-07-28-team-work-overview-runtime-verification.md`
+- 最終Docs指摘を修正後、独立再reviewはCritical 0 / Important 0、APPROVED
+- local merge commit: `4f446b4`。worktreeと`feat/team-work-overview` branchを削除し、remote branch / PR / deployは作成していない
