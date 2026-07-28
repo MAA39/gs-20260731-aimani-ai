@@ -1,4 +1,4 @@
-import type { RelationshipKind, SharedTodoWorkspace, TodoSummary } from '@amidala/contracts';
+import type { RelationshipKind, SharedTodoWorkspace, TeamWorkOverview, TodoSummary } from '@amidala/contracts';
 import type { CurrentMembershipContext } from './identity';
 
 export interface IdGenerator { next(): string }
@@ -11,6 +11,7 @@ export interface CreateSharedTodoCommand {
 export interface TodoMemberSummary { membershipId: string; name: string; title: string | null }
 export interface TodoContextMemberSummary extends TodoMemberSummary { relationshipKinds: RelationshipKind[] }
 export interface SharedTodoWorkspaceQuery { organizationId: string; currentMembershipId: string; contextMembershipId: string }
+export interface TeamWorkOverviewQuery { organizationId: string; currentMembershipId: string }
 export interface CompleteTodoCommand { organizationId: string; todoId: string; assigneeMembershipId: string; now: Date }
 export type CompleteTodoOutcome =
   | { kind: 'completed' | 'already_completed'; todo: TodoSummary }
@@ -24,4 +25,5 @@ export interface TodoRepository {
   createSharedTodo(command: CreateSharedTodoCommand): Promise<TodoSummary>;
   completeTodo(command: CompleteTodoCommand): Promise<CompleteTodoOutcome>;
   getSharedTodoWorkspace(query: SharedTodoWorkspaceQuery): Promise<SharedTodoWorkspace>;
+  getTeamWorkOverview(query: TeamWorkOverviewQuery): Promise<TeamWorkOverview>;
 }

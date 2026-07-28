@@ -2,11 +2,12 @@ import { and, desc, eq, or, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { membership, organization, relationship, todo, todoHandoff } from '@amidala/db/schema';
 import type { AmidalaDatabase } from '@amidala/db/client';
-import { relationshipKindSchema, type RelationshipKind } from '@amidala/contracts';
+import { relationshipKindSchema, type RelationshipKind, type TeamWorkOverview } from '@amidala/contracts';
 import type { CurrentMembershipContext } from '../../domain/identity';
 import type {
   CreateSharedTodoCommand,
   SharedTodoWorkspaceQuery,
+  TeamWorkOverviewQuery,
   TodoContextMemberSummary,
   TodoMemberSummary,
   TodoRepository as TodoRepositoryPort,
@@ -19,6 +20,21 @@ const relationshipOrder: Record<RelationshipKind, number> = { manager_report: 0,
 
 type TodoRow = typeof todo.$inferSelect;
 type Db = AmidalaDatabase;
+type TodoProjection = {
+  creatorName?: string | null;
+  creatorTitle?: string | null;
+  assigneeName?: string | null;
+  assigneeTitle?: string | null;
+  handoffId?: string | null;
+  handoffRequesterId?: string | null;
+  handoffRequesterName?: string | null;
+  handoffRequesterTitle?: string | null;
+  handoffRecipientId?: string | null;
+  handoffRecipientName?: string | null;
+  handoffRecipientTitle?: string | null;
+  handoffMessage?: string | null;
+  handoffRequestedAt?: Date | null;
+};
 
 export class TodoRepositoryDrizzle implements TodoRepositoryPort {
   constructor(private readonly database: AmidalaDatabase) {}
@@ -109,6 +125,122 @@ export class TodoRepositoryDrizzle implements TodoRepositoryPort {
     };
   }
 
+  async getTeamWorkOverview(query: TeamWorkOverviewQuery): Promise<TeamWorkOverview> {
+    const current = alias(membership, 'team_work_current');
+    const openCreator = alias(membership, 'team_work_open_creator');
+    const openAssignee = alias(membership, 'team_work_open_assignee');
+    const handoffRequester = alias(membership, 'team_work_handoff_requester');
+    const handoffRecipient = alias(membership, 'team_work_handoff_recipient');
+    const completedCreator = alias(membership, 'team_work_completed_creator');
+    const completedAssignee = alias(membership, 'team_work_completed_assignee');
+
+    const organizationQuery = this.database
+      .select({ organizationId: organization.id, name: organization.name })
+      .from(organization)
+      .where(eq(organization.id, query.organizationId))
+      .limit(1);
+    const currentMemberQuery = this.database
+      .select({ name: current.displayName, title: current.title })
+      .from(current)
+      .where(and(
+        eq(current.id, query.currentMembershipId),
+        eq(current.organizationId, query.organizationId),
+        eq(current.status, 'active'),
+      ))
+      .limit(1);
+    const openTodoQuery = this.database
+      .select({
+        todo,
+        creatorName: openCreator.displayName,
+        creatorTitle: openCreator.title,
+        assigneeName: openAssignee.displayName,
+        assigneeTitle: openAssignee.title,
+        handoffId: todoHandoff.id,
+        handoffRequesterId: todoHandoff.requesterMembershipId,
+        handoffRequesterName: handoffRequester.displayName,
+        handoffRequesterTitle: handoffRequester.title,
+        handoffRecipientId: todoHandoff.recipientMembershipId,
+        handoffRecipientName: handoffRecipient.displayName,
+        handoffRecipientTitle: handoffRecipient.title,
+        handoffMessage: todoHandoff.requestMessage,
+        handoffRequestedAt: todoHandoff.requestedAt,
+      })
+      .from(todo)
+      .leftJoin(openCreator, and(
+        eq(openCreator.id, todo.creatorMembershipId),
+        eq(openCreator.organizationId, query.organizationId),
+      ))
+      .innerJoin(openAssignee, and(
+        eq(openAssignee.id, todo.assigneeMembershipId),
+        eq(openAssignee.organizationId, query.organizationId),
+        eq(openAssignee.status, 'active'),
+      ))
+      .leftJoin(todoHandoff, and(
+        eq(todoHandoff.todoId, todo.id),
+        eq(todoHandoff.organizationId, query.organizationId),
+        eq(todoHandoff.status, 'requested'),
+      ))
+      .leftJoin(handoffRequester, and(
+        eq(handoffRequester.id, todoHandoff.requesterMembershipId),
+        eq(handoffRequester.organizationId, query.organizationId),
+      ))
+      .leftJoin(handoffRecipient, and(
+        eq(handoffRecipient.id, todoHandoff.recipientMembershipId),
+        eq(handoffRecipient.organizationId, query.organizationId),
+      ))
+      .where(and(eq(todo.organizationId, query.organizationId), eq(todo.status, 'open')))
+      .orderBy(desc(todo.updatedAt), desc(todo.id));
+    const completedTodoQuery = this.database
+      .select({
+        todo,
+        creatorName: completedCreator.displayName,
+        creatorTitle: completedCreator.title,
+        assigneeName: completedAssignee.displayName,
+        assigneeTitle: completedAssignee.title,
+      })
+      .from(todo)
+      .leftJoin(completedCreator, and(
+        eq(completedCreator.id, todo.creatorMembershipId),
+        eq(completedCreator.organizationId, query.organizationId),
+      ))
+      .leftJoin(completedAssignee, and(
+        eq(completedAssignee.id, todo.assigneeMembershipId),
+        eq(completedAssignee.organizationId, query.organizationId),
+      ))
+      .where(and(eq(todo.organizationId, query.organizationId), eq(todo.status, 'completed')))
+      .orderBy(desc(todo.updatedAt), desc(todo.id))
+      .limit(20);
+
+    const [organizationRow] = await organizationQuery;
+    const [currentMemberRow] = await currentMemberQuery;
+    const openRows = await openTodoQuery;
+    const completedRows = await completedTodoQuery;
+    const groups = new Map<string, TeamWorkOverview['members'][number]>();
+    for (const row of openRows) {
+      const summary = this.toTodoSummary(row.todo, row);
+      const existing = groups.get(summary.assignee.membershipId);
+      if (existing) {
+        existing.openTodos.push(summary);
+      } else {
+        groups.set(summary.assignee.membershipId, { member: summary.assignee, openTodos: [summary] });
+      }
+    }
+
+    return {
+      organization: {
+        organizationId: organizationRow?.organizationId ?? query.organizationId,
+        name: organizationRow?.name ?? '',
+      },
+      currentMember: {
+        membershipId: query.currentMembershipId,
+        name: currentMemberRow?.name ?? '',
+        title: currentMemberRow?.title ?? null,
+      },
+      members: [...groups.values()],
+      recentlyCompletedTodos: completedRows.map((row) => this.toTodoSummary(row.todo, row)),
+    };
+  }
+
   private async relationshipKinds(organizationId: string, currentMembershipId: string, contextMembershipId?: string): Promise<RelationshipKind[]> {
     const target = contextMembershipId ?? currentMembershipId;
     const source = contextMembershipId ? currentMembershipId : undefined;
@@ -116,7 +248,7 @@ export class TodoRepositoryDrizzle implements TodoRepositoryPort {
     return [...new Set(rows.map((row) => relationshipKindSchema.safeParse(row.kind).data).filter((kind): kind is RelationshipKind => kind !== undefined))].sort((a, b) => relationshipOrder[a] - relationshipOrder[b]);
   }
 
-  private toTodoSummary(row: TodoRow, names?: { creatorName?: string | null; creatorTitle?: string | null; assigneeName?: string | null; assigneeTitle?: string | null; handoffId?: string | null; handoffRequesterId?: string | null; handoffRequesterName?: string | null; handoffRequesterTitle?: string | null; handoffRecipientId?: string | null; handoffRecipientName?: string | null; handoffRecipientTitle?: string | null; handoffMessage?: string | null; handoffRequestedAt?: Date | null }) {
+  private toTodoSummary(row: TodoRow, names?: TodoProjection) {
     const member = (membershipId: string, name: string | null | undefined, title: string | null | undefined): TodoMemberSummary => ({ membershipId, name: name ?? '', title: title ?? null });
     const pendingHandoff = names?.handoffId && names.handoffRequesterId && names.handoffRecipientId && names.handoffRequestedAt ? { handoffId: names.handoffId, requester: member(names.handoffRequesterId, names.handoffRequesterName, names.handoffRequesterTitle), recipient: member(names.handoffRecipientId, names.handoffRecipientName, names.handoffRecipientTitle), requestMessage: names.handoffMessage ?? null, requestedAt: names.handoffRequestedAt.toISOString() } : null;
     return { todoId: row.id, organizationId: row.organizationId, contextMembershipId: row.contextMembershipId, title: row.title, description: row.description, status: row.status as 'open' | 'completed', creator: member(row.creatorMembershipId, names?.creatorName, names?.creatorTitle), assignee: member(row.assigneeMembershipId, names?.assigneeName, names?.assigneeTitle), createdAt: row.createdAt.toISOString(), updatedAt: row.updatedAt.toISOString(), pendingHandoff };

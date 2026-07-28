@@ -7,6 +7,7 @@ import { todoFailureMessage } from './todo-error-presentation';
 import { completeTodoSuccessMessage } from './complete-todo-presentation';
 import { assignedTodoWorkspaceKey } from './assigned-todo-queries';
 import { todoHandoffWorkspaceKey } from '../handoffs/handoff-queries';
+import { teamWorkOverviewKey } from '../work/team-work-query-key';
 import { sharedTodoWorkspaceOrganizationPrefix } from './todo-queries';
 
 type Props = { organizationId: string; todo: TodoSummary; onCompleted: (message: string) => void };
@@ -19,6 +20,7 @@ export function CompleteTodoDialog({ organizationId, todo, onCompleted }: Props)
   const invalidate = () => Promise.all([
     queryClient.invalidateQueries({ queryKey: assignedTodoWorkspaceKey(organizationId), exact: true }),
     queryClient.invalidateQueries({ queryKey: todoHandoffWorkspaceKey(organizationId), exact: true }),
+    queryClient.invalidateQueries({ queryKey: teamWorkOverviewKey(organizationId), exact: true }),
     queryClient.invalidateQueries({ queryKey: sharedTodoWorkspaceOrganizationPrefix(organizationId), exact: false }),
   ]);
 

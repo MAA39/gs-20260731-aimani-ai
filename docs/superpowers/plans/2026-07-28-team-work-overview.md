@@ -20,7 +20,7 @@
 - open groupは更新の新しいworkを持つmember順、member内は`updatedAt desc, todoId desc`。
 - completedは`updatedAt desc, todoId desc`で最大20件。filter/order/limitはDBで行う。
 - Overviewはread-only。完了/Handoff actionを重複させない。
-- inactive assigneeが残したopen Todoの棚卸し・再割当は別sliceとし、このoverviewには表示しない。
+- activeでないassignee（現行schemaでは`suspended`）が残したopen Todoの棚卸し・再割当は別sliceとし、このoverviewには表示しない。
 - 新しい`useEffect`、new dependency、chart、kanban、table、Cloudflare deployを追加しない。
 - UIは既存content / section heading / TodoCard / navigation / mobile 1-columnを踏襲する。
 
@@ -36,7 +36,7 @@
 - Produces helper: `getTeamWork(cookie, organizationId?)`
 - Proves Organization visibility、grouping、pending placement、recent order/limit
 
-- [ ] **Step 1: test-local response schemaとhelperを書く**
+- [x] **Step 1: test-local response schemaとhelperを書く**
 
 ```ts
 const teamWorkOverviewSchema = z.object({
@@ -59,7 +59,7 @@ const getTeamWork = async (cookie: string, organizationId = 'org_acme_studio') =
 };
 ```
 
-- [ ] **Step 2: grouping / pending placementのfailing testを書く**
+- [x] **Step 2: grouping / pending placementのfailing testを書く**
 
 ```ts
 it('groups open work under the current assignee and keeps pending Handoff with its requester', async () => {
@@ -78,7 +78,7 @@ it('groups open work under the current assignee and keeps pending Handoff with i
 });
 ```
 
-- [ ] **Step 3: visibility / active membership / ordering / completed limit testsを書く**
+- [x] **Step 3: visibility / active membership / ordering / completed limit testsを書く**
 
 同じtest fileでfixture prefix `todo-team-work-${fixtureId}-`を使い、`finally`でそのprefixだけ削除する。
 
@@ -93,14 +93,14 @@ it('shows every Acme open Todo to an Acme Member without leaking Northstar work'
 });
 
 it('returns forbidden when a Northstar Member requests the Acme overview', async () => {
-  expect((await getTeamWork(await signIn('owner@northstar.local'), 'org_acme_studio')).status).toBe(403);
+  expect((await getTeamWork(await signIn('suzuki@amidala.local'), 'org_acme_studio')).status).toBe(403);
 });
 
-it('omits active Members without open work and work assigned to an inactive Member', async () => {
+it('omits active Members without open work and work assigned to a suspended Member', async () => {
   const overview = teamWorkOverviewSchema.parse((await getTeamWork(await signIn('owner@amidala.local'))).body);
   const membershipIds = overview.members.map((group) => group.member.membershipId);
   expect(membershipIds).not.toContain(emptyActiveMembershipId);
-  expect(membershipIds).not.toContain(inactiveMembershipId);
+  expect(membershipIds).not.toContain(suspendedMembershipId);
 });
 
 it('orders open work by updatedAt then Todo ID descending', async () => {
@@ -117,11 +117,11 @@ it('returns only the latest 20 completed Todos in stable order', async () => {
 });
 ```
 
-`acmeOwnerTodoId`等は各testのArrangeでinsertして得たIDとし、同時刻tie fixtureだけ明示IDを使う。inactive fixtureはtest内transactionでMembership statusを`inactive`にし、`finally`で元へ戻す。21 completed fixtureの`updatedAt`は1分ずつずらし、同時刻の2件だけID降順を期待する。
+`acmeOwnerTodoId`等は各testのArrangeでinsertして得たIDとし、同時刻tie fixtureだけ明示IDを使う。activeでないassigneeのfixtureは既存memberを書き換えず、test専用のsynthetic User / `suspended` Membershipを作り、`finally`で削除する。21 completed fixtureの`updatedAt`は1分ずつずらし、同時刻の2件だけID降順を期待する。
 
 DB fixture insertは既存testのparameterized query patternを使い、title以外をstring interpolationしない。
 
-- [ ] **Step 4: REDを確認する**
+- [x] **Step 4: REDを確認する**
 
 ```bash
 TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff \
@@ -130,7 +130,7 @@ TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff \
 
 Expected: `/work`が存在せず404のためnew testsがfailする。既存Handoff testはpassする。
 
-- [ ] **Step 5: test-only commitを作る**
+- [x] **Step 5: test-only commitを作る**
 
 ```bash
 git add apps/api/src/routes/todo-handoffs.integration.test.ts
@@ -156,7 +156,7 @@ git commit -m "test: define Team Work overview behavior"
 - Produces: `GetTeamWorkOverview.execute(userId, input)`
 - Produces: `GET /organizations/:organizationId/work`
 
-- [ ] **Step 1: shared contractを追加する**
+- [x] **Step 1: shared contractを追加する**
 
 `packages/contracts/src/todo.ts`:
 
@@ -174,7 +174,7 @@ export const teamWorkOverviewSchema = z.object({
 export type TeamWorkOverview = z.infer<typeof teamWorkOverviewSchema>;
 ```
 
-- [ ] **Step 2: domain portとuse caseを追加する**
+- [x] **Step 2: domain portとuse caseを追加する**
 
 `apps/api/src/domain/todo.ts`:
 
@@ -189,9 +189,9 @@ export interface TeamWorkOverviewQuery {
 
 `GetTeamWorkOverview.execute`は`findActiveMembershipForUser`でcurrent membershipを検証し、なければ403。repositoryへOrganization/current membershipを渡す。
 
-- [ ] **Step 3: DB queryを実装する**
+- [x] **Step 3: DB queryを実装する**
 
-`getTeamWorkOverview`は次を並列取得する。
+`getTeamWorkOverview`は次のqueryを組み立て、単一`pg.Client`上で順次`await`する。並列実行はnode-postgresの非推奨警告を生むため行わない。
 
 1. Organization summary
 2. current Membership summary
@@ -223,7 +223,7 @@ open rowsはquery順を保って`Map<membershipId, group>`へ一度だけgroupin
 ))
 ```
 
-これによりinactive/deleted assigneeのTodoはoverviewから除外する。
+これによりactiveでない（現行schemaでは`suspended`）/ deleted assigneeのTodoはoverviewから除外する。
 
 既存`toTodoSummary`の第2引数をnamed typeへ抽出し、open/completedの両queryで再利用する。
 
@@ -249,7 +249,7 @@ private toTodoSummary(row: TodoRow, projection?: TodoProjection): TodoSummary
 
 open queryはrequested Handoff joinsを`TodoProjection`へ渡す。completed queryはcreator / assigneeだけを渡すため`pendingHandoff`は必ずnullになる。
 
-- [ ] **Step 4: DI / routeを接続する**
+- [x] **Step 4: DI / routeを接続する**
 
 `RequestCradle`とregisterへ`getTeamWorkOverview`を追加する。`apps/api/src/routes/todos.ts`へ`Context`、`organizationPathSchema`、`GetTeamWorkOverview`をimportし、route moduleの既存session helperをそのままwork routeでも使う。Completion PRで既に`currentUserId`へ抽出済みなので、新しいhelperは作らない。
 
@@ -265,7 +265,7 @@ open queryはrequested Handoff joinsを`TodoProjection`へ渡す。completed que
 })
 ```
 
-- [ ] **Step 5: GREENを確認する**
+- [x] **Step 5: GREENを確認する**
 
 ```bash
 TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff \
@@ -274,7 +274,7 @@ TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff \
 
 Expected: new testsと既存tests pass。
 
-- [ ] **Step 6: API read model commitを作る**
+- [x] **Step 6: API read model commitを作る**
 
 ```bash
 git add packages/contracts/src/todo.ts apps/api/src/domain/todo.ts apps/api/src/application/get-team-work-overview.ts apps/api/src/infrastructure/db/todo-repository.ts apps/api/src/composition/request-scope.ts apps/api/src/routes/todos.ts
@@ -298,7 +298,7 @@ git commit -m "feat: expose Team Work overview"
 - Produces: `TeamWorkOverviewResult`
 - Produces: `getTeamWorkOverview` Server Function / Query options
 
-- [ ] **Step 1: pure status RED testを書く**
+- [x] **Step 1: pure status RED testを書く**
 
 ```ts
 test('Team Work statusはTodoとpending Handoffから導出する', () => {
@@ -316,7 +316,7 @@ test('Team Work statusはTodoとpending Handoffから導出する', () => {
 
 Run `pnpm --filter @amidala/web test`。Expected: module不存在でfail。
 
-- [ ] **Step 2: presenterをGREENにする**
+- [x] **Step 2: presenterをGREENにする**
 
 `teamWorkStatus`を次のpure functionとして実装する。React、Query、dateをimportしない。
 
@@ -338,7 +338,7 @@ export function teamWorkStatus(todo: TodoSummary): TeamWorkStatus {
 }
 ```
 
-- [ ] **Step 3: schema / BFF / queryを実装する**
+- [x] **Step 3: schema / BFF / queryを実装する**
 
 `TeamWorkOverviewResult`はok / forbidden / not_found / validation_error / service_unavailable union。
 
@@ -352,14 +352,14 @@ export const teamWorkOverviewKey = (organizationId: string) => ['teamWork', orga
 
 Server Function validatorは`z.object({ organizationId: z.string().min(1) })`。
 
-- [ ] **Step 4: Web tests / typecheckを確認する**
+- [x] **Step 4: Web tests / typecheckを確認する**
 
 ```bash
 pnpm --filter @amidala/web test
 pnpm --filter @amidala/web exec tsc --noEmit
 ```
 
-- [ ] **Step 5: presenter / BFF commitを作る**
+- [x] **Step 5: presenter / BFF commitを作る**
 
 ```bash
 git add apps/web/src/features/work
@@ -384,7 +384,7 @@ git commit -m "feat: connect Team Work overview BFF"
 - Reuses: `TodoCard`
 - Produces route: `/$organizationId/work`
 
-- [ ] **Step 1: Page / cardを実装する**
+- [x] **Step 1: Page / cardを実装する**
 
 `TeamWorkTodoCard`は`TodoCard`のaction slotへread-only status surfaceを渡す。mutation buttonを置かない。
 
@@ -406,7 +406,7 @@ return <TodoCard todo={todo} action={action} />;
 - empty: `いまチームが持っているボールはありません`。
 - recently completedはitemsがある時だけ`最近完了` section。
 
-- [ ] **Step 2: route loaderを実装する**
+- [x] **Step 2: route loaderを実装する**
 
 ```tsx
 export const Route = createFileRoute('/$organizationId/work')({
@@ -418,7 +418,7 @@ export const Route = createFileRoute('/$organizationId/work')({
 
 componentは`useSuspenseQuery`で同じqueryを読み、`TeamWorkPage`へ渡す。
 
-- [ ] **Step 3: navigationへ既存patternで追加する**
+- [x] **Step 3: navigationへ既存patternで追加する**
 
 `__root.tsx`のlinksへ`BriefcaseBusiness` icon、`to: 'work'`、label `チームのボール`をToday直後に追加する。
 
@@ -429,7 +429,7 @@ componentは`useSuspenseQuery`で同じqueryを読み、`TeamWorkPage`へ渡す�
 
 Vite route generationで`routeTree.gen.ts`を生成し、手書き編集しない。
 
-- [ ] **Step 4: existing design tokensでstyleする**
+- [x] **Step 4: existing design tokensでstyleする**
 
 新規classesはlayoutだけに限定する。
 
@@ -440,7 +440,7 @@ Vite route generationで`routeTree.gen.ts`を生成し、手書き編集しな�
 
 TodoCard、rail、status、empty surface、button、radius、shadow、font tokenを再定義しない。mobile 800px以下は1columnのまま。
 
-- [ ] **Step 5: tests / build / generated routeを検証する**
+- [x] **Step 5: tests / build / generated routeを検証する**
 
 ```bash
 pnpm --filter @amidala/web test
@@ -450,7 +450,7 @@ rg -n "'/\$organizationId/work'" apps/web/src/routeTree.gen.ts
 git diff --check
 ```
 
-- [ ] **Step 6: route / UI commitを作る**
+- [x] **Step 6: route / UI commitを作る**
 
 ```bash
 git add apps/web/src/features/work apps/web/src/routes/'$organizationId'/work.tsx apps/web/src/routeTree.gen.ts apps/web/src/routes/__root.tsx apps/web/src/styles.css
@@ -470,7 +470,7 @@ git commit -m "feat: show Team Work overview"
 - Consumes: `teamWorkOverviewKey`
 - Preserves existing exact invalidations
 
-- [ ] **Step 1: 3 mutationへTeam Work keyを追加する**
+- [x] **Step 1: 3 mutationへTeam Work keyを追加する**
 
 Completion、Handoff request、accept/reject/cancelの既存`Promise.all`へ、それぞれ現行componentの変数名で次を追加する。
 
@@ -487,14 +487,14 @@ client.invalidateQueries({ queryKey: teamWorkOverviewKey(handoff.organizationId)
 
 mutationがTeam Work pageから実行されるわけではないためoptimistic updateは追加しない。
 
-- [ ] **Step 2: Web tests / buildを再実行する**
+- [x] **Step 2: Web tests / buildを再実行する**
 
 ```bash
 pnpm --filter @amidala/web test
 pnpm build
 ```
 
-- [ ] **Step 3: invalidation commitを作る**
+- [x] **Step 3: invalidation commitを作る**
 
 ```bash
 git add apps/web/src/features/todos/CompleteTodoDialog.tsx apps/web/src/features/handoffs/HandoffRequestCard.tsx apps/web/src/features/handoffs/RequestTodoHandoffDialog.tsx
@@ -513,7 +513,7 @@ git commit -m "fix: refresh Team Work after responsibility changes"
 - Produces: reviewed Team Work Overview PR
 - Base: Next Action merge後のlatest `main`
 
-- [ ] **Step 1: full verificationを実行する**
+- [x] **Step 1: full verificationを実行する**
 
 ```bash
 pnpm --filter @amidala/api test
@@ -526,7 +526,7 @@ git diff --exit-code -- apps/web/src/routeTree.gen.ts
 git diff --check
 ```
 
-- [ ] **Step 2: end-to-end local journeyを実行する**
+- [x] **Step 2: end-to-end local journeyを実行する**
 
 1. demo reset
 2. 田中TodayのTodoがTeam Workの田中groupへ`対応中`で出る
@@ -537,16 +537,28 @@ git diff --check
 7. Northstar path / sessionでAcme dataが出ない
 8. direct reload、desktop 1280x720、mobile 390x844、console error/hydration 0
 
-- [ ] **Step 3: independent reviewを依頼する**
+- [x] **Step 3: independent reviewを依頼する**
 
 Organization越境、all-member visibility、DB-side limit/order、pending placement、read-only UI、route typing、query invalidation、existing design consistencyをreview対象にする。
 
-- [ ] **Step 4: Critical/ImportantをTDDで修正して再検証する**
+- [x] **Step 4: Critical/ImportantをTDDで修正して再検証する**
 
-- [ ] **Step 5: small PRを作る**
+- [x] **Step 5: user overrideによりlocal branchでreviewを完了する**
 
-PR title: `feat: show Team Work overview`
+ユーザーの「Pushしなくていい。ローカルでの動作確認がしたい」を優先し、GitHub push / PR / Cloudflare deployは行わない。複数の独立agent reviewとlocal runtimeで代替した。
 
-- [ ] **Step 6: GitHub checks後にmerge commit方式でmergeする**
+- [ ] **Step 6: local mainへmerge commit方式で統合する**
 
-root mainでfresh verificationし、work overview worktree、local/remote branchを削除する。Cloudflare deployは行わない。
+root mainでfresh verificationし、work overview worktreeとlocal branchを削除する。remote branchは作っていない。Cloudflare deployは行わない。
+
+### Task 6 実測（local branch `6b7da4f`）
+
+- API unit 13/13、Web 17/17、PostgreSQL integration 24/24、demo seed 1/1、build 3/3 PASS
+- DB-side Organization filter / stable order / completed limit 20、pending Handoffのcurrent assignee placementをintegrationで確認
+- desktop 1280x720 / mobile 390x844で横overflowなし、mobile navは5項目すべて56px高、console warning/error 0
+- 田中→森のHandoff依頼、次の一手付きaccept、Todo完了、最近完了への移動を実ブラウザで完走
+- Northstar pathは403の固定UIとなりAcme Todoを表示しない
+- reviewで再試行がcached failureを再表示するImportantを検出し、Query自身の`refetch()`へ修正
+- runtimeでServer Functionを含むquery moduleからkeyだけをclient importしたSSR stuckを検出。side-effect-free key moduleに分離後、Work/Today/Todo/Handoffのauthenticated SSRが34〜56ms / HTTP 200へ復帰
+- env symlinkを外しcache bypass rebuild後、production distのlocal env file 0件 / demo marker 0件を確認
+- 詳細: `docs/research/2026-07-28-team-work-overview-runtime-verification.md`

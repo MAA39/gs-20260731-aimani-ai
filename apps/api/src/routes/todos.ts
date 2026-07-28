@@ -1,11 +1,12 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
-import { completeTodoPathSchema, createTodoBodySchema, personTodoPathSchema } from '@amidala/contracts';
+import { completeTodoPathSchema, createTodoBodySchema, organizationPathSchema, personTodoPathSchema } from '@amidala/contracts';
 import type { ApiEnv } from '../app';
 import { ApiError } from '../errors/api-error';
 import type { CreateSharedTodo } from '../application/create-todo';
 import type { GetSharedTodoWorkspace } from '../application/list-shared-todos';
 import type { CompleteTodo } from '../application/complete-todo';
+import type { GetTeamWorkOverview } from '../application/get-team-work-overview';
 
 async function currentUserId(context: Context<ApiEnv>): Promise<string> {
   const auth = await context.get('scope').resolve('auth');
@@ -28,6 +29,12 @@ export function createTodoRoutes() {
       const path = personTodoPathSchema.safeParse(context.req.param());
       if (!path.success) throw new ApiError('validation_error', 'Invalid path.');
       const useCase = await context.get('scope').resolve<GetSharedTodoWorkspace>('getSharedTodoWorkspace');
+      return context.json(await useCase.execute(await currentUserId(context), path.data));
+    })
+    .get('/organizations/:organizationId/work', async (context) => {
+      const path = organizationPathSchema.safeParse(context.req.param());
+      if (!path.success) throw new ApiError('validation_error', 'Invalid Organization path.');
+      const useCase = await context.get('scope').resolve<GetTeamWorkOverview>('getTeamWorkOverview');
       return context.json(await useCase.execute(await currentUserId(context), path.data));
     })
     .post('/organizations/:organizationId/todos/:todoId/complete', async (context) => {
