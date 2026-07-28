@@ -13,6 +13,10 @@ export function isTodoWaitingOnRecipient(todo: AssignedTodoWorkspace['todos'][nu
   return todo.pendingHandoff !== null;
 }
 
+export function acceptedHandoffAnnouncement(recipientName: string) {
+  return `${recipientName}さんが次の担当になりました。`;
+}
+
 export function composeTodayWorkspace(
   assignedWorkspace: AssignedTodoWorkspace,
   handoffWorkspace: TodoHandoffWorkspace,

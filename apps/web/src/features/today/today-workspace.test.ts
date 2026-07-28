@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { AssignedTodoWorkspace, TodoHandoffWorkspace } from '@amidala/contracts';
-import { composeTodayWorkspace, isTodoWaitingOnRecipient } from './today-workspace';
+import { acceptedHandoffAnnouncement, composeTodayWorkspace, isTodoWaitingOnRecipient } from './today-workspace';
+
+test('引き継ぎ受け入れの案内文を作る', () => {
+  assert.equal(acceptedHandoffAnnouncement('森 ハル'), '森 ハルさんが次の担当になりました。');
+});
 
 const member = (membershipId: string, name: string) => ({ membershipId, name, title: null });
 const todo = (todoId: string, pendingHandoff: AssignedTodoWorkspace['todos'][number]['pendingHandoff']) => ({
