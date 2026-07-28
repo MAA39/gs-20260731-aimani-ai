@@ -14,3 +14,9 @@ test('read and create outages give action-specific retry guidance', () => {
   assert.match(todoFailureMessage('shared_workspace', 503), /PeopleのTodoを読み込めませんでした/);
   assert.match(todoFailureMessage('create', 503), /Todoを作成できませんでした/);
 });
+
+test('completion failures use fixed Japanese guidance', () => {
+  assert.equal(todoFailureMessage('complete', 403), '現在の担当者だけがこのTodoを完了できます。');
+  assert.equal(todoFailureMessage('complete', 409, 'handoff_pending'), '引き継ぎの確認待ちです。依頼を取り消すか、相手の返答後に完了してください。');
+  assert.equal(todoFailureMessage('complete', 503), 'Todoを完了できませんでした。時間をおいて、もう一度お試しください。');
+});

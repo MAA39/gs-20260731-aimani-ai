@@ -1,4 +1,4 @@
-import { todoSummarySchema } from '@amidala/contracts';
+import { completeTodoPathSchema, completeTodoResponseSchema, todoSummarySchema } from '@amidala/contracts';
 import type { SharedTodoWorkspace, TodoSummary } from '@amidala/contracts';
 import { z } from 'zod';
 
@@ -27,6 +27,13 @@ export type PersonTodoPath = { organizationId: string; contextMembershipId: stri
 export type CreateSharedTodoInput = z.infer<typeof createSharedTodoInputSchema>;
 export type AssignedTodoWorkspaceInput = z.infer<typeof assignedTodoWorkspaceInputSchema>;
 export type { SharedTodoWorkspace, TodoSummary } from '@amidala/contracts';
+export const completeTodoInputSchema = completeTodoPathSchema;
+export type CompleteTodoInput = (typeof completeTodoInputSchema)['_output'];
+export { completeTodoResponseSchema };
+export type CompleteTodoResult =
+  | { status: 'ok'; todo: TodoSummary }
+  | { status: 'forbidden' | 'not_found' | 'conflict'; error: { code: string; message: string } }
+  | { status: 'error'; error: { code: 'validation_error' | 'service_unavailable'; message: string } };
 
 export type SharedTodoWorkspaceResult =
   | { status: 'ok'; workspace: SharedTodoWorkspace }
