@@ -3,8 +3,15 @@ import test from 'node:test';
 import type { AssignedTodoWorkspace, TodoHandoffWorkspace } from '@amidala/contracts';
 import { acceptedHandoffAnnouncement, composeTodayWorkspace, isTodoWaitingOnRecipient } from './today-workspace';
 
-test('引き継ぎ受け入れの案内文を作る', () => {
-  assert.equal(acceptedHandoffAnnouncement('森 ハル'), '森 ハルさんが次の担当になりました。');
+test('引き継ぎ受け入れの案内へ次の一手を含める', () => {
+  assert.equal(
+    acceptedHandoffAnnouncement('森 ハル', 'インタビュー仮説を3点にまとめる'),
+    '森 ハルさんへ責任が移りました。次の一手: インタビュー仮説を3点にまとめる',
+  );
+  assert.equal(
+    acceptedHandoffAnnouncement('森 ハル', null),
+    '森 ハルさんへ責任が移りました。',
+  );
 });
 
 const member = (membershipId: string, name: string) => ({ membershipId, name, title: null });
@@ -28,6 +35,7 @@ const handoff = (handoffId: string, status: TodoHandoffWorkspace['recentHandoffs
   requester: member('membership-tanaka', '田中'),
   recipient: member('membership-suzuki', '鈴木'),
   requestMessage: null,
+  nextAction: null,
   status,
   requestedAt: '2026-07-28T00:00:00.000Z',
   resolvedAt: status === 'requested' ? null : '2026-07-28T01:00:00.000Z',
