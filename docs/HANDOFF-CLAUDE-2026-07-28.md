@@ -4,7 +4,7 @@
 - 正本の絶対パス: `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/HANDOFF-CLAUDE-2026-07-28.md`
 - repository: `/Users/maa/Projects/gs/000_参照用/amidala-v2`
 - GitHub: <https://github.com/MAA39/amidala-v2>
-- コード基準SHA: `18366d915ce9ce8cc6df36795c124cff56ea921b`（PR #7 merge後）
+- コード基準SHA: `ff48046`（Handoff next action runtime fix後、Task 5検証基準）
 - deploy: Cloudflareへ未deploy。production DB mutationも未実施
 - 移管方針: Codexは本書をmergeしてworkspaceをcleanにした後、機能開発を停止する
 
@@ -219,6 +219,24 @@ pnpm --filter @amidala/web test
 pnpm build
 ! rg -n 'owner@amidala\.local|mori@amidala\.local|amidala-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist
 ```
+
+### Handoff next action Task 5 fresh verification（2026-07-28）
+
+worktree `handoff-next-action` の HEAD `ff48046` で、機密値を表示せず次を再実行した。
+
+```text
+API unit: 13/13 PASS（約1.1s）
+Web tests: 14/14 PASS（約0.64s）
+PostgreSQL integration（127.0.0.1:54329/amidala_handoff）: 18/18 PASS（約4.55s）
+demo seed（127.0.0.1:54329/amidala_demo）: 1/1 PASS（amidala_demo reset後、約0.67s）
+full monorepo build: 3/3 package tasks PASS（約10.1s）
+production artifact marker scan（apps/web/dist）: 0 matches
+git diff --check: PASS
+```
+
+demo seedはcontrollerのbrowser journey後に一度だけ既存のaccepted状態を検出したため、`pnpm db:demo:reset`でローカル`amidala_demo`を初期化して再実行した。browser Step 2はcontrollerの`task-5-browser-results.md`を正とし再実行していない。次の一手のaccept、Today/Handoff recent投影、direct reload保持、desktop 1280x720 / mobile 390x844のoverflowなし、console warning/error 0が記録されている。空のnextAction acceptはintegration suiteで確認済み。
+
+独立review、PR、merge、worktree cleanupはcontroller責任としてdeferred。Cloudflare deployは未実施。
 
 ## 9. アーキテクチャと配置
 
