@@ -551,9 +551,12 @@ describe('Todo Handoff API', () => {
       expect(response.status).toBe(200);
       const overview = teamWorkOverviewSchema.parse(response.body);
       expect(overview.currentMember.membershipId).toBe('acme-studio-mori');
-      const ownerTodo = overview.members
-        .find((group) => group.member.membershipId === 'acme-studio-owner')
-        ?.openTodos.find((todo) => todo.todoId === ownerTodoId);
+      const ownerGroup = overview.members.find((group) => group.member.membershipId === 'acme-studio-owner');
+      const ownerTodo = ownerGroup?.openTodos.find((todo) => todo.todoId === ownerTodoId);
+      const pendingTodoLocations = overview.members.flatMap((group) => group.openTodos
+        .filter((todo) => todo.todoId === ownerTodoId)
+        .map(() => group.member.membershipId));
+      expect(pendingTodoLocations).toEqual(['acme-studio-owner']);
       expect(ownerTodo?.pendingHandoff?.recipient.membershipId).toBe('acme-studio-mori');
       expect(overview.members
         .find((group) => group.member.membershipId === 'acme-studio-mori')
@@ -570,6 +573,7 @@ describe('Todo Handoff API', () => {
     const acmeOwnerTodoId = `${prefix}acme-owner`;
     const acmeMoriTodoId = `${prefix}acme-mori`;
     const northstarTodoId = `${prefix}northstar-owner`;
+    const northstarCompletedTodoId = `${prefix}northstar-completed`;
     const db = new pg.Client({ connectionString: env.DATABASE_URL });
     await db.connect();
     try {
@@ -591,13 +595,27 @@ describe('Todo Handoff API', () => {
         assigneeMembershipId: 'northstar-lab-owner',
         updatedAt: new Date('2099-01-02T00:01:00.000Z'),
       });
+      await insertTeamWorkTodo(db, {
+        todoId: northstarCompletedTodoId,
+        organizationId: 'org_northstar_lab',
+        contextMembershipId: 'northstar-lab-suzuki',
+        creatorMembershipId: 'northstar-lab-owner',
+        assigneeMembershipId: 'northstar-lab-owner',
+        status: 'completed',
+        updatedAt: new Date('2099-01-02T00:04:00.000Z'),
+      });
 
       const response = await getTeamWork(await signIn('mori@amidala.local'));
       expect(response.status).toBe(200);
       const overview = teamWorkOverviewSchema.parse(response.body);
-      const ids = overview.members.flatMap((group) => group.openTodos.map((todo) => todo.todoId));
-      expect(ids).toEqual(expect.arrayContaining([acmeOwnerTodoId, acmeMoriTodoId]));
-      expect(ids).not.toContain(northstarTodoId);
+      const openTodos = overview.members.flatMap((group) => group.openTodos);
+      expect(openTodos.map((todo) => todo.todoId)).toEqual(expect.arrayContaining([acmeOwnerTodoId, acmeMoriTodoId]));
+      expect(openTodos.map((todo) => todo.todoId)).not.toContain(northstarTodoId);
+      expect(overview.recentlyCompletedTodos.map((todo) => todo.todoId)).not.toContain(northstarCompletedTodoId);
+      expect(openTodos.every((todo) => todo.status === 'open')).toBe(true);
+      expect(overview.recentlyCompletedTodos.every((todo) => todo.status === 'completed')).toBe(true);
+      expect([...openTodos, ...overview.recentlyCompletedTodos]
+        .every((todo) => todo.organizationId === 'org_acme_studio')).toBe(true);
     } finally {
       await db.query('delete from todo where id like $1', [`${prefix}%`]);
       await db.end();
@@ -693,7 +711,9 @@ describe('Todo Handoff API', () => {
       const response = await getTeamWork(await signIn('owner@amidala.local'));
       expect(response.status).toBe(200);
       const overview = teamWorkOverviewSchema.parse(response.body);
-      expect(overview.members.slice(0, 2).map((group) => group.member.membershipId))
+      expect(overview.members
+        .map((group) => group.member.membershipId)
+        .filter((membershipId) => membershipId === 'acme-studio-owner' || membershipId === 'acme-studio-mori'))
         .toEqual(['acme-studio-owner', 'acme-studio-mori']);
       const ownerFixtureIds = overview.members
         .find((group) => group.member.membershipId === 'acme-studio-owner')
