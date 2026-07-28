@@ -110,6 +110,39 @@ export function deriveStepAvailability(
   );
 }
 
+export function isWeaklyConnected(
+  steps: readonly ProcessGraphStep[],
+  dependencies: readonly DependencyIdentity[],
+): boolean {
+  if (steps.length <= 1) return true;
+  if (dependencies.length === 0) return false;
+  const knownSteps = new Set(steps.map((step) => step.stepId));
+  const neighbors = new Map(steps.map((step) => [step.stepId, [] as string[]]));
+  for (const dependency of dependencies) {
+    if (
+      !knownSteps.has(dependency.predecessorStepId) ||
+      !knownSteps.has(dependency.successorStepId)
+    ) {
+      return false;
+    }
+    neighbors
+      .get(dependency.predecessorStepId)!
+      .push(dependency.successorStepId);
+    neighbors
+      .get(dependency.successorStepId)!
+      .push(dependency.predecessorStepId);
+  }
+  const visited = new Set<string>();
+  const pending = [steps[0]!.stepId];
+  while (pending.length > 0) {
+    const current = pending.pop()!;
+    if (visited.has(current)) continue;
+    visited.add(current);
+    pending.push(...(neighbors.get(current) ?? []));
+  }
+  return visited.size === steps.length;
+}
+
 export function topologicallySortSteps<T extends ProcessGraphStep>(
   steps: readonly T[],
   dependencies: readonly DependencyIdentity[],

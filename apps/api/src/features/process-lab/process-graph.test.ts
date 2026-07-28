@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   deriveStepAvailability,
+  isWeaklyConnected,
   topologicallySortSteps,
   validateDependencyChange,
 } from './process-graph';
@@ -60,5 +61,13 @@ describe('process graph', () => {
     expect(
       topologicallySortSteps(steps, dependencies).map((step) => step.stepId),
     ).toEqual(['discover', 'design', 'release']);
+  });
+
+  it('detects an isolated step after removing its only dependency', () => {
+    expect(
+      isWeaklyConnected(steps, [
+        { predecessorStepId: 'discover', successorStepId: 'design' },
+      ]),
+    ).toBe(false);
   });
 });

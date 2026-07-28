@@ -13,6 +13,8 @@ import { TodoRepository } from '../infrastructure/db/todo-repository'; import { 
 import { CompleteTodo } from '../application/complete-todo';
 import { GetTeamWorkOverview } from '../application/get-team-work-overview';
 import { TodoHandoffRepository } from '../infrastructure/db/todo-handoff-repository'; import { RequestTodoHandoff } from '../application/request-todo-handoff'; import { AcceptTodoHandoff } from '../application/accept-todo-handoff'; import { RejectTodoHandoff } from '../application/reject-todo-handoff'; import { CancelTodoHandoff } from '../application/cancel-todo-handoff'; import { GetTodoHandoffWorkspace } from '../application/get-todo-handoff-workspace'; import { GetAssignedTodoWorkspace } from '../application/get-assigned-todo-workspace';
+import { ProcessLabRepository } from '../features/process-lab/process-lab-repository';
+import { ProcessLabService } from '../features/process-lab/process-lab-service';
 
 export interface RequestScopeArgs {
   env: ApiBindings;
@@ -24,6 +26,7 @@ export interface RequestCradle extends RootCradle {
   request: Request;
   healthCheck: HealthCheck; todoRepository: Promise<TodoRepository>; createSharedTodo: Promise<CreateSharedTodo>; getSharedTodoWorkspace: Promise<GetSharedTodoWorkspace>; getTeamWorkOverview: Promise<GetTeamWorkOverview>; completeTodo: Promise<CompleteTodo>; todoHandoffRepository: Promise<TodoHandoffRepository>; requestTodoHandoff: Promise<RequestTodoHandoff>; acceptTodoHandoff: Promise<AcceptTodoHandoff>; rejectTodoHandoff: Promise<RejectTodoHandoff>; cancelTodoHandoff: Promise<CancelTodoHandoff>; getTodoHandoffWorkspace: Promise<GetTodoHandoffWorkspace>; getAssignedTodoWorkspace: Promise<GetAssignedTodoWorkspace>;
   databaseResource: Promise<DatabaseResource>; auth: Promise<ReturnType<typeof createAuth>>; membershipRepository: Promise<MembershipRepository>; listOrganizationMembershipsForUser: Promise<ListOrganizationMembershipsForUser>; peopleRepository: Promise<PeopleRepository>; listMembersForCurrentOrganization: Promise<ListMembersForCurrentOrganization>;
+  processLabRepository: Promise<ProcessLabRepository>; processLabService: Promise<ProcessLabService>;
 }
 
 export type RequestScope = AwilixContainer<RequestCradle>;
@@ -61,6 +64,8 @@ export async function withRequestScope<T>(
     getTeamWorkOverview: asFunction(async ({ todoRepository }: { todoRepository: Promise<TodoRepository> }) => new GetTeamWorkOverview(await todoRepository)).scoped(),
     completeTodo: asFunction(async ({ todoRepository, clock }: { todoRepository: Promise<TodoRepository>; clock: Clock }) => new CompleteTodo(await todoRepository, clock)).scoped(),
     todoHandoffRepository: asFunction(async ({ databaseResource }: { databaseResource: Promise<DatabaseResource> }) => new TodoHandoffRepository((await databaseResource).database)).scoped(), requestTodoHandoff: asFunction(async ({ todoHandoffRepository, idGenerator, clock }: { todoHandoffRepository: Promise<TodoHandoffRepository>; idGenerator: RootCradle['idGenerator']; clock: Clock }) => new RequestTodoHandoff(await todoHandoffRepository, idGenerator, clock)).scoped(), acceptTodoHandoff: asFunction(async ({ todoHandoffRepository, clock }: { todoHandoffRepository: Promise<TodoHandoffRepository>; clock: Clock }) => new AcceptTodoHandoff(await todoHandoffRepository, clock)).scoped(), rejectTodoHandoff: asFunction(async ({ todoHandoffRepository, clock }: { todoHandoffRepository: Promise<TodoHandoffRepository>; clock: Clock }) => new RejectTodoHandoff(await todoHandoffRepository, clock)).scoped(), cancelTodoHandoff: asFunction(async ({ todoHandoffRepository, clock }: { todoHandoffRepository: Promise<TodoHandoffRepository>; clock: Clock }) => new CancelTodoHandoff(await todoHandoffRepository, clock)).scoped(), getTodoHandoffWorkspace: asFunction(async ({ todoHandoffRepository }: { todoHandoffRepository: Promise<TodoHandoffRepository> }) => new GetTodoHandoffWorkspace(await todoHandoffRepository)).scoped(), getAssignedTodoWorkspace: asFunction(async ({ todoHandoffRepository }: { todoHandoffRepository: Promise<TodoHandoffRepository> }) => new GetAssignedTodoWorkspace(await todoHandoffRepository)).scoped(),
+    processLabRepository: asFunction(async ({ databaseResource }: { databaseResource: Promise<DatabaseResource> }) => new ProcessLabRepository((await databaseResource).database)).scoped(),
+    processLabService: asFunction(async ({ processLabRepository, clock }: { processLabRepository: Promise<ProcessLabRepository>; clock: Clock }) => new ProcessLabService(await processLabRepository, clock)).scoped(),
   });
 
   try {
