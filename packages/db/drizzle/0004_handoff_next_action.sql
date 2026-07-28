@@ -1,0 +1,2 @@
+ALTER TABLE "todo_handoff" ADD COLUMN "next_action" text;--> statement-breakpoint
+ALTER TABLE "todo_handoff" ADD CONSTRAINT "todo_handoff_next_action_check" CHECK ("todo_handoff"."next_action" is null or char_length("todo_handoff"."next_action") between 1 and 240);

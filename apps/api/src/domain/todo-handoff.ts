@@ -2,7 +2,7 @@ import type { AssignedTodoWorkspace, TodoHandoffStatus, TodoHandoffSummary, Todo
 import type { CurrentMembershipContext } from './identity';
 export type { TodoHandoffWorkspace, AssignedTodoWorkspace, TodoHandoffSummary };
 export interface RequestTodoHandoffCommand { id:string; organizationId:string; todoId:string; requesterMembershipId:string; recipientMembershipId:string; requestMessage:string|null; now:Date }
-export interface AcceptTodoHandoffCommand { organizationId:string; handoffId:string; recipientMembershipId:string; now:Date }
+export interface AcceptTodoHandoffCommand { organizationId:string; handoffId:string; recipientMembershipId:string; nextAction:string|null; now:Date }
 export interface RejectTodoHandoffCommand { organizationId:string; handoffId:string; recipientMembershipId:string; now:Date }
 export interface CancelTodoHandoffCommand { organizationId:string; handoffId:string; requesterMembershipId:string; now:Date }
 export interface TodoHandoffWorkspaceQuery { organizationId:string; currentMembershipId:string }
