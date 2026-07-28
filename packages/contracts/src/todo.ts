@@ -10,4 +10,15 @@ export const todoSummarySchema=z.object({todoId:z.string(),organizationId:z.stri
 export const completeTodoPathSchema = z.object({ organizationId: z.string().min(1), todoId: z.string().min(1) });
 export const completeTodoResponseSchema = z.object({ todo: todoSummarySchema });
 export const sharedTodoWorkspaceSchema=z.object({organization:z.object({organizationId:z.string(),name:z.string()}),currentMember:todoMemberSummarySchema,contextMember:memberSummarySchema,todos:z.array(todoSummarySchema)});
+export const teamWorkMemberGroupSchema = z.object({
+  member: todoMemberSummarySchema,
+  openTodos: z.array(todoSummarySchema),
+});
+export const teamWorkOverviewSchema = z.object({
+  organization: z.object({ organizationId: z.string(), name: z.string() }),
+  currentMember: todoMemberSummarySchema,
+  members: z.array(teamWorkMemberGroupSchema),
+  recentlyCompletedTodos: z.array(todoSummarySchema),
+});
 export type TodoSummary=z.infer<typeof todoSummarySchema>; export type SharedTodoWorkspace=z.infer<typeof sharedTodoWorkspaceSchema>;
+export type TeamWorkOverview = z.infer<typeof teamWorkOverviewSchema>;
