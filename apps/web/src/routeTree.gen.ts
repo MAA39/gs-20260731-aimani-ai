@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as OrganizationsRouteImport } from './routes/organizations'
 import { Route as OrganizationIdHandoffsRouteImport } from './routes/$organizationId/handoffs'
 import { Route as OrganizationIdPeopleRouteImport } from './routes/$organizationId/people'
+import { Route as OrganizationIdTodayRouteImport } from './routes/$organizationId/today'
 import { Route as OrganizationIdTodosRouteImport } from './routes/$organizationId/todos'
 import { Route as OrganizationIdPeopleIndexRouteImport } from './routes/$organizationId/people/index'
 import { Route as OrganizationIdPeopleContextMembershipIdTodosRouteImport } from './routes/$organizationId/people/$contextMembershipId/todos'
@@ -43,6 +44,11 @@ const OrganizationIdPeopleRoute = OrganizationIdPeopleRouteImport.update({
   path: '/$organizationId/people',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrganizationIdTodayRoute = OrganizationIdTodayRouteImport.update({
+  id: '/$organizationId/today',
+  path: '/$organizationId/today',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrganizationIdTodosRoute = OrganizationIdTodosRouteImport.update({
   id: '/$organizationId/todos',
   path: '/$organizationId/todos',
@@ -67,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/organizations': typeof OrganizationsRoute
   '/$organizationId/handoffs': typeof OrganizationIdHandoffsRoute
   '/$organizationId/people': typeof OrganizationIdPeopleRouteWithChildren
+  '/$organizationId/today': typeof OrganizationIdTodayRoute
   '/$organizationId/todos': typeof OrganizationIdTodosRoute
   '/$organizationId/people/': typeof OrganizationIdPeopleIndexRoute
   '/$organizationId/people/$contextMembershipId/todos': typeof OrganizationIdPeopleContextMembershipIdTodosRoute
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/organizations': typeof OrganizationsRoute
   '/$organizationId/handoffs': typeof OrganizationIdHandoffsRoute
+  '/$organizationId/today': typeof OrganizationIdTodayRoute
   '/$organizationId/todos': typeof OrganizationIdTodosRoute
   '/$organizationId/people': typeof OrganizationIdPeopleIndexRoute
   '/$organizationId/people/$contextMembershipId/todos': typeof OrganizationIdPeopleContextMembershipIdTodosRoute
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/organizations': typeof OrganizationsRoute
   '/$organizationId/handoffs': typeof OrganizationIdHandoffsRoute
   '/$organizationId/people': typeof OrganizationIdPeopleRouteWithChildren
+  '/$organizationId/today': typeof OrganizationIdTodayRoute
   '/$organizationId/todos': typeof OrganizationIdTodosRoute
   '/$organizationId/people/': typeof OrganizationIdPeopleIndexRoute
   '/$organizationId/people/$contextMembershipId/todos': typeof OrganizationIdPeopleContextMembershipIdTodosRoute
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/organizations'
     | '/$organizationId/handoffs'
     | '/$organizationId/people'
+    | '/$organizationId/today'
     | '/$organizationId/todos'
     | '/$organizationId/people/'
     | '/$organizationId/people/$contextMembershipId/todos'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/organizations'
     | '/$organizationId/handoffs'
+    | '/$organizationId/today'
     | '/$organizationId/todos'
     | '/$organizationId/people'
     | '/$organizationId/people/$contextMembershipId/todos'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/organizations'
     | '/$organizationId/handoffs'
     | '/$organizationId/people'
+    | '/$organizationId/today'
     | '/$organizationId/todos'
     | '/$organizationId/people/'
     | '/$organizationId/people/$contextMembershipId/todos'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   OrganizationsRoute: typeof OrganizationsRoute
   OrganizationIdHandoffsRoute: typeof OrganizationIdHandoffsRoute
   OrganizationIdPeopleRoute: typeof OrganizationIdPeopleRouteWithChildren
+  OrganizationIdTodayRoute: typeof OrganizationIdTodayRoute
   OrganizationIdTodosRoute: typeof OrganizationIdTodosRoute
 }
 
@@ -167,6 +180,13 @@ declare module '@tanstack/react-router' {
       path: '/$organizationId/people'
       fullPath: '/$organizationId/people'
       preLoaderRoute: typeof OrganizationIdPeopleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$organizationId/today': {
+      id: '/$organizationId/today'
+      path: '/$organizationId/today'
+      fullPath: '/$organizationId/today'
+      preLoaderRoute: typeof OrganizationIdTodayRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$organizationId/todos': {
@@ -213,6 +233,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrganizationsRoute: OrganizationsRoute,
   OrganizationIdHandoffsRoute: OrganizationIdHandoffsRoute,
   OrganizationIdPeopleRoute: OrganizationIdPeopleRouteWithChildren,
+  OrganizationIdTodayRoute: OrganizationIdTodayRoute,
   OrganizationIdTodosRoute: OrganizationIdTodosRoute,
 }
 export const routeTree = rootRouteImport
