@@ -145,19 +145,11 @@ Browser相当HTTP
 
 これはRPC、認証cookie、API Worker、DB transaction、SSR projectionをまとめたruntime evidenceである。
 
-## 6. 未証明のUI項目
+## 6. Todo完了のUI実測
 
-Codex内ブラウザの既存local tabが接続失敗後の内部`data:` error pageになっており、URL policyにより`localhost`へ自動遷移できなかった。別ブラウザやstandalone Playwrightで迂回することはポリシー上行っていない。
+controller実測（2026-07-28、`task-5-browser-results.md`）では、Todo完了journeyの責任状態とviewport境界を確認済みである。desktop 1280x720 / mobile 390x844とも横overflowなし、完了確認Dialogはviewport内、cancel後にtriggerへfocus復帰。田中のToday / AssignedからTodoが消え、live-region「Todoを完了しました。」を表示。森のshared workspaceには「完了」として残り、完了TodoにHandoff依頼actionは出ない。pending Handoff作成後は完了actionが非表示でdirect reload後も維持され、browser console error / warningは0件。
 
-したがって次は未証明であり、Claude Codeの最初の作業にする。
-
-- desktop 1280x720でToday全体の視覚階層
-- mobile 390x844のnavigation、card、dialog、横overflow
-- 画面上のActor Switchを実際にclickした往復
-- dialogから依頼し、card上でacceptする操作感
-- browser console error / hydration warningの有無
-- reduced-motion
-- Today追加後に、3分で価値が伝わるかという人間のUX判断
+これは指定controllerによるruntime evidenceであり、3分で価値が伝わるかという人間のUX判断とは区別する。
 
 HTTP runtimeが通ったことを、視覚・操作・価値仮説の検証済みとは扱わない。
 
@@ -190,6 +182,18 @@ pnpm dev
 移管時点ではlocal serverを停止せず、ユーザーがin-app browserを手動Reloadできる状態で残す。直前のruntime journey後なのでDBは「森が引き受け済み」の状態である。最初から触る場合はresetする。
 
 ## 8. 検証済みコマンド
+
+Todo完了branch（`e60643e`）でTask 5 Step 1をfresh実行した結果:
+
+```text
+API tests: 13/13 PASS
+Web tests: 14/14 PASS
+PostgreSQL integration tests: 10/10 PASS
+demo seed test: 1/1 PASS（demo DB reset後、TEST_DATABASE_URLを明示）
+full monorepo build: 3/3 PASS
+production artifact demo marker scan: 0 matches
+git diff --check: PASS
+```
 
 PR #7 merge後の`main`でfresh実行済み:
 

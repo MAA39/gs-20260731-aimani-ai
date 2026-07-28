@@ -522,7 +522,7 @@ git commit -m "feat: complete Todo from assigned work"
 - Produces: reviewed Todo Completion PR
 - Base: merge時点の最新`main`
 
-- [ ] **Step 1: full local checksを実行する**
+- [x] **Step 1: full local checksを実行する**
 
 ```bash
 pnpm --filter @amidala/api test
@@ -534,7 +534,9 @@ pnpm build
 git diff --check
 ```
 
-- [ ] **Step 2: demo runtime journeyを実行する**
+実測（2026-07-28、todo-completion worktree / e60643e）: API 13/13 PASS、Web 14/14 PASS、PostgreSQL integration 10/10 PASS、demo seed 1/1 PASS、`pnpm build` 3/3 PASS、production artifact scan 0 matches、`git diff --check` PASS。demo checkはブラウザ確認でpending Handoffが残ったため、`pnpm db:demo:reset`後に`TEST_DATABASE_URL`をローカル`amidala_demo`へ設定してfresh実行した。
+
+- [x] **Step 2: demo runtime journeyを実行する**
 
 `pnpm db:demo:reset`後、田中でTodayを開き、確認Dialogからdemo Todoを完了する。次を確認する。
 
@@ -544,6 +546,8 @@ git diff --check
 - pending Handoffを作った別Todoでは完了buttonが表示されない
 - desktop 1280x720 / mobile 390x844でdialogがviewport内
 - browser console error / hydration warning 0
+
+実測（controller実測、2026-07-28）: desktop 1280x720 / mobile 390x844とも横overflowなし。完了確認Dialogはviewport内（mobile rect left 32 / right 343 / top 324.6 / bottom 519.4）、cancel後に完了triggerへfocus復帰。田中のTodayからTodoが消え、live-region「Todoを完了しました。」を表示。森のshared workspaceでは「完了」として残り、完了TodoにHandoff依頼actionは表示されない。pending Handoff作成後は完了actionが非表示で、direct reload後も維持。browser console error / warning 0。
 
 - [ ] **Step 3: independent reviewを依頼する**
 
