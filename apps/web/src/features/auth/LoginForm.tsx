@@ -5,8 +5,8 @@ import { authClient } from './auth-client';
 
 export function LoginForm() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('owner@amidala.local');
-  const [password, setPassword] = useState('amidala-demo-2026');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,6 +24,5 @@ export function LoginForm() {
     <label>パスワード<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required autoComplete="current-password" /></label>
     {error ? <p className="field-error" role="alert" aria-live="polite">{error}</p> : null}
     <button className="primary-button login-submit" type="submit" disabled={pending}>{pending ? '確認しています…' : 'ログインする'} <ArrowRight size={17} aria-hidden="true" /></button>
-    <p className="demo-copy">デモ: owner@amidala.local / amidala-demo-2026</p>
   </form>;
 }
