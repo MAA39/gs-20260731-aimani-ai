@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- Modify only `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`; legacy Aimani AI/BYARD repositories remain read-only.
+- Modify only `<repo-root>`; legacy Aimani AI/BYARD repositories remain read-only.
 - `User` is the organization-independent person, Better Auth `Account` is a credential, and `Membership` is the only User↔Organization connection.
 - Do not use Better Auth Organization Plugin, PostgreSQL RLS, audit/outbox/Queue, Todo/Handoff tables, coverage gates, or new Cloudflare resources.
 - Web never accesses PostgreSQL. Browser-visible auth remains same-origin and all business data flows Web/BFF → Service Binding → private Hono API.

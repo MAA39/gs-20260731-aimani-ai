@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- Modify only `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`; legacy Aimani AI/BYARD repositories remain read-only.
+- Modify only `<repo-root>`; legacy Aimani AI/BYARD repositories remain read-only.
 - Use the exact domain terms `Todo`, `CurrentMembershipContext`, `Context Membership`, `Creator Membership`, and `Assignee Membership`; never use User ID as an Organization-scoped actor.
 - Browser inputs never contain `creatorMembershipId`, `userId`, or `organizationId` outside typed route params. The API derives creator from the Better Auth session and active Membership.
 - Every Todo query and write includes `organization_id`; all three Membership references use composite FKs to `(membership.id, membership.organization_id)`.

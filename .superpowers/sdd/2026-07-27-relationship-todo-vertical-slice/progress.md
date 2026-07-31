@@ -1,6 +1,6 @@
 # SDD ledger — plan: docs/superpowers/plans/2026-07-27-relationship-todo-vertical-slice.md
 
-- Workspace: `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/.worktrees/relationship-todo`
+- Workspace: `<repo-root>/.worktrees/relationship-todo`
 - Branch: `impl/relationship-todo`
 - Base: `f3612a7`
 - Baseline: API unit tests 2/2, Web typecheck, and monorepo build passed on 2026-07-27.

@@ -1,5 +1,7 @@
 # Aimani AI v2 Documentation
 
+このディレクトリには、公開デモに至るまでの**設計・検証履歴**も含まれます。内部handoffやresearchは判断の根拠として削除せず、公開時点の運用に合わせて参照してください。
+
 基準日: 2026-07-26
 対象: Aimani AI v2 と、同じ構成で立ち上げる今後のプロダクト
 
@@ -38,6 +40,8 @@ cp apps/api/.dev.vars.example apps/api/.dev.vars  # 初回だけ
 pnpm db:demo:reset
 pnpm dev
 ```
+
+公開デモの案内は [公開デモ](product/public-demo.md)、公開・更新手順は [deployment](operations/deployment.md) を参照してください。
 
 既存の `apps/api/.dev.vars` を利用している場合は、`DATABASE_URL` のデータベース名を `aimani_ai_demo` に変更する。資格情報はこのDocsへ追加しない。
 

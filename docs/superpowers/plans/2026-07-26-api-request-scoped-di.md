@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- Change only `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`.
+- Change only `<repo-root>`.
 - Add DI only; do not add PostgreSQL, Drizzle, Better Auth, Hyperdrive bindings, Queue, or external resources.
 - Awilix imports stay under `apps/api/src/composition`.
 - Root registrations are stateless singletons; `env`, `request`, and application services are request-scoped or values.

@@ -1,12 +1,12 @@
 # Claude 作業移管 — Aimani AI v2
 
 > [!IMPORTANT]
-> この文書は2026-07-27時点の統合履歴である。現在状態の正本は `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/HANDOFF-CLAUDE-2026-07-28.md`。Claude Codeは先に新正本を読むこと。
+> この文書は2026-07-27時点の統合履歴である。現在状態の正本は `<repo-root>/docs/HANDOFF-CLAUDE-2026-07-28.md`。Claude Codeは先に新正本を読むこと。
 
 - 作成日: 2026-07-27（Asia/Tokyo）
-- 履歴資料の絶対パス: `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/HANDOFF-CLAUDE-2026-07-27.md`
-- GitHub: <https://github.com/MAA39/aimani-ai-v2>
-- Todo Handoff review archive: <https://github.com/MAA39/aimani-ai-v2/pull/1>
+- 履歴資料の絶対パス: `<repo-root>/docs/HANDOFF-CLAUDE-2026-07-27.md`
+- GitHub: <https://github.com/MAA39/gs-20260731-aimani-ai>
+- Todo Handoff review archive: <https://github.com/MAA39/gs-20260731-aimani-ai/pull/1>
 - 引き継ぎ時点の branch: `main`（最終SHAは本書末尾の完了記録を正本とする）
 - 状態: Touchable MVPを`main`へ統合し、feature worktreeを撤去してから移管。Cloudflare deploy は未実施
 
@@ -14,7 +14,7 @@
 
 この履歴資料から作業を再開しない。次の文章だけを新しいClaude Codeセッションへ渡す。
 
-> `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/HANDOFF-CLAUDE-2026-07-28.md` を現在状態の正本として最初から最後まで読み、同文書の「Claude Codeへの最初の依頼」に従ってください。この2026-07-27文書は統合履歴としてのみ参照してください。
+> `<repo-root>/docs/HANDOFF-CLAUDE-2026-07-28.md` を現在状態の正本として最初から最後まで読み、同文書の「Claude Codeへの最初の依頼」に従ってください。この2026-07-27文書は統合履歴としてのみ参照してください。
 
 ## 1. 最重要の意図
 
@@ -36,23 +36,23 @@
 
 変更可能な新規プロダクト:
 
-- repository: `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`
-- 引き継ぎ時のroot: `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`
+- repository: `<repo-root>`
+- 引き継ぎ時のroot: `<repo-root>`
 - 次の実装はrootを直接汚さず、`main`から新しいfeature worktreeを切る
 
 以下は調査用であり、原則として変更しない。
 
-- `/Users/maa/Projects/gs/000_参照用/aimani-ai`
-- `/Users/maa/Projects/gs/000_参照用/aimani-ai-angular`
-- `/Users/maa/Projects/gs/000_参照用/aimani-ai-admin`
-- `/Users/maa/Projects/gs/000_参照用/aimani-ai-infra`
-- `/Users/maa/Projects/gs/000_参照用/BYARD`
-- `/Users/maa/Projects/gs/000_参照用/kakeai.next`
-- `/Users/maa/Projects/gs/000_参照用/inquiry.kakeai.com`
+- `<repo-root>/aimani-ai`
+- `<repo-root>/aimani-ai-angular`
+- `<repo-root>/aimani-ai-admin`
+- `<repo-root>/aimani-ai-infra`
+- `<repo-root>/BYARD`
+- `<repo-root>/kakeai.next`
+- `<repo-root>/inquiry.kakeai.com`
 
 ### 旧ベースworktreeのユーザー変更を保護した記録
 
-統合前のベースworktree `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2` には次のユーザー所有変更が残っていた。
+統合前のベースworktree `<repo-root>` には次のユーザー所有変更が残っていた。
 
 ```text
  M apps/web/src/features/todos/Page.tsx
@@ -73,7 +73,7 @@
 | 項目 | 値 |
 |---|---|
 | private repository | `MAA39/aimani-ai-v2` |
-| remote | `origin = https://github.com/MAA39/aimani-ai-v2.git` |
+| remote | `origin = https://github.com/MAA39/gs-20260731-aimani-ai.git` |
 | main | `289431a` |
 | Todo Handoff review | PR #1。`impl/todo-handoff` → `feat/touchable-mvp` |
 | Touchable MVP integration | PR #2。`feat/touchable-mvp` → `main` |
@@ -93,10 +93,10 @@ main（Touchable MVP統合済み）
 
 | path | branch | SHA | 用途 |
 |---|---|---|---|
-| `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2` | 統合後は`main` | 完了記録参照 | 唯一残すroot |
-| `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/.worktrees/identity-people` | `impl/identity-people` | `ccff02e` | 完了済み参照 |
-| `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/.worktrees/relationship-todo` | `impl/relationship-todo` | `9d260a9` | 完了済み参照 |
-| `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/.worktrees/todo-handoff` | `impl/todo-handoff` | この文書追加前は `61fb950` | 現在の安全な作業場所 |
+| `<repo-root>` | 統合後は`main` | 完了記録参照 | 唯一残すroot |
+| `<repo-root>/.worktrees/identity-people` | `impl/identity-people` | `ccff02e` | 完了済み参照 |
+| `<repo-root>/.worktrees/relationship-todo` | `impl/relationship-todo` | `9d260a9` | 完了済み参照 |
+| `<repo-root>/.worktrees/todo-handoff` | `impl/todo-handoff` | この文書追加前は `61fb950` | 現在の安全な作業場所 |
 
 PR #1はTodo Handoffのレビュー履歴、PR #2はTouchable MVP全体の`main`統合履歴として残す。次の作業をこれらのbranchへ継ぎ足さず、最新`main`から新しいbranch/worktreeを作る。
 
@@ -104,16 +104,16 @@ PR #1はTodo Handoffのレビュー履歴、PR #2はTouchable MVP全体の`main`
 
 ### 横断調査の正本
 
-`/Users/maa/Projects/gs/000_参照用/Docs` には Aimani AI / BYARD / TanStack Start / Next.js から抽出した横断調査がある。特に次を先に読む。
+`<repo-root>/Docs` には Aimani AI / BYARD / TanStack Start / Next.js から抽出した横断調査がある。特に次を先に読む。
 
-1. `/Users/maa/Projects/gs/000_参照用/Docs/09_next_conversation_handoff.md`
-2. `/Users/maa/Projects/gs/000_参照用/Docs/19_todo_transfer_history_exhaustive_analysis.md`
-3. `/Users/maa/Projects/gs/000_参照用/Docs/20_byard_responsibility_roles_exhaustive_analysis.md`
-4. `/Users/maa/Projects/gs/000_参照用/Docs/22_customer_commitment_os_mvp_integration_boundary.md`
-5. `/Users/maa/Projects/gs/000_参照用/Docs/23_tanstack_start_source_ledger.md`
-6. `/Users/maa/Projects/gs/000_参照用/Docs/24_tanstack_start_engineering_standard.md`
-7. `/Users/maa/Projects/gs/000_参照用/Docs/25_tanstack_start_nextjs_principles_matrix.md`
-8. `/Users/maa/Projects/gs/000_参照用/Docs/26_tanstack_start_recipes.md`
+1. `<repo-root>/Docs/09_next_conversation_handoff.md`
+2. `<repo-root>/Docs/19_todo_transfer_history_exhaustive_analysis.md`
+3. `<repo-root>/Docs/20_byard_responsibility_roles_exhaustive_analysis.md`
+4. `<repo-root>/Docs/22_customer_commitment_os_mvp_integration_boundary.md`
+5. `<repo-root>/Docs/23_tanstack_start_source_ledger.md`
+6. `<repo-root>/Docs/24_tanstack_start_engineering_standard.md`
+7. `<repo-root>/Docs/25_tanstack_start_nextjs_principles_matrix.md`
+8. `<repo-root>/Docs/26_tanstack_start_recipes.md`
 
 ### Aimani AI v2 固有Docsの読む順番
 
@@ -134,7 +134,7 @@ PR #1はTodo Handoffのレビュー履歴、PR #2はTouchable MVP全体の`main`
 - Next.js設計原則: <https://zenn.dev/akfm/books/nextjs-basic-principle>
 - TanStack Router 1年運用事例: <https://speakerdeck.com/ytaisei/tanstack-routerwo-xin-gui-purodakutode1nian-jian-yun-yong-sitemitajie-guo>
 - TanStack Start Server Functions file organization: <https://tanstack.com/start/latest/docs/framework/react/guide/server-functions>
-- ローカル参考PDF: `/Users/maa/Downloads/docswell-Z8NMGQ.pdf`
+- ローカル参考PDF: `<repo-root>/Downloads/docswell-Z8NMGQ.pdf`
 - TSKaigi 2026「TanStack Start の createServerFn で作る、型が通る API」: <https://2026.tskaigi.org/talks/25>
 - TSKaigi 2026「実践 TanStack Start：サーバーとクライアント境界の設計パターン」: <https://2026.tskaigi.org/talks/26>
 
@@ -306,8 +306,8 @@ global `/todos` と `/handoffs` のplaceholderは削除済み。Organizationが�
 
 確認済み画像:
 
-- `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/assets/todo-handoff/accepted-recent-desktop.png`
-- `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/assets/todo-handoff/request-or-incoming-mobile.png`
+- `<repo-root>/docs/assets/todo-handoff/accepted-recent-desktop.png`
+- `<repo-root>/docs/assets/todo-handoff/request-or-incoming-mobile.png`
 
 ## 10. Todo Handoff branch の実装履歴
 
@@ -377,7 +377,7 @@ Web Wrangler dry-run + Service Binding確認: PASS
 直近の再実行コマンド:
 
 ```bash
-cd /Users/maa/Projects/gs/000_参照用/aimani-ai-v2
+cd <repo-root>
 pnpm --filter @aimani-ai/web test
 pnpm --filter @aimani-ai/web exec tsc --noEmit
 pnpm build --force
@@ -419,7 +419,7 @@ BETTER_AUTH_URL
 基本操作:
 
 ```bash
-cd /Users/maa/Projects/gs/000_参照用/aimani-ai-v2
+cd <repo-root>
 pnpm install
 pnpm db:up
 pnpm db:migrate
@@ -666,7 +666,7 @@ git status: clean
 ### 最終workspace状態
 
 ```text
-root: /Users/maa/Projects/gs/000_参照用/aimani-ai-v2
+root: <repo-root>
 branch: main
 main integration SHA: d88213c368ab17febb5b88c8106793ea4e11ddf6
 worktrees: root 1件だけ

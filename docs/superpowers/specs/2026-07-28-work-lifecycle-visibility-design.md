@@ -1,7 +1,7 @@
 # Work Lifecycle Visibility Design
 
 - 日付: 2026-07-28（Asia/Tokyo）
-- 対象repository: `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`
+- 対象repository: `<repo-root>`
 - base: `b4adc5175945eb969ad4d02e4e89f2733ff36a55`
 - 状態: ユーザー承認済み
 - UI方針: モックを作らず、既存のToday、TodoCard、HandoffCard、People、Base UIの操作パターンを踏襲する

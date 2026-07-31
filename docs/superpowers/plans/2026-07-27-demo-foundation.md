@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- 変更対象は新規repository `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2` のみ。旧Aimani AI / BYARDは変更しない。
+- 変更対象は新規repository `<repo-root>` のみ。旧Aimani AI / BYARDは変更しない。
 - local demo databaseは`aimani_ai_demo`、integration databaseは`aimani_ai_handoff`。通常database`aimani-ai`をresetしない。
 - reset許可hostは`127.0.0.1`と`localhost`だけ。Hyperdriveやremote PostgreSQLを使わない。
 - demo storyは田中が担当する「顧客インタビューの論点を整理する」、説明「次回の検証で確かめたい仮説を3つに絞る」、森context、初期Handoff 0件、Todo最大3件。

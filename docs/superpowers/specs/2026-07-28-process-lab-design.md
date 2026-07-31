@@ -2,7 +2,7 @@
 
 - 日付: 2026-07-28（Asia/Tokyo）
 - status: user-approved design
-- repository: `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`
+- repository: `<repo-root>`
 - route: `/$organizationId/process-lab`
 - UI label: `工程ラボ`
 - deploy: local only。Cloudflareへdeployしない
@@ -25,10 +25,10 @@ BYARDの工程管理UIで価値があった「工程をノードとして置き�
 
 参照元:
 
-- `/Users/maa/Projects/gs/000_参照用/BYARD/backyard/src/components/workgroup/FlowOfWork.tsx`
-- `/Users/maa/Projects/gs/000_参照用/BYARD/backyard/src/components/workgroup/WorkNode.tsx`
-- `/Users/maa/Projects/gs/000_参照用/BYARD/backyard/src/components/workgroup/WorkDetail.tsx`
-- `/Users/maa/Projects/gs/000_参照用/BYARD/backyard/docs/onboarding/20260204-0005-product-introduction.md`
+- `<repo-root>/BYARD/backyard/src/components/workgroup/FlowOfWork.tsx`
+- `<repo-root>/BYARD/backyard/src/components/workgroup/WorkNode.tsx`
+- `<repo-root>/BYARD/backyard/src/components/workgroup/WorkDetail.tsx`
+- `<repo-root>/BYARD/backyard/docs/onboarding/20260204-0005-product-introduction.md`
 
 採用する:
 
@@ -51,7 +51,7 @@ BYARDの工程管理UIで価値があった「工程をノードとして置き�
 参照元:
 
 - Codex thread: `019f4ab3-36a4-7f50-a77b-c32d4fb71edb`
-- `/Users/maa/Projects/gs/gs-20260710-work-compiler` branch `feat/m2-thin-run`
+- `<repo-root>/Projects/gs/gs-20260710-work-compiler` branch `feat/m2-thin-run`
 - `docs/handoff/2026-07-27-claude-code-handoff.md`
 - `apps/web/src/components/flow/FlowCanvas.tsx`
 - `apps/web/src/components/flow/WorkNode.tsx`

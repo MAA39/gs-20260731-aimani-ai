@@ -567,10 +567,10 @@ PR title: `feat: complete assigned Todo`
 
 PR bodyにdesign link、behavior、integration counts、runtime result、Cloudflare未deployを記載する。
 
-実測: `feat/todo-completion`をpushし、small PR [#10](https://github.com/MAA39/aimani-ai-v2/pull/10) `feat: complete assigned Todo`を作成した。Cloudflare deployは未実施。
+実測: `feat/todo-completion`をpushし、small PR [#10](https://github.com/MAA39/gs-20260731-aimani-ai/pull/10) `feat: complete assigned Todo`を作成した。Cloudflare deployは未実施。
 
 - [x] **Step 6: GitHub checks後にmerge commit方式でmergeする**
 
 root mainをfast-forwardし、API/Web tests、build、artifact scanをfresh実行する。成功後にcompletion worktree、local/remote branchを削除する。
 
-実測: PR [#10](https://github.com/MAA39/aimani-ai-v2/pull/10)はmerge commit `7244f7f`で`main`へ統合済み。merge後rootでAPI 13/13、Web 14/14、build 3/3、artifact marker 0をfresh確認し、worktreeとlocal/remote branchを削除した。
+実測: PR [#10](https://github.com/MAA39/gs-20260731-aimani-ai/pull/10)はmerge commit `7244f7f`で`main`へ統合済み。merge後rootでAPI 13/13、Web 14/14、build 3/3、artifact marker 0をfresh確認し、worktreeとlocal/remote branchを削除した。

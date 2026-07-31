@@ -2,7 +2,7 @@
 
 - 日付: 2026-07-26
 - 状態: UX-first方針反映済み
-- 対象: 新規 `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`
+- 対象: 新規 `<repo-root>`
 - 既存資産: `aimani-ai`、`aimani-ai-angular`、`aimani-ai-admin`、`BYARD`は読み取り専用
 
 ## 1. 最優先事項

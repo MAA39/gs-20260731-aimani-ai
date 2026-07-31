@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- Modify only `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2` and an isolated worktree created from `feat/touchable-mvp`.
+- Modify only `<repo-root>` and an isolated worktree created from `feat/touchable-mvp`.
 - Read `docs/README.md`, the canonical spec, `docs/standards/research-before-build.md`, and `docs/standards/domain-language-and-naming.md` before implementation.
 - Use the exact domain names `TodoHandoff`, `RequestTodoHandoff`, `AcceptTodoHandoff`, `RejectTodoHandoff`, `CancelTodoHandoff`, `GetTodoHandoffWorkspace`, and `GetAssignedTodoWorkspace`.
 - Status is exactly `requested | accepted | rejected | canceled`; terminal timestamp is `resolvedAt` / `resolved_at`.

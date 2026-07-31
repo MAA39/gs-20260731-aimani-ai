@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- Modify only `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`.
+- Modify only `<repo-root>`.
 - Before every task, dispatch a read-only research agent using `docs/standards/research-before-build.md`; update the task brief from current official practices before implementation.
 - Optimize for a touchable browser experience; do not add coverage thresholds, exhaustive state tests, RLS, outbox, Queue, Webhook Worker, generic component frameworks, or speculative abstractions.
 - Keep User independent from Organization and connect them through Membership. Reserve Better Auth `Account` for credentials.

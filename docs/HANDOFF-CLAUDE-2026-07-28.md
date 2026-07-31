@@ -1,9 +1,9 @@
 # Claude Code 作業移管 — Aimani AI v2 最終正本
 
 - 更新日: 2026-07-28（Asia/Tokyo）
-- 正本の絶対パス: `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/HANDOFF-CLAUDE-2026-07-28.md`
-- repository: `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`
-- GitHub: <https://github.com/MAA39/aimani-ai-v2>
+- 正本の絶対パス: `<repo-root>/docs/HANDOFF-CLAUDE-2026-07-28.md`
+- repository: `<repo-root>`
+- GitHub: <https://github.com/MAA39/gs-20260731-aimani-ai>
 - コード統合merge SHA: `4f446b4`（Team Work Overviewをlocal `main`へ統合。最終Docs commitはこの後）
 - deploy: Cloudflareへ未deploy。production DB mutationも未実施
 - 移管方針: Codexは本書をmergeしてworkspaceをcleanにした後、機能開発を停止する
@@ -12,7 +12,7 @@
 
 次を新しいClaude Codeセッションの最初の依頼として使う。
 
-> `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/HANDOFF-CLAUDE-2026-07-28.md` を最初から最後まで読み、必読資料を指定順に読んでください。この文書を現在状態の正本としてください。まずread-onlyでrootが`main`、clean、単一worktreeであることと、local `main`が`origin/main` (`ee9b567`)よりTeam Work OverviewとDocsのcommit分だけaheadであることを確認してください。ユーザーの明示指示によりこの差分はpushしていません。`archive/pre-todo-handoff-local-20260727`をmerge・削除しないでください。次に`http://localhost:5173/org_acme_studio/work`と`/today`をdesktop 1280x720 / mobile 390x844で操作し、田中groupの対応中→森の確認待ち→森groupへ責任移動→最近完了のjourneyを確認してください。「誰の作業が今どこでどうなっているか」が本当に素早く分かるかをユーザーと評価し、一般的なCRUDや管理ダッシュボードを増やさないでください。既存Aimani AI/BYARDは読み取り専用です。変更は必要とユーザーが合意した一つのjourneyに絞り、実装前に公式資料と現行コードを調査してください。
+> `<repo-root>/docs/HANDOFF-CLAUDE-2026-07-28.md` を最初から最後まで読み、必読資料を指定順に読んでください。この文書を現在状態の正本としてください。まずread-onlyでrootが`main`、clean、単一worktreeであることと、local `main`が`origin/main` (`ee9b567`)よりTeam Work OverviewとDocsのcommit分だけaheadであることを確認してください。ユーザーの明示指示によりこの差分はpushしていません。`archive/pre-todo-handoff-local-20260727`をmerge・削除しないでください。次に`http://localhost:5173/org_acme_studio/work`と`/today`をdesktop 1280x720 / mobile 390x844で操作し、田中groupの対応中→森の確認待ち→森groupへ責任移動→最近完了のjourneyを確認してください。「誰の作業が今どこでどうなっているか」が本当に素早く分かるかをユーザーと評価し、一般的なCRUDや管理ダッシュボードを増やさないでください。既存Aimani AI/BYARDは読み取り専用です。変更は必要とユーザーが合意した一つのjourneyに絞り、実装前に公式資料と現行コードを調査してください。
 
 ## 1. ユーザーの期待値
 
@@ -36,17 +36,17 @@ coverage、テスト数、形式的完全性、細部だけのレビューは成
 
 変更対象:
 
-- `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`
+- `<repo-root>`
 
 調査専用。原則変更しない:
 
-- `/Users/maa/Projects/gs/000_参照用/aimani-ai`
-- `/Users/maa/Projects/gs/000_参照用/aimani-ai-angular`
-- `/Users/maa/Projects/gs/000_参照用/aimani-ai-admin`
-- `/Users/maa/Projects/gs/000_参照用/aimani-ai-infra`
-- `/Users/maa/Projects/gs/000_参照用/BYARD`
-- `/Users/maa/Projects/gs/000_参照用/kakeai.next`
-- `/Users/maa/Projects/gs/000_参照用/inquiry.kakeai.com`
+- `<repo-root>/aimani-ai`
+- `<repo-root>/aimani-ai-angular`
+- `<repo-root>/aimani-ai-admin`
+- `<repo-root>/aimani-ai-infra`
+- `<repo-root>/BYARD`
+- `<repo-root>/kakeai.next`
+- `<repo-root>/inquiry.kakeai.com`
 
 保護対象:
 
@@ -60,17 +60,17 @@ coverage、テスト数、形式的完全性、細部だけのレビューは成
 
 | PR | 内容 | 状態 / merge commit |
 |---|---|---|
-| [#1](https://github.com/MAA39/aimani-ai-v2/pull/1) | Todo Handoff review | merged / `5b5b819` |
-| [#2](https://github.com/MAA39/aimani-ai-v2/pull/2) | Touchable MVP → main | merged / `d88213c` |
-| [#3](https://github.com/MAA39/aimani-ai-v2/pull/3) | 3分間Handoff demo仕様 | merged |
-| [#4](https://github.com/MAA39/aimani-ai-v2/pull/4) | 決定論的demo DB / hydration | merged |
-| [#5](https://github.com/MAA39/aimani-ai-v2/pull/5) | development-only Actor Switch | merged |
-| [#6](https://github.com/MAA39/aimani-ai-v2/pull/6) | stale Web build artifact除去 | merged / `344ae3d` |
-| [#7](https://github.com/MAA39/aimani-ai-v2/pull/7) | Today responsibility workspace | merged / `18366d9` |
-| [#8](https://github.com/MAA39/aimani-ai-v2/pull/8) | 本書とlocal runtime証跡 | merged / `b4adc51` |
-| [#9](https://github.com/MAA39/aimani-ai-v2/pull/9) | Work lifecycle visibility設計 | merged / `8461e8a` |
-| [#10](https://github.com/MAA39/aimani-ai-v2/pull/10) | Todo Completion | merged / `7244f7f` |
-| [#11](https://github.com/MAA39/aimani-ai-v2/pull/11) | Handoff Next Action | merged / `ee9b567` |
+| [#1](https://github.com/MAA39/gs-20260731-aimani-ai/pull/1) | Todo Handoff review | merged / `5b5b819` |
+| [#2](https://github.com/MAA39/gs-20260731-aimani-ai/pull/2) | Touchable MVP → main | merged / `d88213c` |
+| [#3](https://github.com/MAA39/gs-20260731-aimani-ai/pull/3) | 3分間Handoff demo仕様 | merged |
+| [#4](https://github.com/MAA39/gs-20260731-aimani-ai/pull/4) | 決定論的demo DB / hydration | merged |
+| [#5](https://github.com/MAA39/gs-20260731-aimani-ai/pull/5) | development-only Actor Switch | merged |
+| [#6](https://github.com/MAA39/gs-20260731-aimani-ai/pull/6) | stale Web build artifact除去 | merged / `344ae3d` |
+| [#7](https://github.com/MAA39/gs-20260731-aimani-ai/pull/7) | Today responsibility workspace | merged / `18366d9` |
+| [#8](https://github.com/MAA39/gs-20260731-aimani-ai/pull/8) | 本書とlocal runtime証跡 | merged / `b4adc51` |
+| [#9](https://github.com/MAA39/gs-20260731-aimani-ai/pull/9) | Work lifecycle visibility設計 | merged / `8461e8a` |
+| [#10](https://github.com/MAA39/gs-20260731-aimani-ai/pull/10) | Todo Completion | merged / `7244f7f` |
+| [#11](https://github.com/MAA39/gs-20260731-aimani-ai/pull/11) | Handoff Next Action | merged / `ee9b567` |
 | local only | Team Work Overview | reviewed / runtime PASS / push・PRなし |
 
 PR #6ではTurbo cache hit時に既存`apps/web/dist`へ古いhashed assetが残り、過去のdemo credential bundleが復元される問題を修正した。root buildが明示的にWeb distをpruneしてからTurbo restoreする。
@@ -127,7 +127,7 @@ Team Work Overviewとこの最終Docsはユーザー指示によりlocal merge�
 
 証跡の詳細:
 
-- `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/research/2026-07-28-today-runtime-verification.md`
+- `<repo-root>/docs/research/2026-07-28-today-runtime-verification.md`
 
 ローカル`aimani_ai_demo`をreset後、実画面と同じ経路で次を完走した。
 
@@ -165,7 +165,7 @@ HTTP runtimeが通ったことを、視覚・操作・価値仮説の検証済�
 
 詳細証跡:
 
-- `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/research/2026-07-28-team-work-overview-runtime-verification.md`
+- `<repo-root>/docs/research/2026-07-28-team-work-overview-runtime-verification.md`
 
 local `aimani_ai_demo`をreset後、田中から森へHandoff依頼、森が次の一手付きでaccept、森がTodo完了までを実ブラウザで完走した。
 
@@ -185,7 +185,7 @@ runtimeで、Query keyだけが必要なclient componentからServer Functionを
 ## 7. ローカル起動と再現
 
 ```bash
-cd /Users/maa/Projects/gs/000_参照用/aimani-ai-v2
+cd <repo-root>
 docker compose up -d postgres
 pnpm db:demo:reset
 pnpm dev
@@ -193,11 +193,11 @@ pnpm dev
 
 必要なignored設定:
 
-- `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/apps/api/.dev.vars`
+- `<repo-root>/apps/api/.dev.vars`
   - `DATABASE_URL`はlocal host port `54329`の`aimani_ai_demo`を向く
   - `BETTER_AUTH_SECRET`
   - `BETTER_AUTH_URL`
-- `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/apps/web/.env.development.local`
+- `<repo-root>/apps/web/.env.development.local`
   - `VITE_DEMO_ACTOR_PASSWORD`
 
 値は本書へ記載しない。現在のrootには両方存在し、Git管理外である。設定を変えた後は`pnpm dev`を再起動し、Workerへ読み直させる。
@@ -370,36 +370,36 @@ Team Work Overviewの不変条件:
 
 必読:
 
-- `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/design/foundation.md`
-- `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/product/legacy-ux-audit.md`
-- `/Users/maa/Projects/gs/000_参照用/Docs/19_todo_transfer_history_exhaustive_analysis.md`
-- `/Users/maa/Projects/gs/000_参照用/Docs/20_byard_responsibility_roles_exhaustive_analysis.md`
+- `<repo-root>/docs/design/foundation.md`
+- `<repo-root>/docs/product/legacy-ux-audit.md`
+- `<repo-root>/Docs/19_todo_transfer_history_exhaustive_analysis.md`
+- `<repo-root>/Docs/20_byard_responsibility_roles_exhaustive_analysis.md`
 
 ## 12. 技術・実装の必読資料
 
 順番:
 
-1. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/README.md`
-2. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/standards/reusable-product-baseline.md`
-3. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/standards/research-before-build.md`
-4. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/standards/react-tanstack-practices.md`
-5. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/standards/domain-language-and-naming.md`
-6. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/decisions/0001-technology-selection-2026-07-26.md`
-7. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/superpowers/specs/2026-07-26-aimani-ai-v2-platform-design.md`
-8. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/superpowers/specs/2026-07-27-three-minute-handoff-demo-design.md`
-9. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/superpowers/plans/2026-07-28-today-workspace.md`
-10. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/research/2026-07-28-today-runtime-verification.md`
-11. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/superpowers/specs/2026-07-28-work-lifecycle-visibility-design.md`
-12. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/superpowers/plans/2026-07-28-team-work-overview.md`
-13. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/research/2026-07-28-team-work-overview-runtime-verification.md`
+1. `<repo-root>/docs/README.md`
+2. `<repo-root>/docs/standards/reusable-product-baseline.md`
+3. `<repo-root>/docs/standards/research-before-build.md`
+4. `<repo-root>/docs/standards/react-tanstack-practices.md`
+5. `<repo-root>/docs/standards/domain-language-and-naming.md`
+6. `<repo-root>/docs/decisions/0001-technology-selection-2026-07-26.md`
+7. `<repo-root>/docs/superpowers/specs/2026-07-26-aimani-ai-v2-platform-design.md`
+8. `<repo-root>/docs/superpowers/specs/2026-07-27-three-minute-handoff-demo-design.md`
+9. `<repo-root>/docs/superpowers/plans/2026-07-28-today-workspace.md`
+10. `<repo-root>/docs/research/2026-07-28-today-runtime-verification.md`
+11. `<repo-root>/docs/superpowers/specs/2026-07-28-work-lifecycle-visibility-design.md`
+12. `<repo-root>/docs/superpowers/plans/2026-07-28-team-work-overview.md`
+13. `<repo-root>/docs/research/2026-07-28-team-work-overview-runtime-verification.md`
 
 横断調査:
 
-- `/Users/maa/Projects/gs/000_参照用/Docs/23_tanstack_start_source_ledger.md`
-- `/Users/maa/Projects/gs/000_参照用/Docs/24_tanstack_start_engineering_standard.md`
-- `/Users/maa/Projects/gs/000_参照用/Docs/25_tanstack_start_nextjs_principles_matrix.md`
-- `/Users/maa/Projects/gs/000_参照用/Docs/26_tanstack_start_recipes.md`
-- `/Users/maa/Downloads/docswell-Z8NMGQ.pdf`
+- `<repo-root>/Docs/23_tanstack_start_source_ledger.md`
+- `<repo-root>/Docs/24_tanstack_start_engineering_standard.md`
+- `<repo-root>/Docs/25_tanstack_start_nextjs_principles_matrix.md`
+- `<repo-root>/Docs/26_tanstack_start_recipes.md`
+- `<repo-root>/Downloads/docswell-Z8NMGQ.pdf`
 
 新しい判断では2026-07-28時点の記録を盲信せず、実装直前に現在の公式一次資料を確認する。外部記事は発想の根拠、公式Docsと実コードは技術事実の根拠として扱う。
 

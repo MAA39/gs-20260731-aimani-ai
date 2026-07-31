@@ -1,7 +1,7 @@
 # Team Work Overview local runtime verification
 
 - 日付: 2026-07-28（Asia/Tokyo）
-- repository: `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`
+- repository: `<repo-root>`
 - 実装branch基準: `6b7da4f`
 - 対象: `/$organizationId/work`（UI表示: `チームのボール`）
 - deploy: Cloudflareへは未deploy。local `aimani_ai_demo` PostgreSQLだけを使用
