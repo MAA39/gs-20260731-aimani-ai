@@ -14,7 +14,7 @@
 ## アーキテクチャ
 
 ```text
-TanStack Start Web Worker --Service Binding/RPC--> Hono API Worker --Hyperdrive--> 専用Supabase PostgreSQL
+TanStack Start Web Worker --Service Binding/RPC--> Hono API Worker --Hyperdrive--> 専用PlanetScale Postgres
              ↘ shared contracts / API client
 ```
 
@@ -52,6 +52,7 @@ Process Lab は仮説検証のための試験機能であり、後で削除で�
 ```bash
 pnpm --filter @aimani-ai/api test
 pnpm --filter @aimani-ai/web test
+pnpm --filter @aimani-ai/db test
 pnpm build
 ```
 
