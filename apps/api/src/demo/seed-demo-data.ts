@@ -1,5 +1,5 @@
 import { createNodePgDatabase } from '@aimani-ai/db/client';
-import { resolveDatabaseUrl, type ApiBindings } from '../config/env';
+import type { ApiBindings } from '../config/env';
 import * as schema from '@aimani-ai/db/schema';
 import { createAuth } from '../auth/create-auth';
 import { eq } from 'drizzle-orm';
@@ -16,7 +16,7 @@ function requireMembershipId(rows: MembershipRow[], organizationId: string, user
   return membership.id;
 }
 
-export async function seedDevelopmentData(databaseUrl: string): Promise<void> {
+export async function seedDemoData(databaseUrl: string): Promise<void> {
   const env = process.env as unknown as ApiBindings;
   const resource = createNodePgDatabase(databaseUrl); await resource.client.connect();
   try {

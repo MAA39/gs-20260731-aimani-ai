@@ -1,7 +1,7 @@
 import { createNodePgDatabase } from '@aimani-ai/db/client'
 import { migrateDatabase } from '@aimani-ai/db/migrations'
 import { deriveLocalDemoDatabaseUrl, assertLocalDemoDatabaseUrl } from './demo-database-url'
-import { seedDevelopmentData } from './seed-development-data'
+import { seedDemoData } from '../demo/seed-demo-data'
 
 const source = process.env.DATABASE_URL
 if (!source) throw new Error('DATABASE_URL is required.')
@@ -30,5 +30,5 @@ try {
 }
 
 await migrateDatabase(target.toString())
-await seedDevelopmentData(target.toString())
+await seedDemoData(target.toString())
 console.log('Demo database reset complete: aimani_ai_demo')

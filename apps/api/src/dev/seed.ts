@@ -1,5 +1,5 @@
 import { resolveDatabaseUrl, type ApiBindings } from '../config/env';
-import { seedDevelopmentData } from './seed-development-data';
+import { seedDemoData } from '../demo/seed-demo-data';
 
 const env = process.env as unknown as ApiBindings;
-await seedDevelopmentData(resolveDatabaseUrl(env));
+await seedDemoData(resolveDatabaseUrl(env));

@@ -7,8 +7,9 @@
     "build": "pnpm clean:web:build && turbo run build",
     "clean:web:build": "node --eval \"require('node:fs').rmSync('apps/web/dist', { recursive: true, force: true })\"",
     "db:up": "docker compose up -d postgres",
-    "db:migrate": "node --env-file=apps/api/.dev.vars --import tsx packages/db/src/migrate.ts",
+    "db:migrate": "node --import tsx packages/db/src/migrate.ts",
     "db:demo:reset": "node --env-file=apps/api/.dev.vars --import tsx apps/api/src/dev/reset-demo-database.ts",
+    "db:public:seed": "node --import tsx apps/api/src/operations/seed-public-demo.ts",
     "db:down": "docker compose down",
     "db:seed": "node --env-file=apps/api/.dev.vars --import tsx apps/api/src/dev/seed.ts"
   },
