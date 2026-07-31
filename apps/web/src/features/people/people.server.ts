@@ -2,19 +2,14 @@ import '@tanstack/react-start/server-only';
 import { createApiClient } from '@aimani-ai/api-client';
 import { listPeopleResponseSchema, type GetPeopleResult } from '@aimani-ai/contracts';
 import type { PeopleInput } from './people-schema';
-import { env } from 'cloudflare:workers';
 import { getRequestHeader } from '@tanstack/react-start/server';
 import { redirect } from '@tanstack/react-router';
 import { peopleFailureMessage } from './people-error-presentation';
+import { createApiFetcher } from '../server/api-fetcher.server';
 
 export async function getPeopleFromApi({ organizationId }: PeopleInput): Promise<GetPeopleResult> {
   const cookie = getRequestHeader('cookie') ?? '';
-  const apiBinding = env.API;
-  const fetcher: typeof fetch = async (input, init) => {
-    const headers = new Headers(init?.headers);
-    if (cookie) headers.set('cookie', cookie);
-    return apiBinding.fetch(new Request(input, { ...init, headers }));
-  };
+  const fetcher = createApiFetcher(cookie);
   // Hono's inferred client shape collapses the `/people` collection when a
   // parameterized `/people/:contextMembershipId/todos` sibling is present.
   // Keep the endpoint typed locally until the client generator can represent

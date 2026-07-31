@@ -1,8 +1,10 @@
 import '@tanstack/react-start/server-only';
 import { env } from 'cloudflare:workers';
+import { mockApiFetch } from './mock-api.server';
 
 export function createApiFetcher(cookie: string): typeof fetch {
   return async (input, init) => {
+    if (import.meta.env.PROD) return mockApiFetch(input, init);
     const headers = new Headers(init?.headers);
     if (cookie) headers.set('cookie', cookie);
     return env.API.fetch(new Request(input, { ...init, headers }));
