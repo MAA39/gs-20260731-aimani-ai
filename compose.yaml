@@ -4,11 +4,11 @@ services:
     ports:
       - "54329:5432"
     environment:
-      POSTGRES_USER: amidala
-      POSTGRES_PASSWORD: amidala
-      POSTGRES_DB: amidala
+      POSTGRES_USER: aimani_ai
+      POSTGRES_PASSWORD: aimani_ai
+      POSTGRES_DB: aimani_ai
     volumes:
-      - amidala-postgres-data:/var/lib/postgresql/data
+      - aimani_ai-postgres-data:/var/lib/postgresql/data
 
 volumes:
-  amidala-postgres-data:
+  aimani_ai-postgres-data:

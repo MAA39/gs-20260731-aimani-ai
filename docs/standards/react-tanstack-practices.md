@@ -1,6 +1,6 @@
 # React 19 / TanStack 実装プラクティス
 
-調査日: 2026-07-26  
+調査日: 2026-07-26
 対象 version: React 19.1.1、TanStack Router 1.170.18、TanStack Start 1.168.32
 
 ## 中心原則
@@ -65,7 +65,7 @@ DOM widget、subscription、analytics表示など外部systemとの同期?
 - `useCallback`: memoized child や external subscription が参照同一性を要求する箇所だけ。
 - `useSyncExternalStore`: browser APIや外部storeの購読。通常のserver stateには使わない。
 
-## Amidala v2 の次スライス
+## Aimani AI v2 の次スライス
 
 ### Login / Organization
 

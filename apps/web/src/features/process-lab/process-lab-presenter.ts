@@ -3,7 +3,7 @@ import type {
   ProcessLabWorkspace,
   ProcessStep,
   StepDependency,
-} from '@amidala/contracts';
+} from '@aimani-ai/contracts';
 
 export type StepAvailability = 'ready' | 'waiting' | 'completed';
 export type ResponsibilityPathRole =

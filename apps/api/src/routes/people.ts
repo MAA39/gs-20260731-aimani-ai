@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import type { ApiEnv } from '../app';
 import { ApiError } from '../errors/api-error';
-import { listPeopleInputSchema } from '@amidala/contracts';
+import { listPeopleInputSchema } from '@aimani-ai/contracts';
 export function createPeopleRoutes() {
   return new Hono<ApiEnv>().get('/organizations/:organizationId/people', async (c) => {
     const parsed = listPeopleInputSchema.safeParse({ organizationId: c.req.param('organizationId') });

@@ -1,14 +1,14 @@
 # Work Lifecycle Visibility Design
 
 - 日付: 2026-07-28（Asia/Tokyo）
-- 対象repository: `/Users/maa/Projects/gs/000_参照用/amidala-v2`
+- 対象repository: `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`
 - base: `b4adc5175945eb969ad4d02e4e89f2733ff36a55`
 - 状態: ユーザー承認済み
 - UI方針: モックを作らず、既存のToday、TodoCard、HandoffCard、People、Base UIの操作パターンを踏襲する
 
 ## 1. 背景
 
-現在のAmidala v2では、Todoを作り、現在担当者から別MembershipへHandoffを依頼し、相手が受け入れるところまで触れる。Todayでは、自分への依頼、自分が持つボール、相手の確認待ち、最近動いたボールを確認できる。
+現在のAimani AI v2では、Todoを作り、現在担当者から別MembershipへHandoffを依頼し、相手が受け入れるところまで触れる。Todayでは、自分への依頼、自分が持つボール、相手の確認待ち、最近動いたボールを確認できる。
 
 一方、次の3点が欠けている。
 

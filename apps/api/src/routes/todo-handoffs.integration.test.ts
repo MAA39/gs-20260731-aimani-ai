@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import pg from 'pg';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { completeTodoResponseSchema, sharedTodoWorkspaceSchema, todoHandoffWorkspaceSchema, todoSummarySchema } from '@amidala/contracts';
+import { completeTodoResponseSchema, sharedTodoWorkspaceSchema, todoHandoffWorkspaceSchema, todoSummarySchema } from '@aimani-ai/contracts';
 import { createApp } from '../app';
 
 const env = {
@@ -63,7 +63,7 @@ describe('Todo Handoff API', () => {
     const response = await app.fetch(new Request('http://localhost:8787/api/auth/sign-in/email', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email, password: 'amidala-demo-2026' }),
+      body: JSON.stringify({ email, password: 'aimani-ai-demo-2026' }),
     }), env);
     expect(response.status).toBe(200);
     return response.headers.getSetCookie().join('; ');
@@ -225,7 +225,7 @@ describe('Todo Handoff API', () => {
   };
 
   it('lets only the current assignee complete an open Todo and removes it from assigned work', async () => {
-    const ownerCookie = await signIn('owner@amidala.local');
+    const ownerCookie = await signIn('owner@aimani-ai.local');
     const todo = await createTodo(ownerCookie);
     const completed = await completeTodo(ownerCookie, todo.todoId);
     expect(completed.status).toBe(200);
@@ -235,8 +235,8 @@ describe('Todo Handoff API', () => {
   });
 
   it('keeps Todo completion idempotent for the assignee and forbidden for another Member', async () => {
-    const ownerCookie = await signIn('owner@amidala.local');
-    const moriCookie = await signIn('mori@amidala.local');
+    const ownerCookie = await signIn('owner@aimani-ai.local');
+    const moriCookie = await signIn('mori@aimani-ai.local');
     const todo = await createTodo(ownerCookie);
     expect((await completeTodo(moriCookie, todo.todoId)).status).toBe(403);
     expect((await completeTodo(ownerCookie, todo.todoId)).status).toBe(200);
@@ -246,7 +246,7 @@ describe('Todo Handoff API', () => {
   });
 
   it('does not complete a Todo while its Handoff is waiting for a decision', async () => {
-    const ownerCookie = await signIn('owner@amidala.local');
+    const ownerCookie = await signIn('owner@aimani-ai.local');
     const todo = await createTodo(ownerCookie);
     const requested = await requestHandoff(ownerCookie, todo.todoId, { recipientMembershipId: 'acme-studio-mori' });
     const result = await completeTodo(ownerCookie, todo.todoId);
@@ -256,16 +256,16 @@ describe('Todo Handoff API', () => {
   });
 
   it('does not disclose a Todo through another Organization path', async () => {
-    const ownerCookie = await signIn('owner@amidala.local');
-    const northstarCookie = await signIn('suzuki@amidala.local');
+    const ownerCookie = await signIn('owner@aimani-ai.local');
+    const northstarCookie = await signIn('suzuki@aimani-ai.local');
     const todo = await createTodo(ownerCookie);
     expect((await completeTodo(northstarCookie, todo.todoId, 'org_northstar_lab')).status).toBe(404);
     expect((await completeTodo(northstarCookie, todo.todoId, 'org_acme_studio')).status).toBe(403);
   });
 
   it('moves responsibility only when the recipient accepts the Todo Handoff', async () => {
-    const ownerCookie = await signIn('owner@amidala.local');
-    const moriCookie = await signIn('mori@amidala.local');
+    const ownerCookie = await signIn('owner@aimani-ai.local');
+    const moriCookie = await signIn('mori@aimani-ai.local');
     const todo = await createTodo(ownerCookie);
 
     const requested = await requestHandoff(ownerCookie, todo.todoId, {
@@ -299,8 +299,8 @@ describe('Todo Handoff API', () => {
   });
 
   it('stores the recipient next action with acceptance without overwriting it on retry', async () => {
-    const ownerCookie = await signIn('owner@amidala.local');
-    const moriCookie = await signIn('mori@amidala.local');
+    const ownerCookie = await signIn('owner@aimani-ai.local');
+    const moriCookie = await signIn('mori@aimani-ai.local');
     const todo = await createTodo(ownerCookie);
     const handoffId = await requestHandoffId(ownerCookie, todo.todoId);
 
@@ -319,8 +319,8 @@ describe('Todo Handoff API', () => {
   });
 
   it('stores null next action when acceptance has no body or only blanks', async () => {
-    const ownerCookie = await signIn('owner@amidala.local');
-    const moriCookie = await signIn('mori@amidala.local');
+    const ownerCookie = await signIn('owner@aimani-ai.local');
+    const moriCookie = await signIn('mori@aimani-ai.local');
     for (const body of [undefined, { nextAction: '   ' }]) {
       const todo = await createTodo(ownerCookie);
       const requested = await requestHandoff(ownerCookie, todo.todoId, { recipientMembershipId: 'acme-studio-mori' });
@@ -331,8 +331,8 @@ describe('Todo Handoff API', () => {
   });
 
   it('ignores next action bodies on reject and cancel', async () => {
-    const ownerCookie = await signIn('owner@amidala.local');
-    const moriCookie = await signIn('mori@amidala.local');
+    const ownerCookie = await signIn('owner@aimani-ai.local');
+    const moriCookie = await signIn('mori@aimani-ai.local');
 
     const rejectedTodo = await createTodo(ownerCookie);
     const rejectedRequest = await requestHandoff(ownerCookie, rejectedTodo.todoId, { recipientMembershipId: 'acme-studio-mori' });
@@ -355,8 +355,8 @@ describe('Todo Handoff API', () => {
     ['null body', null],
     ['array body', []],
   ])('rejects %s acceptance input without changing the pending handoff', async (_label, body) => {
-    const ownerCookie = await signIn('owner@amidala.local');
-    const moriCookie = await signIn('mori@amidala.local');
+    const ownerCookie = await signIn('owner@aimani-ai.local');
+    const moriCookie = await signIn('mori@aimani-ai.local');
     const todo = await createTodo(ownerCookie);
     const handoffId = await requestHandoffId(ownerCookie, todo.todoId);
 
@@ -374,8 +374,8 @@ describe('Todo Handoff API', () => {
   });
 
   it('does not allow a non-recipient to save a next action', async () => {
-    const ownerCookie = await signIn('owner@amidala.local');
-    const moriCookie = await signIn('mori@amidala.local');
+    const ownerCookie = await signIn('owner@aimani-ai.local');
+    const moriCookie = await signIn('mori@aimani-ai.local');
     const todo = await createTodo(ownerCookie);
     const requested = await requestHandoff(ownerCookie, todo.todoId, { recipientMembershipId: 'acme-studio-mori' });
     const handoffId = requested.handoff?.handoffId ?? '';
@@ -390,9 +390,9 @@ describe('Todo Handoff API', () => {
   });
 
   it('serializes competing decisions, rejects another Organization, and allows cancellation', async () => {
-    const ownerCookie = await signIn('owner@amidala.local');
-    const satoCookie = await signIn('sato@amidala.local');
-    const suzukiCookie = await signIn('suzuki@amidala.local');
+    const ownerCookie = await signIn('owner@aimani-ai.local');
+    const satoCookie = await signIn('sato@aimani-ai.local');
+    const suzukiCookie = await signIn('suzuki@aimani-ai.local');
     const todo = await createTodo(ownerCookie);
     const requested = await requestHandoff(ownerCookie, todo.todoId, {
       recipientMembershipId: 'acme-studio-sato',
@@ -434,7 +434,7 @@ describe('Todo Handoff API', () => {
   });
 
   it('shows only Handoffs involving the current Member before applying the recent limit', async () => {
-    const ownerCookie = await signIn('owner@amidala.local');
+    const ownerCookie = await signIn('owner@aimani-ai.local');
     const fixtureId = randomUUID();
     const db = new pg.Client({ connectionString: env.DATABASE_URL });
     await db.connect();
@@ -509,7 +509,7 @@ describe('Todo Handoff API', () => {
   });
 
   it('does not include completed Todos in the Assigned Todo workspace', async () => {
-    const ownerCookie = await signIn('owner@amidala.local');
+    const ownerCookie = await signIn('owner@aimani-ai.local');
     const completedTodo = await createTodo(ownerCookie);
     const db = new pg.Client({ connectionString: env.DATABASE_URL });
     await db.connect();
@@ -547,7 +547,7 @@ describe('Todo Handoff API', () => {
         [`handoff-team-work-${fixtureId}`, ownerTodoId, new Date('2099-01-01T00:03:00.000Z')],
       );
 
-      const response = await getTeamWork(await signIn('mori@amidala.local'));
+      const response = await getTeamWork(await signIn('mori@aimani-ai.local'));
       expect(response.status).toBe(200);
       const overview = teamWorkOverviewSchema.parse(response.body);
       expect(overview.currentMember.membershipId).toBe('acme-studio-mori');
@@ -605,7 +605,7 @@ describe('Todo Handoff API', () => {
         updatedAt: new Date('2099-01-02T00:04:00.000Z'),
       });
 
-      const response = await getTeamWork(await signIn('mori@amidala.local'));
+      const response = await getTeamWork(await signIn('mori@aimani-ai.local'));
       expect(response.status).toBe(200);
       const overview = teamWorkOverviewSchema.parse(response.body);
       const openTodos = overview.members.flatMap((group) => group.openTodos);
@@ -623,7 +623,7 @@ describe('Todo Handoff API', () => {
   });
 
   it('returns forbidden when a Northstar Member requests the Acme overview', async () => {
-    const response = await getTeamWork(await signIn('suzuki@amidala.local'), 'org_acme_studio');
+    const response = await getTeamWork(await signIn('suzuki@aimani-ai.local'), 'org_acme_studio');
     expect(response.status).toBe(403);
   });
 
@@ -664,7 +664,7 @@ describe('Todo Handoff API', () => {
         updatedAt: new Date('2099-01-03T00:01:00.000Z'),
       });
 
-      const response = await getTeamWork(await signIn('owner@amidala.local'));
+      const response = await getTeamWork(await signIn('owner@aimani-ai.local'));
       expect(response.status).toBe(200);
       const overview = teamWorkOverviewSchema.parse(response.body);
       const membershipIds = overview.members.map((group) => group.member.membershipId);
@@ -708,7 +708,7 @@ describe('Todo Handoff API', () => {
         updatedAt: new Date('2099-01-04T00:03:00.000Z'),
       });
 
-      const response = await getTeamWork(await signIn('owner@amidala.local'));
+      const response = await getTeamWork(await signIn('owner@aimani-ai.local'));
       expect(response.status).toBe(200);
       const overview = teamWorkOverviewSchema.parse(response.body);
       expect(overview.members
@@ -748,7 +748,7 @@ describe('Todo Handoff API', () => {
         completedTodoIds[19],
         ...completedTodoIds.slice(1, 19).reverse(),
       ];
-      const response = await getTeamWork(await signIn('owner@amidala.local'));
+      const response = await getTeamWork(await signIn('owner@aimani-ai.local'));
       expect(response.status).toBe(200);
       const overview = teamWorkOverviewSchema.parse(response.body);
       expect(overview.recentlyCompletedTodos).toHaveLength(20);

@@ -1,5 +1,5 @@
-import { teamWorkOverviewSchema } from '@amidala/contracts';
-import type { TeamWorkOverview } from '@amidala/contracts';
+import { teamWorkOverviewSchema } from '@aimani-ai/contracts';
+import type { TeamWorkOverview } from '@aimani-ai/contracts';
 import { z } from 'zod';
 
 export const teamWorkOverviewInputSchema = z.object({

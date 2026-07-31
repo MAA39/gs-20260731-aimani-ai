@@ -1,6 +1,6 @@
 import { CheckCircle2 } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
-import type { MemberSummary } from '@amidala/contracts';
+import type { MemberSummary } from '@aimani-ai/contracts';
 
 const labels: Record<string, string> = { manager_report: '直属の部下', supporter: 'サポートする人', peer: '同僚' };
 export function PersonCard({ person, organizationId }: { person: MemberSummary; organizationId: string }) {

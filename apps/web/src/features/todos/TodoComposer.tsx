@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState, type RefObject } from 'react';
 import { createSharedTodo } from './todos.functions';
 import { createSharedTodoInputSchema } from './todo-schema';
-import type { SharedTodoWorkspace } from '@amidala/contracts';
+import type { SharedTodoWorkspace } from '@aimani-ai/contracts';
 
 export function TodoComposer({ workspace, titleInputRef }: { workspace: SharedTodoWorkspace; titleInputRef: RefObject<HTMLInputElement | null> }) {
   const formRef = useRef<HTMLFormElement>(null);

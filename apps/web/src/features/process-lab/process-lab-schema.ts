@@ -1,4 +1,4 @@
-import { processLabWorkspaceSchema, type ProcessLabWorkspace } from '@amidala/contracts';
+import { processLabWorkspaceSchema, type ProcessLabWorkspace } from '@aimani-ai/contracts';
 import { z } from 'zod';
 
 export const processLabInputSchema = z.object({

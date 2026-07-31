@@ -1,1 +1,1 @@
-{ "name": "amidala-web", "main": "src/server.ts", "compatibility_date": "2026-06-24", "compatibility_flags": ["nodejs_compat"], "assets": { "directory": "dist/client" }, "services": [{ "binding": "API", "service": "amidala-api" }] }
+{ "name": "gs-20260731-aimani-ai-web", "main": "src/server.ts", "compatibility_date": "2026-06-24", "compatibility_flags": ["nodejs_compat"], "assets": { "directory": "dist/client" }, "services": [{ "binding": "API", "service": "gs-20260731-aimani-ai-api" }] }

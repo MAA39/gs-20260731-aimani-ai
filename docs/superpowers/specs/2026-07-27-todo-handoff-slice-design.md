@@ -1,9 +1,9 @@
 # Todo Handoff Vertical Slice Design
 
 - 日付: 2026-07-27
-- 対象: `amidala-v2`
+- 対象: `aimani-ai-v2`
 - 状態: AI設計レビューで確定
-- 親仕様: [`2026-07-26-amidala-v2-platform-design.md`](./2026-07-26-amidala-v2-platform-design.md)
+- 親仕様: [`2026-07-26-aimani-ai-v2-platform-design.md`](./2026-07-26-aimani-ai-v2-platform-design.md)
 - 前提: [`2026-07-27-relationship-todo-slice-design.md`](./2026-07-27-relationship-todo-slice-design.md)
 
 ## 1. 目的

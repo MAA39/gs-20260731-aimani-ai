@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import type { ProcessLabWorkspace } from '@amidala/contracts';
+import type { ProcessLabWorkspace } from '@aimani-ai/contracts';
 import {
   canConnectProcessSteps,
   orderProcessSteps,

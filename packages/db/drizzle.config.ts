@@ -10,5 +10,5 @@ export default defineConfig({
   schema: './src/schema/index.ts',
   out: './drizzle',
   dialect: 'postgresql',
-  dbCredentials: { url: process.env.DATABASE_URL ?? 'postgresql://amidala:amidala@127.0.0.1:54329/amidala' },
+  dbCredentials: { url: process.env.DATABASE_URL ?? 'postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai' },
 });

@@ -29,7 +29,7 @@
 - Test: `apps/web/src/features/today/today-workspace.test.ts`
 
 **Interfaces:**
-- Consumes: `AssignedTodoWorkspace`、`TodoHandoffWorkspace` from `@amidala/contracts`
+- Consumes: `AssignedTodoWorkspace`、`TodoHandoffWorkspace` from `@aimani-ai/contracts`
 - Produces: `composeTodayWorkspace(assignedWorkspace, handoffWorkspace): TodayWorkspace`
 - `TodayWorkspace` fields: `organization`、`currentMember`、`incomingRequests`、`ownedTodos`、`outgoingRequests`、`recentHandoffs`
 - `ownedTodos` は `pendingHandoff === null` のTodoだけ。依頼中Todoは「相手の返答を待っている」へ一度だけ表示する。
@@ -41,7 +41,7 @@
 ```ts
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import type { AssignedTodoWorkspace, TodoHandoffWorkspace } from '@amidala/contracts';
+import type { AssignedTodoWorkspace, TodoHandoffWorkspace } from '@aimani-ai/contracts';
 import { composeTodayWorkspace } from './today-workspace';
 
 test('Todayは受信・自分のボール・相手待ち・直近の責任移動へ重複なく分ける', () => {
@@ -59,7 +59,7 @@ Fixtureは契約型を満たし、`todo-waiting.pendingHandoff.handoffId` と `h
 
 - [x] **Step 2: REDを確認する**
 
-Run: `pnpm --filter @amidala/web test`
+Run: `pnpm --filter @aimani-ai/web test`
 
 Expected: `ERR_MODULE_NOT_FOUND` または `composeTodayWorkspace is not a function` で新規testだけが失敗する。
 
@@ -68,7 +68,7 @@ Expected: `ERR_MODULE_NOT_FOUND` または `composeTodayWorkspace is not a funct
 `apps/web/src/features/today/today-workspace.ts`:
 
 ```ts
-import type { AssignedTodoWorkspace, TodoHandoffWorkspace } from '@amidala/contracts';
+import type { AssignedTodoWorkspace, TodoHandoffWorkspace } from '@aimani-ai/contracts';
 
 export type TodayWorkspace = {
   organization: AssignedTodoWorkspace['organization'];
@@ -96,7 +96,7 @@ export function composeTodayWorkspace(
 
 - [x] **Step 4: GREENと全Web testsを確認する**
 
-Run: `pnpm --filter @amidala/web test`
+Run: `pnpm --filter @aimani-ai/web test`
 
 Expected: 既存10件と新規1件がpassし、fail 0。
 
@@ -131,7 +131,7 @@ assert.equal(isTodoWaitingOnRecipient(ownedTodo), false);
 
 - [x] **Step 2: REDを確認する**
 
-Run: `pnpm --filter @amidala/web test`
+Run: `pnpm --filter @aimani-ai/web test`
 
 Expected: `isTodoWaitingOnRecipient is not a function` で失敗する。
 
@@ -151,7 +151,7 @@ export function isTodoWaitingOnRecipient(todo: AssignedTodoWorkspace['todos'][nu
 
 - [x] **Step 5: testsとtype/buildを確認する**
 
-Run: `pnpm --filter @amidala/web test && pnpm build`
+Run: `pnpm --filter @aimani-ai/web test && pnpm build`
 
 Expected: Web tests pass、Turbo 3 tasks成功、TypeScript error 0。
 
@@ -216,13 +216,13 @@ export const Route = createFileRoute('/$organizationId/today')({
 
 - [x] **Step 5: route tree生成とbuildを確認する**
 
-Run: `pnpm --filter @amidala/web build`
+Run: `pnpm --filter @aimani-ai/web build`
 
 Expected: `routeTree.gen.ts` に `/$organizationId/today` が生成され、build成功。
 
 - [x] **Step 6: testsとdiff hygieneを確認する**
 
-Run: `pnpm --filter @amidala/web test && git diff --check`
+Run: `pnpm --filter @aimani-ai/web test && git diff --check`
 
 Expected: tests pass、whitespace error 0。
 
@@ -257,7 +257,7 @@ assert.equal(acceptedHandoffAnnouncement('森 ハル'), '森 ハルさんが次�
 
 - [x] **Step 2: REDを確認する**
 
-Run: `pnpm --filter @amidala/web test`
+Run: `pnpm --filter @aimani-ai/web test`
 
 Expected: export不在でfail。
 
@@ -289,9 +289,9 @@ labelを `背景と期待（任意）`、placeholderを `背景と、次に期�
 Run:
 
 ```bash
-pnpm --filter @amidala/web test
+pnpm --filter @aimani-ai/web test
 pnpm build
-! rg -n 'owner@amidala\.local|mori@amidala\.local|amidala-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist
+! rg -n 'owner@aimani-ai\.local|mori@aimani-ai\.local|aimani-ai-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist
 git diff --check
 ```
 
@@ -316,11 +316,11 @@ git commit -m "feat: make Today the demo starting point"
 - [x] **Step 1: full local checksを実行する**
 
 ```bash
-pnpm --filter @amidala/api test
-pnpm --filter @amidala/web test
+pnpm --filter @aimani-ai/api test
+pnpm --filter @aimani-ai/web test
 pnpm build
-pnpm --filter @amidala/api test:integration
-pnpm --filter @amidala/api test:demo
+pnpm --filter @aimani-ai/api test:integration
+pnpm --filter @aimani-ai/api test:demo
 git diff --check
 git status --short --branch
 ```
@@ -350,7 +350,7 @@ PR bodyに、既存read model composition、3分journey、test/build結果、Clo
 
 merge commit方式でmainへ統合し、main上でWeb/API tests、build、artifact scanを再実行する。成功後にToday worktree、local/remote branchを撤去する。
 
-実測: PR #7をmerge commit `18366d9`で`main`へ統合。API 13/13、Web 12/12、build 3/3、production artifact marker 0件をfresh確認し、Today worktreeとlocal/remote branchを撤去した。最終browser自動操作はCodex内browserのURL policyで実施できず、同じWeb/API WorkerとPostgreSQLを通るServer Function runtime journeyを `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/research/2026-07-28-today-runtime-verification.md` に記録した。
+実測: PR #7をmerge commit `18366d9`で`main`へ統合。API 13/13、Web 12/12、build 3/3、production artifact marker 0件をfresh確認し、Today worktreeとlocal/remote branchを撤去した。最終browser自動操作はCodex内browserのURL policyで実施できず、同じWeb/API WorkerとPostgreSQLを通るServer Function runtime journeyを `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/research/2026-07-28-today-runtime-verification.md` に記録した。
 
 ## Self-review record
 

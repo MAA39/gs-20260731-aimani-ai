@@ -1,7 +1,7 @@
 import type {
   ProcessStepStatus,
   StepDependency,
-} from '@amidala/contracts';
+} from '@aimani-ai/contracts';
 
 export type ProcessGraphViolation =
   | 'self_dependency'

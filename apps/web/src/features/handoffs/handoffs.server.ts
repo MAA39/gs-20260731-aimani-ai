@@ -1,7 +1,7 @@
 import '@tanstack/react-start/server-only';
 import { getRequestHeader } from '@tanstack/react-start/server';
 import { redirect } from '@tanstack/react-router';
-import { assignedTodoWorkspaceSchema, todoHandoffResponseSchema, todoHandoffWorkspaceSchema } from '@amidala/contracts';
+import { assignedTodoWorkspaceSchema, todoHandoffResponseSchema, todoHandoffWorkspaceSchema } from '@aimani-ai/contracts';
 import type { AssignedTodoWorkspaceResult, TodoHandoffMutationResult, TodoHandoffWorkspaceResult, RequestTodoHandoffInput, AcceptTodoHandoffInput, RejectTodoHandoffInput, CancelTodoHandoffInput } from './handoff-schema';
 import { classifyTodoHandoffFailure } from './handoff-error-presentation';
 import { createApiFetcher, readApiBody } from '../server/api-fetcher.server';

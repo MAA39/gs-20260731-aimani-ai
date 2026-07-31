@@ -7,7 +7,7 @@ import {
   processDependencyPathSchema,
   processStepPathSchema,
   updateProcessStepBodySchema,
-} from '@amidala/contracts';
+} from '@aimani-ai/contracts';
 import type { ApiEnv } from '../../app';
 import { ApiError } from '../../errors/api-error';
 import type { ProcessLabService } from './process-lab-service';

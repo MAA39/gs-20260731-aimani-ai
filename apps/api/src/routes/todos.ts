@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
-import { completeTodoPathSchema, createTodoBodySchema, organizationPathSchema, personTodoPathSchema } from '@amidala/contracts';
+import { completeTodoPathSchema, createTodoBodySchema, organizationPathSchema, personTodoPathSchema } from '@aimani-ai/contracts';
 import type { ApiEnv } from '../app';
 import { ApiError } from '../errors/api-error';
 import type { CreateSharedTodo } from '../application/create-todo';

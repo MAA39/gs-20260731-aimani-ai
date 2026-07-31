@@ -1,6 +1,6 @@
 import '@tanstack/react-start/server-only';
-import { createApiClient } from '@amidala/api-client';
-import { listPeopleResponseSchema, type GetPeopleResult } from '@amidala/contracts';
+import { createApiClient } from '@aimani-ai/api-client';
+import { listPeopleResponseSchema, type GetPeopleResult } from '@aimani-ai/contracts';
 import type { PeopleInput } from './people-schema';
 import { env } from 'cloudflare:workers';
 import { getRequestHeader } from '@tanstack/react-start/server';

@@ -2,7 +2,7 @@ import { ChevronRight } from 'lucide-react';
 import type {
   ProcessLabWorkspace,
   ProcessStepStatus,
-} from '@amidala/contracts';
+} from '@aimani-ai/contracts';
 import { orderProcessSteps, toFlowNodes } from './process-lab-presenter';
 
 export function MobileProcessList({

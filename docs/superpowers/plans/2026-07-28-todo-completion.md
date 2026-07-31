@@ -70,7 +70,7 @@ const completeTodo = async (
 
 ```ts
 it('lets only the current assignee complete an open Todo and removes it from assigned work', async () => {
-  const ownerCookie = await signIn('owner@amidala.local');
+  const ownerCookie = await signIn('owner@aimani-ai.local');
   const todo = await createTodo(ownerCookie);
 
   const completed = await completeTodo(ownerCookie, todo.todoId);
@@ -90,8 +90,8 @@ it('lets only the current assignee complete an open Todo and removes it from ass
 
 ```ts
 it('keeps Todo completion idempotent for the assignee and forbidden for another Member', async () => {
-  const ownerCookie = await signIn('owner@amidala.local');
-  const moriCookie = await signIn('mori@amidala.local');
+  const ownerCookie = await signIn('owner@aimani-ai.local');
+  const moriCookie = await signIn('mori@aimani-ai.local');
   const todo = await createTodo(ownerCookie);
 
   expect((await completeTodo(moriCookie, todo.todoId)).status).toBe(403);
@@ -102,7 +102,7 @@ it('keeps Todo completion idempotent for the assignee and forbidden for another 
 });
 
 it('does not complete a Todo while its Handoff is waiting for a decision', async () => {
-  const ownerCookie = await signIn('owner@amidala.local');
+  const ownerCookie = await signIn('owner@aimani-ai.local');
   const todo = await createTodo(ownerCookie);
   const requested = await requestHandoff(ownerCookie, todo.todoId, { recipientMembershipId: 'acme-studio-mori' });
 
@@ -114,8 +114,8 @@ it('does not complete a Todo while its Handoff is waiting for a decision', async
 });
 
 it('does not disclose a Todo through another Organization path', async () => {
-  const ownerCookie = await signIn('owner@amidala.local');
-  const northstarCookie = await signIn('suzuki@amidala.local');
+  const ownerCookie = await signIn('owner@aimani-ai.local');
+  const northstarCookie = await signIn('suzuki@aimani-ai.local');
   const todo = await createTodo(ownerCookie);
 
   expect((await completeTodo(northstarCookie, todo.todoId, 'org_northstar_lab')).status).toBe(404);
@@ -128,8 +128,8 @@ it('does not disclose a Todo through another Organization path', async () => {
 Run:
 
 ```bash
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff \
-  pnpm --filter @amidala/api test:integration -- todo-handoffs.integration.test.ts --run
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_handoff \
+  pnpm --filter @aimani-ai/api test:integration -- todo-handoffs.integration.test.ts --run
 ```
 
 Expected: 新endpointが存在せず、各new testが404または期待bodyのparse errorでfailする。他の既存test errorではないことを確認する。
@@ -246,7 +246,7 @@ async completeTodo(command: CompleteTodoCommand): Promise<CompleteTodoOutcome> {
 }
 ```
 
-`type Db = AmidalaDatabase`をrepository moduleへ追加する。`createSharedTodo`に埋め込まれたcreator / assignee / pending Handoffのjoin projectionを、次のprivate helperへ抽出する。
+`type Db = AimaniAiDatabase`をrepository moduleへ追加する。`createSharedTodo`に埋め込まれたcreator / assignee / pending Handoffのjoin projectionを、次のprivate helperへ抽出する。
 
 ```ts
 private async loadTodoSummary(
@@ -323,8 +323,8 @@ endpointを既存`createTodoRoutes()` chainへ追加する。
 - [ ] **Step 5: GREENを確認する**
 
 ```bash
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff \
-  pnpm --filter @amidala/api test:integration -- todo-handoffs.integration.test.ts --run
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_handoff \
+  pnpm --filter @aimani-ai/api test:integration -- todo-handoffs.integration.test.ts --run
 ```
 
 Expected: happy-path、assignee authority、idempotency、pending conflict、Organization non-disclosureと既存testsがすべてpassする。
@@ -434,8 +434,8 @@ export const completeTodo = createServerFn({ method: 'POST' })
 - [ ] **Step 4: Web testsとbuildを確認する**
 
 ```bash
-pnpm --filter @amidala/web test
-pnpm --filter @amidala/web exec tsc --noEmit
+pnpm --filter @aimani-ai/web test
+pnpm --filter @aimani-ai/web exec tsc --noEmit
 ```
 
 Expected: error tests pass、TypeScript pass。
@@ -495,9 +495,9 @@ pending Handoffがある場合は現行pending表示だけ。ない場合は同�
 - [ ] **Step 4: Web tests / buildを実行する**
 
 ```bash
-pnpm --filter @amidala/web test
+pnpm --filter @aimani-ai/web test
 pnpm build
-! rg -n 'owner@amidala\.local|mori@amidala\.local|amidala-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist
+! rg -n 'owner@aimani-ai\.local|mori@aimani-ai\.local|aimani-ai-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist
 git diff --check
 ```
 
@@ -525,16 +525,16 @@ git commit -m "feat: complete Todo from assigned work"
 - [x] **Step 1: full local checksを実行する**
 
 ```bash
-pnpm --filter @amidala/api test
-pnpm --filter @amidala/web test
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff pnpm --filter @amidala/api test:integration --run
-pnpm --filter @amidala/api test:demo --run
+pnpm --filter @aimani-ai/api test
+pnpm --filter @aimani-ai/web test
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_handoff pnpm --filter @aimani-ai/api test:integration --run
+pnpm --filter @aimani-ai/api test:demo --run
 pnpm build
-! rg -n 'owner@amidala\.local|mori@amidala\.local|amidala-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist
+! rg -n 'owner@aimani-ai\.local|mori@aimani-ai\.local|aimani-ai-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist
 git diff --check
 ```
 
-実測（2026-07-28、todo-completion worktree / bd47a9c）: API 13/13 PASS、Web 14/14 PASS、PostgreSQL integration 10/10 PASS、demo seed 1/1 PASS、`pnpm build` 3/3 PASS、production artifact scan 0 matches、`git diff --check` PASS。demo checkはブラウザ確認でpending Handoffが残ったため、`pnpm db:demo:reset`後に`TEST_DATABASE_URL`をローカル`amidala_demo`へ設定してfresh実行した。canonical completion schemaへ一本化した最終commit後にもcontrollerが全コマンドをfresh再実行した。
+実測（2026-07-28、todo-completion worktree / bd47a9c）: API 13/13 PASS、Web 14/14 PASS、PostgreSQL integration 10/10 PASS、demo seed 1/1 PASS、`pnpm build` 3/3 PASS、production artifact scan 0 matches、`git diff --check` PASS。demo checkはブラウザ確認でpending Handoffが残ったため、`pnpm db:demo:reset`後に`TEST_DATABASE_URL`をローカル`aimani_ai_demo`へ設定してfresh実行した。canonical completion schemaへ一本化した最終commit後にもcontrollerが全コマンドをfresh再実行した。
 
 - [x] **Step 2: demo runtime journeyを実行する**
 
@@ -567,10 +567,10 @@ PR title: `feat: complete assigned Todo`
 
 PR bodyにdesign link、behavior、integration counts、runtime result、Cloudflare未deployを記載する。
 
-実測: `feat/todo-completion`をpushし、small PR [#10](https://github.com/MAA39/amidala-v2/pull/10) `feat: complete assigned Todo`を作成した。Cloudflare deployは未実施。
+実測: `feat/todo-completion`をpushし、small PR [#10](https://github.com/MAA39/aimani-ai-v2/pull/10) `feat: complete assigned Todo`を作成した。Cloudflare deployは未実施。
 
 - [x] **Step 6: GitHub checks後にmerge commit方式でmergeする**
 
 root mainをfast-forwardし、API/Web tests、build、artifact scanをfresh実行する。成功後にcompletion worktree、local/remote branchを削除する。
 
-実測: PR [#10](https://github.com/MAA39/amidala-v2/pull/10)はmerge commit `7244f7f`で`main`へ統合済み。merge後rootでAPI 13/13、Web 14/14、build 3/3、artifact marker 0をfresh確認し、worktreeとlocal/remote branchを削除した。
+実測: PR [#10](https://github.com/MAA39/aimani-ai-v2/pull/10)はmerge commit `7244f7f`で`main`へ統合済み。merge後rootでAPI 13/13、Web 14/14、build 3/3、artifact marker 0をfresh確認し、worktreeとlocal/remote branchを削除した。

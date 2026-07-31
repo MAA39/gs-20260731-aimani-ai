@@ -1,7 +1,7 @@
 # Identity → People 縦切り設計
 
-日付: 2026-07-27  
-ステータス: 採用。Claude Opusの反証レビュー、Cloudflare / Better Auth / Drizzle公式資料調査、旧Amidala / BYARD監査を反映
+日付: 2026-07-27
+ステータス: 採用。Claude Opusの反証レビュー、Cloudflare / Better Auth / Drizzle公式資料調査、旧Aimani AI / BYARD監査を反映
 
 ## 1. 目的
 

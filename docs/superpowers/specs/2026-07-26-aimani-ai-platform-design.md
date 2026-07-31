@@ -1,9 +1,9 @@
-# Amidala v2 UX-firstプラットフォーム設計
+# Aimani AI v2 UX-firstプラットフォーム設計
 
 - 日付: 2026-07-26
 - 状態: UX-first方針反映済み
-- 対象: 新規 `/Users/maa/Projects/gs/000_参照用/amidala-v2`
-- 既存資産: `amidala`、`amidala-angular`、`amidala-admin`、`BYARD`は読み取り専用
+- 対象: 新規 `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`
+- 既存資産: `aimani-ai`、`aimani-ai-angular`、`aimani-ai-admin`、`BYARD`は読み取り専用
 
 ## 1. 最優先事項
 
@@ -31,7 +31,7 @@
 - 未ログインと他組織の操作はAPIで拒否される
 - 主要導線1本のPlaywright E2Eが通る
 - Cloudflare previewでユーザーが触れる
-- 既存Amidala/BYARDへ変更がない
+- 既存Aimani AI/BYARDへ変更がない
 
 ## 3. 初期スコープから外すもの
 
@@ -48,7 +48,7 @@
 - 全テーブルのTestcontainers検証
 - SSO、SCIM、MFA
 - メール確認とpassword reset
-- 既存Amidalaデータ移行
+- 既存Aimani AIデータ移行
 - 月次ヒアリング、Knowledge、通知、詳細監査ログ
 
 ただし一般公開前には、メール確認、password reset、rate limit、RLSまたは同等のtenant防御、バックアップ/復旧を別のhardeningフェーズで判断する。
@@ -86,7 +86,7 @@ API Workerは`workers_dev = false`、`preview_urls = false`とし、Web Worker�
 ## 5. モノレポ構成
 
 ```text
-amidala-v2/
+aimani-ai-v2/
 ├── apps/
 │   ├── web/                       # TanStack Start / BFF / UI
 │   └── api/                       # Hono / Auth / DI / DB access
@@ -241,7 +241,7 @@ Web WorkerはDBへ接続せず、認可の最終判断もしない。
 - デザインシステム構築はせず、色・余白・文字サイズの小さなtokenだけ定義する
 - Peopleを単なる名簿にせず、関係・未完了Todo・次のactionを同じ視線上に置く
 - Handoffは依頼者、現在担当、引継ぎ先を結ぶ`relationship rail`で可視化する
-- 既存Amidalaのindigoを再解釈し、BYARDのgreenはsuccess/connectedへ限定する
+- 既存Aimani AIのindigoを再解釈し、BYARDのgreenはsuccess/connectedへ限定する
 - Manropeを見出し/utility、Noto Sans JPを本文に使う
 - 色だけで状態を表さず、iconと日本語labelを併用する
 
@@ -321,4 +321,4 @@ Web WorkerはDBへ接続せず、認可の最終判断もしない。
 - roleをMembershipの1値から複数割当にするか
 - assignment履歴が必要か
 - RLS/outbox/Queueが必要になる運用条件は何か
-- 既存Amidalaから何を移行し、何を捨てるか
+- 既存Aimani AIから何を移行し、何を捨てるか

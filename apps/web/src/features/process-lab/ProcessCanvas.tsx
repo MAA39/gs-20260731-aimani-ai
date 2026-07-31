@@ -11,7 +11,7 @@ import {
 } from '@xyflow/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import type { ProcessLabWorkspace, ProcessStepStatus } from '@amidala/contracts';
+import type { ProcessLabWorkspace, ProcessStepStatus } from '@aimani-ai/contracts';
 import {
   connectProcessSteps,
   disconnectProcessSteps,

@@ -1,9 +1,9 @@
-# Claude Code 作業移管 — Amidala v2 最終正本
+# Claude Code 作業移管 — Aimani AI v2 最終正本
 
 - 更新日: 2026-07-28（Asia/Tokyo）
-- 正本の絶対パス: `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/HANDOFF-CLAUDE-2026-07-28.md`
-- repository: `/Users/maa/Projects/gs/000_参照用/amidala-v2`
-- GitHub: <https://github.com/MAA39/amidala-v2>
+- 正本の絶対パス: `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/HANDOFF-CLAUDE-2026-07-28.md`
+- repository: `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`
+- GitHub: <https://github.com/MAA39/aimani-ai-v2>
 - コード統合merge SHA: `4f446b4`（Team Work Overviewをlocal `main`へ統合。最終Docs commitはこの後）
 - deploy: Cloudflareへ未deploy。production DB mutationも未実施
 - 移管方針: Codexは本書をmergeしてworkspaceをcleanにした後、機能開発を停止する
@@ -12,7 +12,7 @@
 
 次を新しいClaude Codeセッションの最初の依頼として使う。
 
-> `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/HANDOFF-CLAUDE-2026-07-28.md` を最初から最後まで読み、必読資料を指定順に読んでください。この文書を現在状態の正本としてください。まずread-onlyでrootが`main`、clean、単一worktreeであることと、local `main`が`origin/main` (`ee9b567`)よりTeam Work OverviewとDocsのcommit分だけaheadであることを確認してください。ユーザーの明示指示によりこの差分はpushしていません。`archive/pre-todo-handoff-local-20260727`をmerge・削除しないでください。次に`http://localhost:5173/org_acme_studio/work`と`/today`をdesktop 1280x720 / mobile 390x844で操作し、田中groupの対応中→森の確認待ち→森groupへ責任移動→最近完了のjourneyを確認してください。「誰の作業が今どこでどうなっているか」が本当に素早く分かるかをユーザーと評価し、一般的なCRUDや管理ダッシュボードを増やさないでください。既存Amidala/BYARDは読み取り専用です。変更は必要とユーザーが合意した一つのjourneyに絞り、実装前に公式資料と現行コードを調査してください。
+> `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/HANDOFF-CLAUDE-2026-07-28.md` を最初から最後まで読み、必読資料を指定順に読んでください。この文書を現在状態の正本としてください。まずread-onlyでrootが`main`、clean、単一worktreeであることと、local `main`が`origin/main` (`ee9b567`)よりTeam Work OverviewとDocsのcommit分だけaheadであることを確認してください。ユーザーの明示指示によりこの差分はpushしていません。`archive/pre-todo-handoff-local-20260727`をmerge・削除しないでください。次に`http://localhost:5173/org_acme_studio/work`と`/today`をdesktop 1280x720 / mobile 390x844で操作し、田中groupの対応中→森の確認待ち→森groupへ責任移動→最近完了のjourneyを確認してください。「誰の作業が今どこでどうなっているか」が本当に素早く分かるかをユーザーと評価し、一般的なCRUDや管理ダッシュボードを増やさないでください。既存Aimani AI/BYARDは読み取り専用です。変更は必要とユーザーが合意した一つのjourneyに絞り、実装前に公式資料と現行コードを調査してください。
 
 ## 1. ユーザーの期待値
 
@@ -36,14 +36,14 @@ coverage、テスト数、形式的完全性、細部だけのレビューは成
 
 変更対象:
 
-- `/Users/maa/Projects/gs/000_参照用/amidala-v2`
+- `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`
 
 調査専用。原則変更しない:
 
-- `/Users/maa/Projects/gs/000_参照用/amidala`
-- `/Users/maa/Projects/gs/000_参照用/amidala-angular`
-- `/Users/maa/Projects/gs/000_参照用/amidala-admin`
-- `/Users/maa/Projects/gs/000_参照用/amidala-infra`
+- `/Users/maa/Projects/gs/000_参照用/aimani-ai`
+- `/Users/maa/Projects/gs/000_参照用/aimani-ai-angular`
+- `/Users/maa/Projects/gs/000_参照用/aimani-ai-admin`
+- `/Users/maa/Projects/gs/000_参照用/aimani-ai-infra`
 - `/Users/maa/Projects/gs/000_参照用/BYARD`
 - `/Users/maa/Projects/gs/000_参照用/kakeai.next`
 - `/Users/maa/Projects/gs/000_参照用/inquiry.kakeai.com`
@@ -60,17 +60,17 @@ coverage、テスト数、形式的完全性、細部だけのレビューは成
 
 | PR | 内容 | 状態 / merge commit |
 |---|---|---|
-| [#1](https://github.com/MAA39/amidala-v2/pull/1) | Todo Handoff review | merged / `5b5b819` |
-| [#2](https://github.com/MAA39/amidala-v2/pull/2) | Touchable MVP → main | merged / `d88213c` |
-| [#3](https://github.com/MAA39/amidala-v2/pull/3) | 3分間Handoff demo仕様 | merged |
-| [#4](https://github.com/MAA39/amidala-v2/pull/4) | 決定論的demo DB / hydration | merged |
-| [#5](https://github.com/MAA39/amidala-v2/pull/5) | development-only Actor Switch | merged |
-| [#6](https://github.com/MAA39/amidala-v2/pull/6) | stale Web build artifact除去 | merged / `344ae3d` |
-| [#7](https://github.com/MAA39/amidala-v2/pull/7) | Today responsibility workspace | merged / `18366d9` |
-| [#8](https://github.com/MAA39/amidala-v2/pull/8) | 本書とlocal runtime証跡 | merged / `b4adc51` |
-| [#9](https://github.com/MAA39/amidala-v2/pull/9) | Work lifecycle visibility設計 | merged / `8461e8a` |
-| [#10](https://github.com/MAA39/amidala-v2/pull/10) | Todo Completion | merged / `7244f7f` |
-| [#11](https://github.com/MAA39/amidala-v2/pull/11) | Handoff Next Action | merged / `ee9b567` |
+| [#1](https://github.com/MAA39/aimani-ai-v2/pull/1) | Todo Handoff review | merged / `5b5b819` |
+| [#2](https://github.com/MAA39/aimani-ai-v2/pull/2) | Touchable MVP → main | merged / `d88213c` |
+| [#3](https://github.com/MAA39/aimani-ai-v2/pull/3) | 3分間Handoff demo仕様 | merged |
+| [#4](https://github.com/MAA39/aimani-ai-v2/pull/4) | 決定論的demo DB / hydration | merged |
+| [#5](https://github.com/MAA39/aimani-ai-v2/pull/5) | development-only Actor Switch | merged |
+| [#6](https://github.com/MAA39/aimani-ai-v2/pull/6) | stale Web build artifact除去 | merged / `344ae3d` |
+| [#7](https://github.com/MAA39/aimani-ai-v2/pull/7) | Today responsibility workspace | merged / `18366d9` |
+| [#8](https://github.com/MAA39/aimani-ai-v2/pull/8) | 本書とlocal runtime証跡 | merged / `b4adc51` |
+| [#9](https://github.com/MAA39/aimani-ai-v2/pull/9) | Work lifecycle visibility設計 | merged / `8461e8a` |
+| [#10](https://github.com/MAA39/aimani-ai-v2/pull/10) | Todo Completion | merged / `7244f7f` |
+| [#11](https://github.com/MAA39/aimani-ai-v2/pull/11) | Handoff Next Action | merged / `ee9b567` |
 | local only | Team Work Overview | reviewed / runtime PASS / push・PRなし |
 
 PR #6ではTurbo cache hit時に既存`apps/web/dist`へ古いhashed assetが残り、過去のdemo credential bundleが復元される問題を修正した。root buildが明示的にWeb distをpruneしてからTurbo restoreする。
@@ -108,7 +108,7 @@ Team Work Overviewとこの最終Docsはユーザー指示によりlocal merge�
 - requesterによるcancel
 - accept時のTodo担当変更とHandoff終端化を同一transactionで実行
 - development-onlyの田中 彩 / 森 ハル Actor Switch
-- 決定論的な専用`amidala_demo` DB reset
+- 決定論的な専用`aimani_ai_demo` DB reset
 - `Today`責任ワークスペース
 - current assigneeによるTodo Completion
 - Handoff accept時の受領者の`次の一手`
@@ -127,9 +127,9 @@ Team Work Overviewとこの最終Docsはユーザー指示によりlocal merge�
 
 証跡の詳細:
 
-- `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/research/2026-07-28-today-runtime-verification.md`
+- `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/research/2026-07-28-today-runtime-verification.md`
 
-ローカル`amidala_demo`をreset後、実画面と同じ経路で次を完走した。
+ローカル`aimani_ai_demo`をreset後、実画面と同じ経路で次を完走した。
 
 ```text
 Browser相当HTTP
@@ -165,9 +165,9 @@ HTTP runtimeが通ったことを、視覚・操作・価値仮説の検証済�
 
 詳細証跡:
 
-- `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/research/2026-07-28-team-work-overview-runtime-verification.md`
+- `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/research/2026-07-28-team-work-overview-runtime-verification.md`
 
-local `amidala_demo`をreset後、田中から森へHandoff依頼、森が次の一手付きでaccept、森がTodo完了までを実ブラウザで完走した。
+local `aimani_ai_demo`をreset後、田中から森へHandoff依頼、森が次の一手付きでaccept、森がTodo完了までを実ブラウザで完走した。
 
 - 初期: 田中group / `対応中`
 - Handoff requested: 田中groupのまま / `森 ハルさんの確認待ち`
@@ -185,7 +185,7 @@ runtimeで、Query keyだけが必要なclient componentからServer Functionを
 ## 7. ローカル起動と再現
 
 ```bash
-cd /Users/maa/Projects/gs/000_参照用/amidala-v2
+cd /Users/maa/Projects/gs/000_参照用/aimani-ai-v2
 docker compose up -d postgres
 pnpm db:demo:reset
 pnpm dev
@@ -193,11 +193,11 @@ pnpm dev
 
 必要なignored設定:
 
-- `/Users/maa/Projects/gs/000_参照用/amidala-v2/apps/api/.dev.vars`
-  - `DATABASE_URL`はlocal host port `54329`の`amidala_demo`を向く
+- `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/apps/api/.dev.vars`
+  - `DATABASE_URL`はlocal host port `54329`の`aimani_ai_demo`を向く
   - `BETTER_AUTH_SECRET`
   - `BETTER_AUTH_URL`
-- `/Users/maa/Projects/gs/000_参照用/amidala-v2/apps/web/.env.development.local`
+- `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/apps/web/.env.development.local`
   - `VITE_DEMO_ACTOR_PASSWORD`
 
 値は本書へ記載しない。現在のrootには両方存在し、Git管理外である。設定を変えた後は`pnpm dev`を再起動し、Workerへ読み直させる。
@@ -206,9 +206,9 @@ pnpm dev
 
 - <http://localhost:5173/org_acme_studio/today>
 
-初期状態へ戻す時だけ`pnpm db:demo:reset`を使う。scriptはDB名が`amidala_demo`であることを検証する。既存・production DBを対象にしない。
+初期状態へ戻す時だけ`pnpm db:demo:reset`を使う。scriptはDB名が`aimani_ai_demo`であることを検証する。既存・production DBを対象にしない。
 
-移管時点ではlocal serverをroot `main`から起動し、ユーザーがin-app browserをReloadできる状態で残す。`amidala_demo`は最終journey後にresetし、田中の初期Todoがopenな状態に戻す。
+移管時点ではlocal serverをroot `main`から起動し、ユーザーがin-app browserをReloadできる状態で残す。`aimani_ai_demo`は最終journey後にresetし、田中の初期Todoがopenな状態に戻す。
 
 ## 8. 検証済みコマンド
 
@@ -243,10 +243,10 @@ demo database safety test: 1/1 PASS
 再実行:
 
 ```bash
-pnpm --filter @amidala/api test
-pnpm --filter @amidala/web test
+pnpm --filter @aimani-ai/api test
+pnpm --filter @aimani-ai/web test
 pnpm build
-! rg -n 'owner@amidala\.local|mori@amidala\.local|amidala-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist
+! rg -n 'owner@aimani-ai\.local|mori@aimani-ai\.local|aimani-ai-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist
 ```
 
 ### Handoff next action Task 5 fresh verification（2026-07-28）
@@ -256,14 +256,14 @@ worktree `handoff-next-action` の HEAD `ff48046` で、機密値を表示せず
 ```text
 API unit: 13/13 PASS（約1.1s）
 Web tests: 14/14 PASS（約0.64s）
-PostgreSQL integration（127.0.0.1:54329/amidala_handoff）: 18/18 PASS（約4.55s）
-demo seed（127.0.0.1:54329/amidala_demo）: 1/1 PASS（amidala_demo reset後、約0.67s）
+PostgreSQL integration（127.0.0.1:54329/aimani_ai_handoff）: 18/18 PASS（約4.55s）
+demo seed（127.0.0.1:54329/aimani_ai_demo）: 1/1 PASS（aimani_ai_demo reset後、約0.67s）
 full monorepo build: 3/3 package tasks PASS（約10.1s）
 production artifact marker scan（apps/web/dist）: 0 matches
 git diff --check: PASS
 ```
 
-demo seedはcontrollerのbrowser journey後に一度だけ既存のaccepted状態を検出したため、`pnpm db:demo:reset`でローカル`amidala_demo`を初期化して再実行した。browser Step 2はcontrollerの`task-5-browser-results.md`を正とし再実行していない。次の一手のaccept、Today/Handoff recent投影、direct reload保持、desktop 1280x720 / mobile 390x844のoverflowなし、console warning/error 0が記録されている。空のnextAction acceptはintegration suiteで確認済み。
+demo seedはcontrollerのbrowser journey後に一度だけ既存のaccepted状態を検出したため、`pnpm db:demo:reset`でローカル`aimani_ai_demo`を初期化して再実行した。browser Step 2はcontrollerの`task-5-browser-results.md`を正とし再実行していない。次の一手のaccept、Today/Handoff recent投影、direct reload保持、desktop 1280x720 / mobile 390x844のoverflowなし、console warning/error 0が記録されている。空のnextAction acceptはintegration suiteで確認済み。
 
 独立review、PR #11、merge commit `ee9b567`、worktree cleanupまで完了済み。Cloudflare deployは未実施。
 
@@ -275,7 +275,7 @@ local branch `feat/team-work-overview`の実装とDocsを確認し、`4f446b4`�
 API unit: 13/13 PASS
 Web tests: 17/17 PASS
 PostgreSQL integration: 24/24 PASS
-demo seed: 1/1 PASS（amidala_demo reset後）
+demo seed: 1/1 PASS（aimani_ai_demo reset後）
 full monorepo build: 3/3 PASS
 production artifact demo marker scan: 0 matches
 production artifact local env file scan: 0 files（cache bypass rebuild後）
@@ -284,7 +284,7 @@ git diff --check: PASS
 
 独立reviewでAPIはCritical / Important 0、BFF/presenterは0、UIは「再試行がcached failureを再取得しない」Important 1件を検出し、`refetch()`へ修正後にtests/buildを再実行した。runtimeではquery key importからServer Function graphがclient SSRへ逆流するstuckを検出し、side-effect-free key moduleに分離した。
 
-最終差分reviewはコードのCritical / Important 0。Docsで旧fixture名・存在しないstatus・DB query並列実行という実装不一致をImportant 1件として検出し、実装どおりの`suzuki@amidala.local`、synthetic `suspended` Membership、単一`pg.Client`上の順次`await`へ修正した。再reviewはCritical 0 / Important 0、APPROVED。
+最終差分reviewはコードのCritical / Important 0。Docsで旧fixture名・存在しないstatus・DB query並列実行という実装不一致をImportant 1件として検出し、実装どおりの`suzuki@aimani-ai.local`、synthetic `suspended` Membership、単一`pg.Client`上の順次`await`へ修正した。再reviewはCritical 0 / Important 0、APPROVED。
 
 ## 9. アーキテクチャと配置
 
@@ -370,8 +370,8 @@ Team Work Overviewの不変条件:
 
 必読:
 
-- `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/design/foundation.md`
-- `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/product/legacy-ux-audit.md`
+- `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/design/foundation.md`
+- `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/product/legacy-ux-audit.md`
 - `/Users/maa/Projects/gs/000_参照用/Docs/19_todo_transfer_history_exhaustive_analysis.md`
 - `/Users/maa/Projects/gs/000_参照用/Docs/20_byard_responsibility_roles_exhaustive_analysis.md`
 
@@ -379,19 +379,19 @@ Team Work Overviewの不変条件:
 
 順番:
 
-1. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/README.md`
-2. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/standards/reusable-product-baseline.md`
-3. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/standards/research-before-build.md`
-4. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/standards/react-tanstack-practices.md`
-5. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/standards/domain-language-and-naming.md`
-6. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/decisions/0001-technology-selection-2026-07-26.md`
-7. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/superpowers/specs/2026-07-26-amidala-v2-platform-design.md`
-8. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/superpowers/specs/2026-07-27-three-minute-handoff-demo-design.md`
-9. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/superpowers/plans/2026-07-28-today-workspace.md`
-10. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/research/2026-07-28-today-runtime-verification.md`
-11. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/superpowers/specs/2026-07-28-work-lifecycle-visibility-design.md`
-12. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/superpowers/plans/2026-07-28-team-work-overview.md`
-13. `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/research/2026-07-28-team-work-overview-runtime-verification.md`
+1. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/README.md`
+2. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/standards/reusable-product-baseline.md`
+3. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/standards/research-before-build.md`
+4. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/standards/react-tanstack-practices.md`
+5. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/standards/domain-language-and-naming.md`
+6. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/decisions/0001-technology-selection-2026-07-26.md`
+7. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/superpowers/specs/2026-07-26-aimani-ai-v2-platform-design.md`
+8. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/superpowers/specs/2026-07-27-three-minute-handoff-demo-design.md`
+9. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/superpowers/plans/2026-07-28-today-workspace.md`
+10. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/research/2026-07-28-today-runtime-verification.md`
+11. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/superpowers/specs/2026-07-28-work-lifecycle-visibility-design.md`
+12. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/superpowers/plans/2026-07-28-team-work-overview.md`
+13. `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/research/2026-07-28-team-work-overview-runtime-verification.md`
 
 横断調査:
 

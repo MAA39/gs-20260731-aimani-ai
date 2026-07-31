@@ -2,7 +2,7 @@ import { ArrowDownRight, ArrowUpRight, Link2Off } from 'lucide-react';
 import type {
   ProcessLabWorkspace,
   ProcessStepStatus,
-} from '@amidala/contracts';
+} from '@aimani-ai/contracts';
 import type { StepAvailability } from './process-lab-presenter';
 
 type SelectedDependency = { source: string; target: string } | null;

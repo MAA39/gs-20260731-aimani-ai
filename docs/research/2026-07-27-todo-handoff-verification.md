@@ -1,27 +1,27 @@
 # Todo Handoff 検証記録
 
-検証日: 2026-07-27  
-対象: Amidala v2 Todo Handoff vertical slice  
+検証日: 2026-07-27
+対象: Aimani AI v2 Todo Handoff vertical slice
 状態: **DONE_WITH_CONCERNS**（実ブラウザ検証済み。reduced motionは未エミュレート）
 
 ## 環境とデータ
 
-- Worktree: `amidala-v2/.worktrees/todo-handoff`
-- PostgreSQL: `postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff`
-- `amidala_handoff` はdrop/recreate後、全Drizzle migrationと`apps/api/src/dev/seed.ts`を適用。
-- Seed accounts: `owner@amidala.local`（田中 彩）、`sato@amidala.local`（佐藤 花子）、`mori@amidala.local`（森 ハル）、`suzuki@amidala.local`（鈴木 健）。Organizations: Acme Studio / Northstar Lab。
+- Worktree: `aimani-ai-v2/.worktrees/todo-handoff`
+- PostgreSQL: `postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_handoff`
+- `aimani_ai_handoff` はdrop/recreate後、全Drizzle migrationと`apps/api/src/dev/seed.ts`を適用。
+- Seed accounts: `owner@aimani-ai.local`（田中 彩）、`sato@aimani-ai.local`（佐藤 花子）、`mori@aimani-ai.local`（森 ハル）、`suzuki@aimani-ai.local`（鈴木 健）。Organizations: Acme Studio / Northstar Lab。
 - 開発Worker: `http://localhost:5173/`（Vite TanStack Start、API auxiliary Worker Service Binding）。Browser viewportはdesktop `1280×720`、mobile `390×844`。
 
 ## 実行コマンドと結果
 
 | command | result |
 |---|---|
-| `pnpm --filter @amidala/api test -- --run` | PASS（2/2 tests） |
-| `TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff pnpm --filter @amidala/api test:integration -- todo-handoffs.integration.test.ts --run` | PASS（6/6 tests） |
-| `pnpm --filter @amidala/web exec tsc --noEmit` | PASS |
-| `pnpm build --force` | PASS。Turbo warning: `@amidala/db#build` output files未設定のみ |
-| `pnpm --filter @amidala/api exec wrangler deploy --dry-run` | PASS。No bindings found。dry-runのみ |
-| `pnpm --filter @amidala/web exec wrangler deploy --config dist/server/wrangler.json --dry-run` | PASS。`env.API (amidala-api)` binding確認。dry-runのみ |
+| `pnpm --filter @aimani-ai/api test -- --run` | PASS（2/2 tests） |
+| `TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_handoff pnpm --filter @aimani-ai/api test:integration -- todo-handoffs.integration.test.ts --run` | PASS（6/6 tests） |
+| `pnpm --filter @aimani-ai/web exec tsc --noEmit` | PASS |
+| `pnpm build --force` | PASS。Turbo warning: `@aimani-ai/db#build` output files未設定のみ |
+| `pnpm --filter @aimani-ai/api exec wrangler deploy --dry-run` | PASS。No bindings found。dry-runのみ |
+| `pnpm --filter @aimani-ai/web exec wrangler deploy --config dist/server/wrangler.json --dry-run` | PASS。`env.API (aimani-ai-api)` binding確認。dry-runのみ |
 | `git diff --check` | PASS |
 
 ## Browser journey

@@ -4,14 +4,14 @@
 
 **Goal:** ローカルで毎回同じ田中→森のTodo storyを再現でき、TanStack Startの二重entryによるhydration警告がないデモ基盤を作る。
 
-**Architecture:** 既存の通常seedはupsert用途のまま関数化し、`db:demo:reset`だけが厳格にlocalhostの`amidala_demo`を選び、schema再作成・migration・seedを順に実行する。WebはTanStack Start既定のdocument hydrationだけを使い、旧Vite SPA entryを除去する。
+**Architecture:** 既存の通常seedはupsert用途のまま関数化し、`db:demo:reset`だけが厳格にlocalhostの`aimani_ai_demo`を選び、schema再作成・migration・seedを順に実行する。WebはTanStack Start既定のdocument hydrationだけを使い、旧Vite SPA entryを除去する。
 
 **Tech Stack:** TypeScript 7、TanStack Start 1.168、React 19、Vitest 4、PostgreSQL 17、Drizzle ORM 0.45、Better Auth 1.6、pnpm 11
 
 ## Global Constraints
 
-- 変更対象は新規repository `/Users/maa/Projects/gs/000_参照用/amidala-v2` のみ。旧Amidala / BYARDは変更しない。
-- local demo databaseは`amidala_demo`、integration databaseは`amidala_handoff`。通常database`amidala`をresetしない。
+- 変更対象は新規repository `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2` のみ。旧Aimani AI / BYARDは変更しない。
+- local demo databaseは`aimani_ai_demo`、integration databaseは`aimani_ai_handoff`。通常database`aimani-ai`をresetしない。
 - reset許可hostは`127.0.0.1`と`localhost`だけ。Hyperdriveやremote PostgreSQLを使わない。
 - demo storyは田中が担当する「顧客インタビューの論点を整理する」、説明「次回の検証で確かめたい仮説を3つに絞る」、森context、初期Handoff 0件、Todo最大3件。
 - full Event Sourcing、CRUD追加、Cloudflare deploy、通知はこのPRに入れない。
@@ -35,7 +35,7 @@
 Run:
 
 ```bash
-pnpm --filter @amidala/web dev
+pnpm --filter @aimani-ai/web dev
 curl -sS http://localhost:5173/ | rg '<div id="root"|/src/main.tsx'
 ```
 
@@ -50,9 +50,9 @@ Expected: `apps/web/index.html`由来の`<div id="root">`と`/src/main.tsx`が�
 Run:
 
 ```bash
-curl -sS -D /tmp/amidala-root-headers.txt -o /tmp/amidala-root-body.html http://localhost:5173/
-rg '^(HTTP/|location:)' /tmp/amidala-root-headers.txt
-if rg -q '<div id="root"|/src/main.tsx' /tmp/amidala-root-body.html; then exit 1; fi
+curl -sS -D /tmp/aimani-ai-root-headers.txt -o /tmp/aimani-ai-root-body.html http://localhost:5173/
+rg '^(HTTP/|location:)' /tmp/aimani-ai-root-headers.txt
+if rg -q '<div id="root"|/src/main.tsx' /tmp/aimani-ai-root-body.html; then exit 1; fi
 curl -sS http://localhost:5173/login | rg '<!DOCTYPE html><html lang="ja">'
 ```
 
@@ -60,7 +60,7 @@ Expected: `/`はStart側のredirect/SSR responseで、legacy entry文字列は0�
 
 - [ ] **Step 4: Web buildを確認する**
 
-Run: `pnpm --filter @amidala/web build`
+Run: `pnpm --filter @aimani-ai/web build`
 
 Expected: exit 0。
 
@@ -79,7 +79,7 @@ git commit -m "fix: use the TanStack Start document entry"
 
 **Interfaces:**
 - Consumes: local `DATABASE_URL: string`。
-- Produces: `deriveLocalDemoDatabaseUrl(source: string): string`、`assertLocalDemoDatabaseUrl(target: string): URL`、`DEMO_DATABASE_NAME = 'amidala_demo'`。
+- Produces: `deriveLocalDemoDatabaseUrl(source: string): string`、`assertLocalDemoDatabaseUrl(target: string): URL`、`DEMO_DATABASE_NAME = 'aimani_ai_demo'`。
 
 - [ ] **Step 1: guardのfailing testを書く**
 
@@ -89,16 +89,16 @@ import { assertLocalDemoDatabaseUrl, deriveLocalDemoDatabaseUrl } from './demo-d
 
 describe('assertLocalDemoDatabaseUrl', () => {
   it.each([
-    'postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo',
-    'postgresql://amidala:amidala@localhost:54329/amidala_demo',
+    'postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_demo',
+    'postgresql://aimani_ai:aimani_ai@localhost:54329/aimani_ai_demo',
   ])('accepts only the local demo database: %s', (value) => {
-    expect(assertLocalDemoDatabaseUrl(value).pathname).toBe('/amidala_demo')
+    expect(assertLocalDemoDatabaseUrl(value).pathname).toBe('/aimani_ai_demo')
   })
 
   it.each([
-    'postgresql://amidala:amidala@127.0.0.1:54329/amidala',
-    'postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff',
-    'postgresql://user:pass@example.com:5432/amidala_demo',
+    'postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani-ai',
+    'postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_handoff',
+    'postgresql://user:pass@example.com:5432/aimani_ai_demo',
     'not-a-url',
   ])('rejects an unsafe target: %s', (value) => {
     expect(() => assertLocalDemoDatabaseUrl(value)).toThrow(/local demo database/i)
@@ -107,8 +107,8 @@ describe('assertLocalDemoDatabaseUrl', () => {
 
 describe('deriveLocalDemoDatabaseUrl', () => {
   it('keeps local connection details and replaces only the database name', () => {
-    expect(deriveLocalDemoDatabaseUrl('postgresql://amidala:amidala@127.0.0.1:54329/amidala'))
-      .toBe('postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo')
+    expect(deriveLocalDemoDatabaseUrl('postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani-ai'))
+      .toBe('postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_demo')
   })
 
   it('does not derive a target from a remote connection', () => {
@@ -120,14 +120,14 @@ describe('deriveLocalDemoDatabaseUrl', () => {
 
 - [ ] **Step 2: testが存在しないmoduleで落ちることを確認する**
 
-Run: `pnpm --filter @amidala/api test -- demo-database-url.test.ts --run`
+Run: `pnpm --filter @aimani-ai/api test -- demo-database-url.test.ts --run`
 
 Expected: FAIL with module not found。
 
 - [ ] **Step 3: 最小実装を書く**
 
 ```ts
-export const DEMO_DATABASE_NAME = 'amidala_demo'
+export const DEMO_DATABASE_NAME = 'aimani_ai_demo'
 const LOCAL_HOSTS = new Set(['127.0.0.1', 'localhost'])
 
 export function assertLocalDemoDatabaseUrl(target: string): URL {
@@ -156,7 +156,7 @@ export function deriveLocalDemoDatabaseUrl(source: string): string {
 
 - [ ] **Step 4: guard testを通す**
 
-Run: `pnpm --filter @amidala/api test -- demo-database-url.test.ts --run`
+Run: `pnpm --filter @aimani-ai/api test -- demo-database-url.test.ts --run`
 
 Expected: PASS。
 
@@ -243,8 +243,8 @@ await database.insert(schema.todo).values({
 Run:
 
 ```bash
-pnpm --filter @amidala/db build
-pnpm --filter @amidala/api build
+pnpm --filter @aimani-ai/db build
+pnpm --filter @aimani-ai/api build
 pnpm db:seed
 pnpm db:seed
 ```
@@ -293,8 +293,8 @@ expect(Number(handoffCount.rows[0].count)).toBe(0)
 Run:
 
 ```bash
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo \
-  pnpm --filter @amidala/api test:demo -- --run
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_demo \
+  pnpm --filter @aimani-ai/api test:demo -- --run
 ```
 
 Expected: databaseまたはtable/storyが存在せずFAIL。
@@ -306,11 +306,11 @@ Expected: databaseまたはtable/storyが存在せずFAIL。
 1. `process.env.DATABASE_URL`を必須化。
 2. `deriveLocalDemoDatabaseUrl`でtargetを作り、`assertLocalDemoDatabaseUrl`で再検証。
 3. 同じhost/port/user/passwordでpathnameだけ`/postgres`にしたmaintenance URLへ接続。
-4. `pg_database`に`amidala_demo`がなければ固定SQL `CREATE DATABASE amidala_demo`を実行。
+4. `pg_database`に`aimani_ai_demo`がなければ固定SQL `CREATE DATABASE aimani_ai_demo`を実行。
 5. targetへ接続し、`DROP SCHEMA public CASCADE; CREATE SCHEMA public;`を実行してclose。
 6. `migrateDatabase(target)`。
 7. `seedDevelopmentData(target)`。
-8. credentialを含めず`Demo database reset complete: amidala_demo`だけを出力。
+8. credentialを含めず`Demo database reset complete: aimani_ai_demo`だけを出力。
 
 root `package.json`へ追加する。
 
@@ -318,7 +318,7 @@ root `package.json`へ追加する。
 "db:demo:reset": "node --env-file=apps/api/.dev.vars --import tsx apps/api/src/dev/reset-demo-database.ts"
 ```
 
-`apps/api/.dev.vars.example`の`DATABASE_URL`は`amidala_demo`へ変更し、新規cloneが画面用DBを使うようにする。integrationは引き続き明示的な`TEST_DATABASE_URL=.../amidala_handoff`を使う。
+`apps/api/.dev.vars.example`の`DATABASE_URL`は`aimani_ai_demo`へ変更し、新規cloneが画面用DBを使うようにする。integrationは引き続き明示的な`TEST_DATABASE_URL=.../aimani_ai_handoff`を使う。
 
 - [ ] **Step 4: resetとstory testを2回通す**
 
@@ -327,11 +327,11 @@ Run:
 ```bash
 pnpm db:up
 pnpm db:demo:reset
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo \
-  pnpm --filter @amidala/api test:demo -- --run
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_demo \
+  pnpm --filter @aimani-ai/api test:demo -- --run
 pnpm db:demo:reset
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo \
-  pnpm --filter @amidala/api test:demo -- --run
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_demo \
+  pnpm --filter @aimani-ai/api test:demo -- --run
 ```
 
 Expected: 2回ともPASSし、resetの再実行でも同じdomain storyになる。
@@ -341,11 +341,11 @@ Expected: 2回ともPASSし、resetの再実行でも同じdomain storyになる
 Run:
 
 ```bash
-DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala \
+DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani-ai \
   node --import tsx -e "import('./apps/api/src/dev/demo-database-url.ts').then(({assertLocalDemoDatabaseUrl}) => assertLocalDemoDatabaseUrl(process.env.DATABASE_URL))"
 ```
 
-Expected: non-zeroで`Refusing reset`。実際のreset commandはsourceから`amidala_demo`を導出するため、raw target guardを直接検査する。
+Expected: non-zeroで`Refusing reset`。実際のreset commandはsourceから`aimani_ai_demo`を導出するため、raw target guardを直接検査する。
 
 - [ ] **Step 6: Docsへローカル起動順を記録する**
 
@@ -358,7 +358,7 @@ cp apps/api/.dev.vars.example apps/api/.dev.vars  # 初回だけ
 pnpm dev
 ```
 
-既存`.dev.vars`利用者は`DATABASE_URL`のdatabase名を`amidala_demo`へ変更する。資格情報の値はDocsへ追加しない。
+既存`.dev.vars`利用者は`DATABASE_URL`のdatabase名を`aimani_ai_demo`へ変更する。資格情報の値はDocsへ追加しない。
 
 - [ ] **Step 7: Commit**
 
@@ -379,29 +379,29 @@ git commit -m "feat: reset a deterministic local demo database"
 - [x] **Step 1: 全DB-free checksを実行する**
 
 ```bash
-pnpm --filter @amidala/api test -- --run
-pnpm --filter @amidala/web test
+pnpm --filter @aimani-ai/api test -- --run
+pnpm --filter @aimani-ai/web test
 pnpm build
 git diff --check
 ```
 
 Expected: すべてPASS。
 
-実測 (2026-07-28): `pnpm --filter @amidala/api test -- --run` (13/13 PASS)、`pnpm --filter @amidala/web test` (7/7 PASS)、`pnpm build` (turbo 3 tasks PASS)、`git diff --check` (exit 0)。
+実測 (2026-07-28): `pnpm --filter @aimani-ai/api test -- --run` (13/13 PASS)、`pnpm --filter @aimani-ai/web test` (7/7 PASS)、`pnpm build` (turbo 3 tasks PASS)、`git diff --check` (exit 0)。
 
 - [x] **Step 2: fresh demo DBを確認する**
 
 ```bash
 pnpm db:demo:reset
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo \
-  pnpm --filter @amidala/api test:demo -- --run
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_demo \
+  pnpm --filter @aimani-ai/api test:demo -- --run
 ```
 
 Expected: story test PASS。
 
-実測 (2026-07-28): `pnpm db:demo:reset` が `Demo database reset complete: amidala_demo` で終了。専用の `test:demo` command は 1 file / 1 test PASS。
+実測 (2026-07-28): `pnpm db:demo:reset` が `Demo database reset complete: aimani_ai_demo` で終了。専用の `test:demo` command は 1 file / 1 test PASS。
 
-実装更新: `vitest.demo.config.ts` は `TEST_DATABASE_URL` を必須化し、local `amidala_demo` URLをassertしたうえでdemo seed testのみをinclude。通常の `vitest.integration.config.ts` は `src/dev/**` をexcludeし、demo testが通常integration suiteへ混入しない。
+実装更新: `vitest.demo.config.ts` は `TEST_DATABASE_URL` を必須化し、local `aimani_ai_demo` URLをassertしたうえでdemo seed testのみをinclude。通常の `vitest.integration.config.ts` は `src/dev/**` をexcludeし、demo testが通常integration suiteへ混入しない。
 
 - [ ] **Step 3: SSRとconsoleを確認する**
 

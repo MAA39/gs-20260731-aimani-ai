@@ -11,7 +11,7 @@
 ## Global Constraints
 
 - Switcherは`import.meta.env.DEV`かつ`VITE_DEMO_ACTOR_PASSWORD`がある時だけ表示する。
-- 本番Web artifactへ`owner@amidala.local`、`mori@amidala.local`、demo password、`VITE_DEMO_ACTOR_PASSWORD`を残さない。
+- 本番Web artifactへ`owner@aimani-ai.local`、`mori@aimani-ai.local`、demo password、`VITE_DEMO_ACTOR_PASSWORD`を残さない。
 - 通常LoginFormのemail/password初期値は空にし、demo credential表示を削除する。
 - actor identityは`authClient.useSession()`のname/emailを表示し、UserをOrganizationから独立した認証主体として扱う。
 - 切替対象は田中 彩と森 ハルだけ。任意impersonationやproduction代理操作は作らない。
@@ -41,8 +41,8 @@ import { DEMO_ACTORS, demoActorSwitchFailureMessage, isDemoActorSwitchEnabled } 
 
 test('demo actors use the domain names and seeded emails', () => {
   assert.deepEqual(DEMO_ACTORS, [
-    { id: 'tanaka', name: '田中 彩', email: 'owner@amidala.local' },
-    { id: 'mori', name: '森 ハル', email: 'mori@amidala.local' },
+    { id: 'tanaka', name: '田中 彩', email: 'owner@aimani-ai.local' },
+    { id: 'mori', name: '森 ハル', email: 'mori@aimani-ai.local' },
   ])
 })
 
@@ -60,7 +60,7 @@ test('actor switch failure never exposes an upstream message', () => {
 
 - [ ] **Step 2: REDを確認する**
 
-Run: `pnpm --filter @amidala/web test`
+Run: `pnpm --filter @aimani-ai/web test`
 
 Expected: module not foundでFAIL。
 
@@ -69,8 +69,8 @@ Expected: module not foundでFAIL。
 ```ts
 export type DemoActor = { id: 'tanaka' | 'mori'; name: string; email: string }
 export const DEMO_ACTORS = [
-  { id: 'tanaka', name: '田中 彩', email: 'owner@amidala.local' },
-  { id: 'mori', name: '森 ハル', email: 'mori@amidala.local' },
+  { id: 'tanaka', name: '田中 彩', email: 'owner@aimani-ai.local' },
+  { id: 'mori', name: '森 ハル', email: 'mori@aimani-ai.local' },
 ] as const satisfies readonly DemoActor[]
 
 export function isDemoActorSwitchEnabled(dev: boolean, password: string | undefined): password is string {
@@ -86,7 +86,7 @@ export function demoActorSwitchFailureMessage(): string {
 
 - [ ] **Step 4: GREENを確認する**
 
-Run: `pnpm --filter @amidala/web test`
+Run: `pnpm --filter @aimani-ai/web test`
 
 Expected: 10 tests PASS（既存7 + 新規3）。
 
@@ -160,8 +160,8 @@ top bar右側を`.actor-controls`にし、name/emailを省略可能に表示す�
 - [ ] **Step 5: tests/buildを通す**
 
 ```bash
-pnpm --filter @amidala/web test
-pnpm --filter @amidala/web build
+pnpm --filter @aimani-ai/web test
+pnpm --filter @aimani-ai/web build
 git diff --check
 ```
 
@@ -205,25 +205,25 @@ VITE_DEMO_ACTOR_PASSWORD=
 実際の`.env.development.local`を作業用に置いても、production buildはdevelopment local envを読まない。
 
 ```bash
-pnpm --filter @amidala/web build
-if rg -n 'owner@amidala\.local|mori@amidala\.local|amidala-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist; then exit 1; fi
+pnpm --filter @aimani-ai/web build
+if rg -n 'owner@aimani-ai\.local|mori@aimani-ai\.local|aimani-ai-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist; then exit 1; fi
 ```
 
 Expected: grep hit 0、exit 0。
 
-実測: `pnpm --filter @amidala/web build` 成功後、指定パターンの `rg` はhit 0（否定条件のgateはexit 0）。
+実測: `pnpm --filter @aimani-ai/web build` 成功後、指定パターンの `rg` はhit 0（否定条件のgateはexit 0）。
 
 - [x] **Step 4: local dev compileを確認する**
 
-`.env.development.local`へlocal seed passwordを設定し、`pnpm --filter @amidala/web dev`の起動ログにcompile errorがないことを確認して終了する。ブラウザinspectionがURL policyで拒否される場合は迂回しない。
+`.env.development.local`へlocal seed passwordを設定し、`pnpm --filter @aimani-ai/web dev`の起動ログにcompile errorがないことを確認して終了する。ブラウザinspectionがURL policyで拒否される場合は迂回しない。
 
 実測: ignoredな`.env.development.local`へseed passwordを設定し、dev起動ログでVite ready／compile errorなしを確認した（ブラウザinspectionは実施していない）。
 
 - [x] **Step 5: full verification**
 
 ```bash
-pnpm --filter @amidala/api test -- --run
-pnpm --filter @amidala/web test
+pnpm --filter @aimani-ai/api test -- --run
+pnpm --filter @aimani-ai/web test
 pnpm build
 git diff --check
 git status --short --branch

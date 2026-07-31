@@ -6,14 +6,14 @@ import {
   todoHandoffPathSchema,
   todoHandoffResponseSchema,
   todoHandoffWorkspaceSchema,
-} from '@amidala/contracts';
+} from '@aimani-ai/contracts';
 import { z } from 'zod';
 import type {
   AssignedTodoWorkspace,
   TodoHandoffSummary,
   TodoHandoffWorkspace,
   TodoSummary,
-} from '@amidala/contracts';
+} from '@aimani-ai/contracts';
 
 export const requestTodoHandoffInputSchema = requestTodoHandoffPathSchema.and(requestTodoHandoffBodySchema) as unknown as z.ZodType<{ organizationId: string; todoId: string; recipientMembershipId: string; requestMessage?: string }>;
 export const acceptTodoHandoffInputSchema = todoHandoffPathSchema.and(acceptTodoHandoffBodySchema) as unknown as z.ZodType<{ organizationId: string; handoffId: string; nextAction?: string }>;

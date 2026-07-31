@@ -1,6 +1,6 @@
 import { ApiError } from '../errors/api-error';
 import type { CurrentMembershipContext } from '../domain/identity';
-import type { MemberSummary } from '@amidala/contracts';
+import type { MemberSummary } from '@aimani-ai/contracts';
 
 export interface PeopleReadModel {
   findActiveMembershipForUser(userId: string, organizationId: string): Promise<CurrentMembershipContext | null>;

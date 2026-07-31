@@ -8,9 +8,9 @@ status: DONE_WITH_CONCERNS
 
 ## GREEN
 
-- `pnpm --filter @amidala/db build` PASS
-- `pnpm --filter @amidala/api build` PASS
-- `TEST_DATABASE_URL=postgresql://amidala@127.0.0.1:54329/amidala_handoff pnpm --filter @amidala/api test:integration -- todo-handoffs.integration.test.ts` PASS（3 files / 4 tests）
+- `pnpm --filter @aimani-ai/db build` PASS
+- `pnpm --filter @aimani-ai/api build` PASS
+- `TEST_DATABASE_URL=postgresql://aimani-ai@127.0.0.1:54329/aimani-ai_handoff pnpm --filter @aimani-ai/api test:integration -- todo-handoffs.integration.test.ts` PASS（3 files / 4 tests）
 
 ## 変更・判断
 
@@ -27,7 +27,7 @@ repositoryの厳密なTodo→Membership→TodoHandoff FOR UPDATE transaction、2
 ## Rescue
 
 - RED: 先行実装時の focused integration は `TEST_DATABASE_URL is required`、隔離DB設定後に2シナリオを実行。
-- GREEN: `pnpm --filter @amidala/api build` PASS、`TEST_DATABASE_URL=postgresql://amidala@127.0.0.1:54329/amidala_handoff pnpm --filter @amidala/api test:integration -- todo-handoffs.integration.test.ts` PASS（3 files / 4 tests）。
+- GREEN: `pnpm --filter @aimani-ai/api build` PASS、`TEST_DATABASE_URL=postgresql://aimani-ai@127.0.0.1:54329/aimani-ai_handoff pnpm --filter @aimani-ai/api test:integration -- todo-handoffs.integration.test.ts` PASS（3 files / 4 tests）。
 - 変更: repository を READ COMMITTED transaction 化し、request/decision のTodo・Membership・Handoffロック順、conditional RETURNING、acceptのTodo/Handoff同一transaction、typed route DI を追加。
 - transaction判断: decision は Todo→Membership ID昇順→Handoff FOR UPDATE。request は exact active retry をmutable invariant より先に判定。40P01/40001 は rollback 後に service failure として再送出し、23505 は指定constraintのみ新queryで再判定。
 - commit: `85561bd`（既存commit amend）。

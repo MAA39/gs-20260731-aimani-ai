@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { Users, RefreshCw } from 'lucide-react';
-import type { GetPeopleResult } from '@amidala/contracts';
+import type { GetPeopleResult } from '@aimani-ai/contracts';
 import type { OrganizationMembershipSummary } from '../organizations/organizations-schema';
 import { OrganizationSwitcher } from '../organizations/OrganizationSwitcher';
 import { PersonCard } from './PersonCard';

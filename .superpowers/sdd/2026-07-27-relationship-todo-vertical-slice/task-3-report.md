@@ -7,7 +7,7 @@
 - TanStack Query 公式 mutation / invalidation を確認し、`useMutation` の `onSuccess` で対象 query key を `await invalidateQueries` してからフォームを reset する構成にした。楽観更新や重複する action state は置いていない。
   - https://tanstack.com/query/latest/docs/framework/react/guides/mutations
   - https://tanstack.com/query/latest/docs/framework/react/guides/invalidations-from-mutations
-- 既存 Amidala / BYARD の調査結果に従い、Person Todo を汎用 dashboard ではなく People から選んだ相手との関係ワークスペースとして実装した。`[現在のメンバー] — Shared Todo — [相手]` の rail、作成者→現在の担当の rail、組織を失わない shell nav を共通化した。
+- 既存 Aimani AI / BYARD の調査結果に従い、Person Todo を汎用 dashboard ではなく People から選んだ相手との関係ワークスペースとして実装した。`[現在のメンバー] — Shared Todo — [相手]` の rail、作成者→現在の担当の rail、組織を失わない shell nav を共通化した。
 
 ## 実装範囲
 
@@ -22,8 +22,8 @@
 実行結果（すべて成功）:
 
 ```text
-pnpm --filter @amidala/web exec tsc --noEmit
-pnpm --filter @amidala/web build
+pnpm --filter @aimani-ai/web exec tsc --noEmit
+pnpm --filter @aimani-ai/web build
 pnpm build
 git diff --check
 ```

@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- Modify only `/Users/maa/Projects/gs/000_参照用/amidala-v2`; legacy Amidala/BYARD repositories remain read-only.
+- Modify only `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`; legacy Aimani AI/BYARD repositories remain read-only.
 - `User` is the organization-independent person, Better Auth `Account` is a credential, and `Membership` is the only User↔Organization connection.
 - Do not use Better Auth Organization Plugin, PostgreSQL RLS, audit/outbox/Queue, Todo/Handoff tables, coverage gates, or new Cloudflare resources.
 - Web never accesses PostgreSQL. Browser-visible auth remains same-origin and all business data flows Web/BFF → Service Binding → private Hono API.
@@ -42,10 +42,10 @@
 
 - [x] **Step 1: Pin packages and create the local database contract**
 
-Registry verification on 2026-07-27 produced `better-auth 1.6.25`, `@better-auth/drizzle-adapter 1.6.25`, and `auth 1.6.25` with description `The CLI for Better Auth`; `better-auth@1.6.25` exports `./minimal`. Re-run these exact commands before install if the registry has changed: `pnpm view <package>@1.6.25 name version description` and `pnpm view better-auth@1.6.25 exports --json`. Add `drizzle-orm@0.45.2` and `pg@8.22.0` to `@amidala/db`; add `drizzle-kit@0.31.10` and `@types/pg@8.20.0` as its dev dependencies. Add `tsx@4.23.1` and `@types/node@26.1.1` as root development tooling. Better Auth packages belong to `@amidala/api` in Task 2, not the DB package. `@amidala/contracts` already exists; add `zod@4.4.3` there in Task 1. Use PostgreSQL 17 in Compose and document only this local URL in `apps/api/.dev.vars.example`:
+Registry verification on 2026-07-27 produced `better-auth 1.6.25`, `@better-auth/drizzle-adapter 1.6.25`, and `auth 1.6.25` with description `The CLI for Better Auth`; `better-auth@1.6.25` exports `./minimal`. Re-run these exact commands before install if the registry has changed: `pnpm view <package>@1.6.25 name version description` and `pnpm view better-auth@1.6.25 exports --json`. Add `drizzle-orm@0.45.2` and `pg@8.22.0` to `@aimani-ai/db`; add `drizzle-kit@0.31.10` and `@types/pg@8.20.0` as its dev dependencies. Add `tsx@4.23.1` and `@types/node@26.1.1` as root development tooling. Better Auth packages belong to `@aimani-ai/api` in Task 2, not the DB package. `@aimani-ai/contracts` already exists; add `zod@4.4.3` there in Task 1. Use PostgreSQL 17 in Compose and document only this local URL in `apps/api/.dev.vars.example`:
 
 ```text
-DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala
+DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani-ai
 BETTER_AUTH_SECRET=local-development-secret-change-before-preview
 BETTER_AUTH_URL=http://localhost:5173
 ```
@@ -87,7 +87,7 @@ Run:
 ```bash
 pnpm install
 cp apps/api/.dev.vars.example apps/api/.dev.vars
-pnpm --filter @amidala/db exec drizzle-kit generate
+pnpm --filter @aimani-ai/db exec drizzle-kit generate
 pnpm db:up
 pnpm db:migrate
 ```
@@ -96,7 +96,7 @@ Expected: PostgreSQL 17 starts and all seven tables exist without runtime migrat
 
 - [x] **Step 4: Verify and commit**
 
-Run `pnpm --filter @amidala/db build`, `pnpm db:migrate`, and a read-only SQL query confirming the seven exact table names. Commit `feat: add local identity database`.
+Run `pnpm --filter @aimani-ai/db build`, `pnpm db:migrate`, and a read-only SQL query confirming the seven exact table names. Commit `feat: add local identity database`.
 
 ---
 
@@ -137,7 +137,7 @@ app.on(['GET', 'POST'], '/api/auth/*', (c) => c.get('scope').resolve('auth').han
 
 Use email/password only, trusted localhost origin, HTTP-only SameSite=Lax cookie defaults, and no Organization Plugin.
 
-Add exact API dependencies `better-auth@1.6.25`, `@better-auth/drizzle-adapter@1.6.25`, `@amidala/db@workspace:*`, and `zod@4.4.3`. Use the default singular table mapping and pass the explicit Drizzle schema object to the adapter. Core columns are maintained explicitly at the pinned version; no runtime/Worker migration is allowed.
+Add exact API dependencies `better-auth@1.6.25`, `@better-auth/drizzle-adapter@1.6.25`, `@aimani-ai/db@workspace:*`, and `zod@4.4.3`. Use the default singular table mapping and pass the explicit Drizzle schema object to the adapter. Core columns are maintained explicitly at the pinned version; no runtime/Worker migration is allowed.
 
 - [x] **Step 3: Add session and organization application flow**
 
@@ -147,14 +147,14 @@ Resolve the session with `auth.api.getSession({ headers })`. `/organizations` re
 
 - [x] **Step 4: Seed the touchable identity graph**
 
-Run the seed as a Node script in `@amidala/api`, after `createAuth` exists; `packages/db` must not import the API package. Call `auth.api.signUpEmail` directly against the local DB, then upsert these fixtures by email/slug:
+Run the seed as a Node script in `@aimani-ai/api`, after `createAuth` exists; `packages/db` must not import the API package. Call `auth.api.signUpEmail` directly against the local DB, then upsert these fixtures by email/slug:
 
 ```text
 email / password / display name
-owner@amidala.local  / amidala-demo-2026 / 田中 彩
-sato@amidala.local   / amidala-demo-2026 / 佐藤 花子
-suzuki@amidala.local / amidala-demo-2026 / 鈴木 健
-mori@amidala.local   / amidala-demo-2026 / 森 ハル
+owner@aimani-ai.local  / aimani-ai-demo-2026 / 田中 彩
+sato@aimani-ai.local   / aimani-ai-demo-2026 / 佐藤 花子
+suzuki@aimani-ai.local / aimani-ai-demo-2026 / 鈴木 健
+mori@aimani-ai.local   / aimani-ai-demo-2026 / 森 ハル
 
 acme-studio: owner + sato + mori; owner/sato = manager_report, mori = relationship未設定
 northstar-lab: owner + suzuki, peer
@@ -193,23 +193,23 @@ Run `pnpm db:seed`, API typecheck/test/build, `pnpm build`, and Wrangler dry-run
 - Produces: `MemberSummary = { membershipId: string; name: string; title: string | null; relationshipKinds: Array<'manager_report' | 'supporter' | 'peer'> }`
 - Produces: `GET /organizations/:organizationId/people`
 - Produces: `getPeople({ data: { organizationId } }): Promise<{ people: MemberSummary[] }>`
-- Produces: `createApiClient(fetcher): ReturnType<typeof hc<AppType>>`, where `@amidala/api-client` has a type-only workspace dependency on `@amidala/api` and Web imports only the client package
+- Produces: `createApiClient(fetcher): ReturnType<typeof hc<AppType>>`, where `@aimani-ai/api-client` has a type-only workspace dependency on `@aimani-ai/api` and Web imports only the client package
 
 - [x] **Step 1: Write the failing cross-tenant test**
 
-Add a separate `test:integration` script and Vitest config that includes only `src/**/*.integration.test.ts`; keep the default test command DB-free. The integration config must fail immediately with `TEST_DATABASE_URL is required` before importing the app when the variable is absent. Start the local DB, migrate, and seed, then run with `TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala`.
+Add a separate `test:integration` script and Vitest config that includes only `src/**/*.integration.test.ts`; keep the default test command DB-free. The integration config must fail immediately with `TEST_DATABASE_URL is required` before importing the app when the variable is absent. Start the local DB, migrate, and seed, then run with `TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani-ai`.
 
-In the test, sign in `sato@amidala.local` / `amidala-demo-2026` through the existing Hono Better Auth route and extract all `Set-Cookie` values. Request Organization ID `org_northstar_lab`'s People endpoint with that cookie; do not substitute its slug `northstar-lab`. Assert status `403`, body equals `{ error: { code: 'forbidden', message: 'This organization is not available to this user.' } }`, and body has no `people` property. The test imports the existing `createApp`; before the People route is implemented it compiles and fails with actual 404 rather than setup/type errors.
+In the test, sign in `sato@aimani-ai.local` / `aimani-ai-demo-2026` through the existing Hono Better Auth route and extract all `Set-Cookie` values. Request Organization ID `org_northstar_lab`'s People endpoint with that cookie; do not substitute its slug `northstar-lab`. Assert status `403`, body equals `{ error: { code: 'forbidden', message: 'This organization is not available to this user.' } }`, and body has no `people` property. The test imports the existing `createApp`; before the People route is implemented it compiles and fails with actual 404 rather than setup/type errors.
 
 - [x] **Step 2: Verify RED**
 
-Run `TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala pnpm --filter @amidala/api test:integration -- --run` and record the expected missing route/service failure. The default DB-free test remains green.
+Run `TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani-ai pnpm --filter @aimani-ai/api test:integration -- --run` and record the expected missing route/service failure. The default DB-free test remains green.
 
 - [x] **Step 3: Implement the tenant-safe query**
 
 Validate `organizationId`, derive `userId` from session, find the active Membership, reject absence with 403, then query active Memberships in the same Organization excluding the Current Membership. Left join Relationships on both Membership IDs and `organization_id`, so users without a Relationship remain visible. `manager_report` means source=manager and target=direct report. Return one card per Membership, sort names deterministically, and sort relationship kinds `manager_report`, `supporter`, `peer`. Never accept `membershipId` as identity input.
 
-Compose Hono route modules with `.route()` and export `AppType = ReturnType<typeof createApp>` from `apps/api/src/app-type.ts`. Add `"./app-type": { "types": "./src/app-type.ts" }` to `@amidala/api` exports. `@amidala/api-client` adds a type-only workspace dependency on `@amidala/api`, uses a no-emit tsconfig, exports its source from `package.json`, and constructs `hc<AppType>('http://api.internal', { fetch: fetcher })`; the supplied fetcher delegates to `env.API.fetch` and is never the public network fetch. The API package does not depend on api-client, so no package cycle is introduced.
+Compose Hono route modules with `.route()` and export `AppType = ReturnType<typeof createApp>` from `apps/api/src/app-type.ts`. Add `"./app-type": { "types": "./src/app-type.ts" }` to `@aimani-ai/api` exports. `@aimani-ai/api-client` adds a type-only workspace dependency on `@aimani-ai/api`, uses a no-emit tsconfig, exports its source from `package.json`, and constructs `hc<AppType>('http://api.internal', { fetch: fetcher })`; the supplied fetcher delegates to `env.API.fetch` and is never the public network fetch. The API package does not depend on api-client, so no package cycle is introduced.
 
 - [x] **Step 4: Add the thin Start Server Function**
 

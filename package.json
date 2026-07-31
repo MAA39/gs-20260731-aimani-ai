@@ -1,9 +1,9 @@
 {
-  "name": "amidala-v2",
+  "name": "aimani-ai-v2",
   "private": true,
   "packageManager": "pnpm@11.17.0",
   "scripts": {
-    "dev": "pnpm --filter @amidala/web dev",
+    "dev": "pnpm --filter @aimani-ai/web dev",
     "build": "pnpm clean:web:build && turbo run build",
     "clean:web:build": "node --eval \"require('node:fs').rmSync('apps/web/dist', { recursive: true, force: true })\"",
     "db:up": "docker compose up -d postgres",

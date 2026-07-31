@@ -1,7 +1,7 @@
 # 再利用可能なプロダクト基準
 
-基準日: 2026-07-26  
-ステータス: Amidala v2 で検証する初版
+基準日: 2026-07-26
+ステータス: Aimani AI v2 で検証する初版
 
 ## 目的
 
@@ -44,11 +44,11 @@
 - headless component を使い、プロダクト固有の見た目は自分たちで所有する。
 - Storybook や大規模デザインシステムを先に作らない。実画面で繰り返し現れた部品から抽出する。
 
-## Amidala 固有であり、他製品では決め直す判断
+## Aimani AI 固有であり、他製品では決め直す判断
 
 - People をホームにし、人との関係から Todo と Handoff に入る情報設計
 - `relationship rail` を使った責任の受け渡し表現
-- Amidala の indigo を引き継ぐ色調
+- Aimani AI の indigo を引き継ぐ色調
 - Handoff の承認で Todo の担当者を変更する状態遷移
 - Cloudflare の Web Worker / private API Worker 二層構成
 - PostgreSQL 接続先の具体的なサービスとリージョン

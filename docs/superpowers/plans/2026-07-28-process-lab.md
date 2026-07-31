@@ -74,7 +74,7 @@ describe('process graph', () => {
 
 - [x] **Step 2: Run the unit test and observe RED**
 
-Run: `pnpm --filter @amidala/api exec vitest run src/features/process-lab/process-graph.test.ts`
+Run: `pnpm --filter @aimani-ai/api exec vitest run src/features/process-lab/process-graph.test.ts`
 
 Expected: FAIL because `process-graph.ts` does not exist.
 
@@ -99,7 +99,7 @@ Implement graph traversal with `Map<string, string[]>` and Kahn's algorithm. `va
 
 - [x] **Step 4: Run unit tests and package builds**
 
-Run: `pnpm --filter @amidala/api exec vitest run src/features/process-lab/process-graph.test.ts && pnpm --filter @amidala/contracts exec tsc -p tsconfig.json`
+Run: `pnpm --filter @aimani-ai/api exec vitest run src/features/process-lab/process-graph.test.ts && pnpm --filter @aimani-ai/contracts exec tsc -p tsconfig.json`
 
 Expected: PASS.
 
@@ -133,7 +133,7 @@ Add assertions that after seeding Acme has one board, six steps, at least five d
 
 - [x] **Step 2: Run the demo test and observe RED**
 
-Run: `TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo pnpm --filter @amidala/api test:demo -- --run src/dev/demo-seed.integration.test.ts`
+Run: `TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_demo pnpm --filter @aimani-ai/api test:demo -- --run src/dev/demo-seed.integration.test.ts`
 
 Expected: FAIL because Process Lab tables do not exist.
 
@@ -165,7 +165,7 @@ Connect 1→2→3, 3→4, 3→5, 4→6, 5→6. Give every step a layout row.
 
 - [x] **Step 5: Reset the local demo DB and observe GREEN**
 
-Run: `pnpm db:demo:reset && TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo pnpm --filter @amidala/api test:demo -- --run src/dev/demo-seed.integration.test.ts`
+Run: `pnpm db:demo:reset && TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_demo pnpm --filter @aimani-ai/api test:demo -- --run src/dev/demo-seed.integration.test.ts`
 
 Expected: PASS and the development database contains the Process Lab board.
 
@@ -213,7 +213,7 @@ Use the existing Better Auth test helper and real test database pattern from `to
 
 - [x] **Step 2: Run the integration test and observe RED**
 
-Run: `TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo pnpm --filter @amidala/api test:integration -- --run src/features/process-lab/process-lab.integration.test.ts`
+Run: `TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_demo pnpm --filter @aimani-ai/api test:integration -- --run src/features/process-lab/process-lab.integration.test.ts`
 
 Expected: FAIL with 404 because routes are not mounted.
 
@@ -239,7 +239,7 @@ The service converts domain violations to `ApiError('conflict', message)` and au
 
 Register `processLabRepository` and `processLabService` as request-scoped dependencies and mount `createProcessLabRoutes()` once in `app.ts`.
 
-Run: `TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo pnpm --filter @amidala/api test:integration -- --run src/features/process-lab/process-lab.integration.test.ts`
+Run: `TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_demo pnpm --filter @aimani-ai/api test:integration -- --run src/features/process-lab/process-lab.integration.test.ts`
 
 Expected: PASS.
 
@@ -273,7 +273,7 @@ Assert that a complete API workspace parses, while a dependency pointing at an a
 
 - [x] **Step 2: Run the web test and observe RED**
 
-Run: `pnpm --filter @amidala/web test -- src/features/process-lab/process-lab-schema.test.ts`
+Run: `pnpm --filter @aimani-ai/web test -- src/features/process-lab/process-lab-schema.test.ts`
 
 Expected: FAIL because the schema module is missing.
 
@@ -283,7 +283,7 @@ Follow the existing `features/work` split. `process-lab-query-key.ts` must impor
 
 - [x] **Step 4: Run the focused web test and typecheck**
 
-Run: `pnpm --filter @amidala/web test -- src/features/process-lab/process-lab-schema.test.ts && pnpm --filter @amidala/web exec tsc --noEmit -p tsconfig.json`
+Run: `pnpm --filter @aimani-ai/web test -- src/features/process-lab/process-lab-schema.test.ts && pnpm --filter @aimani-ai/web exec tsc --noEmit -p tsconfig.json`
 
 Expected: PASS.
 
@@ -317,7 +317,7 @@ git commit -m "feat: add Process Lab BFF boundary"
 
 - [x] **Step 1: Add the exact React Flow dependency**
 
-Run: `pnpm --filter @amidala/web add @xyflow/react@12.11.2`
+Run: `pnpm --filter @aimani-ai/web add @xyflow/react@12.11.2`
 
 Expected: only `apps/web/package.json` and `pnpm-lock.yaml` change.
 
@@ -333,7 +333,7 @@ it('orders the mobile list predecessor-first');
 
 - [x] **Step 3: Run presenter tests and observe RED**
 
-Run: `pnpm --filter @amidala/web test -- src/features/process-lab/process-lab-presenter.test.ts`
+Run: `pnpm --filter @aimani-ai/web test -- src/features/process-lab/process-lab-presenter.test.ts`
 
 Expected: FAIL because presenter functions do not exist.
 
@@ -356,13 +356,13 @@ Use event-driven updates only:
 
 Mutation calls are serialized per board. While saving, show `保存中`; on success replace query data with the returned full workspace; on failure show an inline retryable message and keep the local canvas visible.
 
-- [x] **Step 5: Implement responsive, Amidala-native styling**
+- [x] **Step 5: Implement responsive, Aimani AI-native styling**
 
 Use existing color/spacing tokens and Manrope / Noto Sans JP. Desktop layout is canvas plus 320px inspector; mobile under 760px hides canvas and shows the topologically ordered stacked list. Avoid gradients, dashboard-card grids, ornamental metrics, and oversized titles. Include a small `実験機能` badge and one-sentence explanation so the page reads as a disposable lab.
 
 - [x] **Step 6: Run presenter tests and web typecheck**
 
-Run: `pnpm --filter @amidala/web test -- src/features/process-lab/process-lab-presenter.test.ts && pnpm --filter @amidala/web exec tsc --noEmit -p tsconfig.json`
+Run: `pnpm --filter @aimani-ai/web test -- src/features/process-lab/process-lab-presenter.test.ts && pnpm --filter @aimani-ai/web exec tsc --noEmit -p tsconfig.json`
 
 Expected: PASS.
 
@@ -392,7 +392,7 @@ Use `ensureQueryData(processLabQuery(organizationId))`, a skeleton `pendingCompo
 
 - [x] **Step 2: Extend the shell's organization-route recognition**
 
-Add `process-lab` to the root route regex and page-title mapping so authentication, organization context, and the Amidala shell apply. Do not add it to main navigation arrays.
+Add `process-lab` to the root route regex and page-title mapping so authentication, organization context, and the Aimani AI shell apply. Do not add it to main navigation arrays.
 
 - [x] **Step 3: Add one contextual link from Team Work**
 
@@ -400,7 +400,7 @@ Add a subdued link labelled `工程のつながりを試す` with supporting cop
 
 - [x] **Step 4: Generate route tree and build**
 
-Run: `pnpm --filter @amidala/web build`
+Run: `pnpm --filter @aimani-ai/web build`
 
 Expected: TanStack route generation includes `process-lab`, build succeeds, and no server-only code leaks into the client bundle.
 
@@ -408,7 +408,7 @@ Expected: TanStack route generation includes `process-lab`, build succeeds, and 
 
 ```bash
 git add apps/web/src/routes apps/web/src/features/work/TeamWorkPage.tsx
-git commit -m "feat: link Process Lab into Amidala"
+git commit -m "feat: link Process Lab into Aimani AI"
 ```
 
 ---
@@ -432,11 +432,11 @@ Run:
 
 ```bash
 pnpm db:demo:reset
-pnpm --filter @amidala/api test
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo pnpm --filter @amidala/api test:integration
+pnpm --filter @aimani-ai/api test
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_demo pnpm --filter @aimani-ai/api test:integration
 pnpm db:demo:reset
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_demo pnpm --filter @amidala/api test:demo
-pnpm --filter @amidala/web test
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_demo pnpm --filter @aimani-ai/api test:demo
+pnpm --filter @aimani-ai/web test
 pnpm build
 ```
 

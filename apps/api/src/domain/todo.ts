@@ -1,4 +1,4 @@
-import type { RelationshipKind, SharedTodoWorkspace, TeamWorkOverview, TodoSummary } from '@amidala/contracts';
+import type { RelationshipKind, SharedTodoWorkspace, TeamWorkOverview, TodoSummary } from '@aimani-ai/contracts';
 import type { CurrentMembershipContext } from './identity';
 
 export interface IdGenerator { next(): string }

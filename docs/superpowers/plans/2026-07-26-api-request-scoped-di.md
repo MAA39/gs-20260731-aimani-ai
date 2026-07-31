@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- Change only `/Users/maa/Projects/gs/000_参照用/amidala-v2`.
+- Change only `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`.
 - Add DI only; do not add PostgreSQL, Drizzle, Better Auth, Hyperdrive bindings, Queue, or external resources.
 - Awilix imports stay under `apps/api/src/composition`.
 - Root registrations are stateless singletons; `env`, `request`, and application services are request-scoped or values.
@@ -71,7 +71,7 @@ Add a second assertion in the same test file that throws inside `withRequestScop
 
 - [x] **Step 2: Run the focused test and verify RED**
 
-Run: `pnpm --filter @amidala/api test -- --run`
+Run: `pnpm --filter @aimani-ai/api test -- --run`
 
 Expected: FAIL because `root-container.ts` and `request-scope.ts` do not exist.
 
@@ -124,8 +124,8 @@ export default createApp({ rootContainer: createRootContainer() });
 Run:
 
 ```bash
-pnpm --filter @amidala/api test -- --run
-pnpm --filter @amidala/api build
+pnpm --filter @aimani-ai/api test -- --run
+pnpm --filter @aimani-ai/api build
 pnpm build
 ```
 

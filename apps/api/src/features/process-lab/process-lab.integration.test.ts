@@ -1,6 +1,6 @@
 import pg from 'pg';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { processLabWorkspaceSchema } from '@amidala/contracts';
+import { processLabWorkspaceSchema } from '@aimani-ai/contracts';
 import { createApp } from '../../app';
 
 const databaseUrl = process.env.TEST_DATABASE_URL;
@@ -22,7 +22,7 @@ describe('Process Lab API', () => {
       new Request('http://localhost:8787/api/auth/sign-in/email', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ email, password: 'amidala-demo-2026' }),
+        body: JSON.stringify({ email, password: 'aimani-ai-demo-2026' }),
       }),
       env,
     );
@@ -91,7 +91,7 @@ describe('Process Lab API', () => {
   });
 
   it('returns the connected board to an authenticated organization member', async () => {
-    const cookie = await signIn('owner@amidala.local');
+    const cookie = await signIn('owner@aimani-ai.local');
     const response = await request(cookie, '/organizations/org_acme_studio/process-lab');
     expect(response.status).toBe(200);
     const workspace = processLabWorkspaceSchema.parse(response.body);
@@ -101,13 +101,13 @@ describe('Process Lab API', () => {
   });
 
   it('returns 403 when a member requests another organization board', async () => {
-    const cookie = await signIn('suzuki@amidala.local');
+    const cookie = await signIn('suzuki@aimani-ai.local');
     const response = await request(cookie, '/organizations/org_acme_studio/process-lab');
     expect(response.status).toBe(403);
   });
 
   it('rejects starting a step whose predecessor is incomplete', async () => {
-    const cookie = await signIn('owner@amidala.local');
+    const cookie = await signIn('owner@aimani-ai.local');
     const response = await request(
       cookie,
       '/organizations/org_acme_studio/process-lab/steps/launch_preparation/status',
@@ -120,7 +120,7 @@ describe('Process Lab API', () => {
   });
 
   it('rejects a dependency that creates a directed cycle', async () => {
-    const cookie = await signIn('owner@amidala.local');
+    const cookie = await signIn('owner@aimani-ai.local');
     const response = await request(
       cookie,
       '/organizations/org_acme_studio/process-lab/dependencies',
@@ -139,7 +139,7 @@ describe('Process Lab API', () => {
   });
 
   it('persists a moved step and returns the incremented revision', async () => {
-    const cookie = await signIn('owner@amidala.local');
+    const cookie = await signIn('owner@aimani-ai.local');
     const moved = await request(
       cookie,
       '/organizations/org_acme_studio/process-lab/steps/launch_preparation/layout',
@@ -153,7 +153,7 @@ describe('Process Lab API', () => {
   });
 
   it('connects and disconnects a valid dependency without isolating a step', async () => {
-    const cookie = await signIn('owner@amidala.local');
+    const cookie = await signIn('owner@aimani-ai.local');
     const connected = await request(
       cookie,
       '/organizations/org_acme_studio/process-lab/dependencies',

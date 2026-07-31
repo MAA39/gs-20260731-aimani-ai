@@ -72,8 +72,8 @@ const decide = async (
 
 ```ts
 it('stores the recipient next action with acceptance without overwriting it on retry', async () => {
-  const ownerCookie = await signIn('owner@amidala.local');
-  const moriCookie = await signIn('mori@amidala.local');
+  const ownerCookie = await signIn('owner@aimani-ai.local');
+  const moriCookie = await signIn('mori@aimani-ai.local');
   const todo = await createTodo(ownerCookie);
   const requested = await requestHandoff(ownerCookie, todo.todoId, { recipientMembershipId: 'acme-studio-mori' });
   const handoffId = requested.handoff?.handoffId ?? '';
@@ -106,8 +106,8 @@ reject/cancel routeはbodyを受け取らない既存契約を維持する。tes
 - [ ] **Step 4: REDを確認する**
 
 ```bash
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff \
-  pnpm --filter @amidala/api test:integration -- todo-handoffs.integration.test.ts --run
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_handoff \
+  pnpm --filter @aimani-ai/api test:integration -- todo-handoffs.integration.test.ts --run
 ```
 
 Expected: response schemaにnextActionがなく、accept保存testがfailする。既存Handoff behaviorの失敗ではないことを確認する。
@@ -159,7 +159,7 @@ check(
 Run:
 
 ```bash
-pnpm --filter @amidala/db exec drizzle-kit generate --name=handoff_next_action
+pnpm --filter @aimani-ai/db exec drizzle-kit generate --name=handoff_next_action
 ```
 
 生成SQLが`ADD COLUMN next_action text`とcheckだけを含み、既存table drop/recreateをしないことをinspectする。migration SQL / journal / snapshotを手書きで代替しない。
@@ -220,11 +220,11 @@ implementation worktreeのignored `.dev.vars`がlocal demo DBだけを指すと�
 
 ```bash
 pnpm db:migrate
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff \
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_handoff \
   pnpm exec tsx -e \
   "import { migrateDatabase } from './packages/db/src/migrations.ts'; await migrateDatabase(process.env.TEST_DATABASE_URL!)"
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff \
-  pnpm --filter @amidala/api test:integration -- todo-handoffs.integration.test.ts --run
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_handoff \
+  pnpm --filter @aimani-ai/api test:integration -- todo-handoffs.integration.test.ts --run
 ```
 
 2つ目のcommandでintegration DBへ同じgenerated migrationを適用する。Expected: new testsと既存tests pass。
@@ -267,7 +267,7 @@ test('引き継ぎ受け入れの案内へ次の一手を含める', () => {
 });
 ```
 
-Run `pnpm --filter @amidala/web test`。Expected: function signature / copy mismatchでfail。
+Run `pnpm --filter @aimani-ai/web test`。Expected: function signature / copy mismatchでfail。
 
 - [ ] **Step 2: pure announcementをGREENにする**
 
@@ -293,8 +293,8 @@ API responseは拡張済み`todoHandoffResponseSchema`でparseする。
 - [ ] **Step 4: Web tests / typecheckを実行する**
 
 ```bash
-pnpm --filter @amidala/web test
-pnpm --filter @amidala/web exec tsc --noEmit
+pnpm --filter @aimani-ai/web test
+pnpm --filter @aimani-ai/web exec tsc --noEmit
 ```
 
 - [ ] **Step 5: BFF commitを作る**
@@ -363,9 +363,9 @@ Dialogは`.dialog-*` / `.handoff-form` / `.form-field` / `.dialog-actions`を再
 - [ ] **Step 4: tests / build / marker scanを実行する**
 
 ```bash
-pnpm --filter @amidala/web test
+pnpm --filter @aimani-ai/web test
 pnpm build
-! rg -n 'owner@amidala\.local|mori@amidala\.local|amidala-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist
+! rg -n 'owner@aimani-ai\.local|mori@aimani-ai\.local|aimani-ai-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist
 git diff --check
 ```
 
@@ -391,12 +391,12 @@ git commit -m "feat: declare next action when accepting Handoff"
 - [x] **Step 1: full verificationを実行する**
 
 ```bash
-pnpm --filter @amidala/api test
-pnpm --filter @amidala/web test
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff pnpm --filter @amidala/api test:integration --run
-pnpm --filter @amidala/api test:demo --run
+pnpm --filter @aimani-ai/api test
+pnpm --filter @aimani-ai/web test
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_handoff pnpm --filter @aimani-ai/api test:integration --run
+pnpm --filter @aimani-ai/api test:demo --run
 pnpm build
-! rg -n 'owner@amidala\.local|mori@amidala\.local|amidala-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist
+! rg -n 'owner@aimani-ai\.local|mori@aimani-ai\.local|aimani-ai-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist
 git diff --check
 ```
 
@@ -404,13 +404,13 @@ git diff --check
 
 - API unit: 13/13 PASS（約1.1s）
 - Web test: 14/14 PASS（約0.64s）
-- PostgreSQL integration（`127.0.0.1:54329/amidala_handoff`）: 18/18 PASS（約4.55s）
-- demo seed（`127.0.0.1:54329/amidala_demo`、reset後）: 1/1 PASS（約0.67s）
+- PostgreSQL integration（`127.0.0.1:54329/aimani_ai_handoff`）: 18/18 PASS（約4.55s）
+- demo seed（`127.0.0.1:54329/aimani_ai_demo`、reset後）: 1/1 PASS（約0.67s）
 - `pnpm build`: 3/3 package tasks PASS（約10.1s）
 - production artifact marker scan（`apps/web/dist`）: 0 matches
 - `git diff --check`: PASS
 
-demo seedはブラウザjourney後のDB状態で一度不一致となったため、`pnpm db:demo:reset`（`amidala_demo`のみ）後に再実行してPASSを確認した。
+demo seedはブラウザjourney後のDB状態で一度不一致となったため、`pnpm db:demo:reset`（`aimani_ai_demo`のみ）後に再実行してPASSを確認した。
 
 - [x] **Step 2: local runtime journeyを実行する**
 
@@ -438,10 +438,10 @@ runtimeでActor Switch直後に旧principalのquery projectionが残る問題を
 
 PR title: `feat: record Handoff next action`
 
-実測: `feat/handoff-next-action`をpushし、small PR [#11](https://github.com/MAA39/amidala-v2/pull/11) `feat: record Handoff next action`を作成。Cloudflare deployは未実施。
+実測: `feat/handoff-next-action`をpushし、small PR [#11](https://github.com/MAA39/aimani-ai-v2/pull/11) `feat: record Handoff next action`を作成。Cloudflare deployは未実施。
 
 - [x] **Step 6: GitHub checks後にmerge commit方式でmergeする**
 
 root mainでfresh verification後、next-action worktree、local/remote branchを削除する。
 
-実測: PR [#11](https://github.com/MAA39/amidala-v2/pull/11)はmerge commit `ee9b567`で`main`へ統合済み。merge後rootでAPI 13/13、Web 14/14、build 3/3、artifact marker 0をfresh確認し、worktreeとlocal/remote branchを削除した。Cloudflare deployは行っていない。
+実測: PR [#11](https://github.com/MAA39/aimani-ai-v2/pull/11)はmerge commit `ee9b567`で`main`へ統合済み。merge後rootでAPI 13/13、Web 14/14、build 3/3、artifact marker 0をfresh確認し、worktreeとlocal/remote branchを削除した。Cloudflare deployは行っていない。

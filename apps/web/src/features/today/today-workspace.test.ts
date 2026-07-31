@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import type { AssignedTodoWorkspace, TodoHandoffWorkspace } from '@amidala/contracts';
+import type { AssignedTodoWorkspace, TodoHandoffWorkspace } from '@aimani-ai/contracts';
 import { acceptedHandoffAnnouncement, composeTodayWorkspace, isTodoWaitingOnRecipient } from './today-workspace';
 
 test('引き継ぎ受け入れの案内へ次の一手を含める', () => {
@@ -42,7 +42,7 @@ const handoff = (handoffId: string, status: TodoHandoffWorkspace['recentHandoffs
 });
 
 const assignedWorkspace: AssignedTodoWorkspace = {
-  organization: { organizationId: 'organization-1', name: 'Amidala' },
+  organization: { organizationId: 'organization-1', name: 'Aimani AI' },
   currentMember: member('membership-tanaka', '田中'),
   todos: [
     todo('todo-owned', null),

@@ -6,13 +6,13 @@ import {
   processLabStep,
   processLabStepLayout,
   user,
-} from '@amidala/db/schema';
-import type { AmidalaDatabase } from '@amidala/db/client';
+} from '@aimani-ai/db/schema';
+import type { AimaniAiDatabase } from '@aimani-ai/db/client';
 import type {
   ConnectProcessStepsInput,
   ProcessLabWorkspace,
   ProcessStepStatus,
-} from '@amidala/contracts';
+} from '@aimani-ai/contracts';
 import {
   deriveStepAvailability,
   isWeaklyConnected,
@@ -35,10 +35,10 @@ export class ProcessLabRepositoryError extends Error {
   }
 }
 
-type DatabaseExecutor = AmidalaDatabase;
+type DatabaseExecutor = AimaniAiDatabase;
 
 export class ProcessLabRepository {
-  constructor(private readonly database: AmidalaDatabase) {}
+  constructor(private readonly database: AimaniAiDatabase) {}
 
   private async assertMembership(
     database: DatabaseExecutor,

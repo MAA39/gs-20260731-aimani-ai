@@ -1,7 +1,7 @@
-# 既存 Amidala / BYARD UX 監査
+# 既存 Aimani AI / BYARD UX 監査
 
-調査日: 2026-07-26  
-方針: 既存リポジトリは読み取り専用。新規実装は `amidala-v2` のみ
+調査日: 2026-07-26
+方針: 既存リポジトリは読み取り専用。新規実装は `aimani-ai-v2` のみ
 
 ## 調査の問い
 
@@ -10,16 +10,16 @@
 3. Todo/Handoff に転用すべき操作と状態は何か。
 4. 見た目、コピー、アクセシビリティの何を残し、何を作り直すか。
 
-## Amidala から得たもの
+## Aimani AI から得たもの
 
 ### People を起点にする情報設計
 
-Amidala は `/l/people/:uuid` の相手ワークスペースに `1on1`、`todo`、`history`、`goals`、`message`、`profile` を並べている。仕事の種類ではなく「誰との関係か」を先に選ぶ設計であり、Amidala v2 の核として継承する。
+Aimani AI は `/l/people/:uuid` の相手ワークスペースに `1on1`、`todo`、`history`、`goals`、`message`、`profile` を並べている。仕事の種類ではなく「誰との関係か」を先に選ぶ設計であり、Aimani AI v2 の核として継承する。
 
 根拠:
 
-- `amidala-angular/src/app/authorized-routing-module/top-page-routing-module/top-routing.ts:8-120`
-- `amidala-angular/src/app/authorized-routing-module/top-page-routing-module/top-tab-layout/top-tab-layout.component.html:19-45,87-120`
+- `aimani-ai-angular/src/app/authorized-routing-module/top-page-routing-module/top-routing.ts:8-120`
+- `aimani-ai-angular/src/app/authorized-routing-module/top-page-routing-module/top-tab-layout/top-tab-layout.component.html:19-45,87-120`
 
 ### 未完了を正式な状態として見せる
 
@@ -27,9 +27,9 @@ Amidala は `/l/people/:uuid` の相手ワークスペースに `1on1`、`todo`�
 
 根拠:
 
-- `amidala-angular/src/app/authorized-routing-module/top-page-routing-module/people/one-on-one/ooo-main/ooo-main.component.html:31-37,89-221`
-- `amidala-angular/src/app/authorized-routing-module/top-page-routing-module/people/one-on-one/ooo-detail/ooo-detail.component.html:1-12,28-85`
-- `amidala-angular/src/app/authorized-routing-module/top-page-routing-module/people/one-on-one/ooo-detail/ooo-status-card/ooo-status-card.component.html:1-98`
+- `aimani-ai-angular/src/app/authorized-routing-module/top-page-routing-module/people/one-on-one/ooo-main/ooo-main.component.html:31-37,89-221`
+- `aimani-ai-angular/src/app/authorized-routing-module/top-page-routing-module/people/one-on-one/ooo-detail/ooo-detail.component.html:1-12,28-85`
+- `aimani-ai-angular/src/app/authorized-routing-module/top-page-routing-module/people/one-on-one/ooo-detail/ooo-status-card/ooo-status-card.component.html:1-98`
 
 ### Todo の見方と Handoff の原型
 
@@ -37,7 +37,7 @@ Amidala は `/l/people/:uuid` の相手ワークスペースに `1on1`、`todo`�
 
 根拠:
 
-- `amidala-angular/src/app/authorized-routing-module/authorized-shared/components/todo-base/todo-base.component.html:5-123`
+- `aimani-ai-angular/src/app/authorized-routing-module/authorized-shared/components/todo-base/todo-base.component.html:5-123`
 
 ### デザイン資産
 
@@ -48,15 +48,15 @@ Amidala は `/l/people/:uuid` の相手ワークスペースに `1on1`、`todo`�
 
 根拠:
 
-- `amidala-angular/src/assets/scss/_variables.scss:1-107`
-- `amidala-angular/src/assets/scss/_theme.scss:1-115`
-- `amidala-angular/src/app/authorized-routing-module/authorized-shared/components/side-nav-main/side-nav-main.component.scss:47-154`
+- `aimani-ai-angular/src/assets/scss/_variables.scss:1-107`
+- `aimani-ai-angular/src/assets/scss/_theme.scss:1-115`
+- `aimani-ai-angular/src/app/authorized-routing-module/authorized-shared/components/side-nav-main/side-nav-main.component.scss:47-154`
 
 ## BYARD から得たもの
 
 ### Account / Member / Organization の分離
 
-BYARD は Account を認証主体、Member を Organization 内の人物・権限として扱い、同じ Account の複数 Organization 所属を表現する。Amidala v2 ではこの境界を継承しつつ、Better Authの公式語彙に合わせて User / Membership と呼ぶ。Accountはcredentialの意味に予約する。
+BYARD は Account を認証主体、Member を Organization 内の人物・権限として扱い、同じ Account の複数 Organization 所属を表現する。Aimani AI v2 ではこの境界を継承しつつ、Better Authの公式語彙に合わせて User / Membership と呼ぶ。Accountはcredentialの意味に予約する。
 
 根拠:
 
@@ -86,7 +86,7 @@ BYARD の permission は Docs の説明より実装が多層化し、Stream/Work
 
 ## 移植判断
 
-| 対象 | 判断 | Amidala v2 での扱い |
+| 対象 | 判断 | Aimani AI v2 での扱い |
 |---|---|---|
 | People → 相手 workspace | そのまま継承 | People を初期 home とし、相手詳細から Todo へ入る |
 | 相手タブ | 再解釈 | 初期は Overview / Todos。1on1 / History / Goals は後続 slice |
@@ -134,7 +134,7 @@ BYARD の permission は Docs の説明より実装が多層化し、Stream/Work
 
 ## 未検証事項
 
-- Amidala の Storybook/Figma は対象 repository 内に見つからなかった。
+- Aimani AI の Storybook/Figma は対象 repository 内に見つからなかった。
 - Angular の最終的な見た目は local 起動での目視確認が必要。
-- `Byard_mp4` の録画は BYARD の画面根拠であり、Amidala の画面として扱わない。
+- `Byard_mp4` の録画は BYARD の画面根拠であり、Aimani AI の画面として扱わない。
 - 初回 UI 実装後、legacy と新規を並べた screenshot critique を行う。

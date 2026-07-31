@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- Modify only `/Users/maa/Projects/gs/000_参照用/amidala-v2` and an isolated worktree created from `feat/touchable-mvp`.
+- Modify only `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2` and an isolated worktree created from `feat/touchable-mvp`.
 - Read `docs/README.md`, the canonical spec, `docs/standards/research-before-build.md`, and `docs/standards/domain-language-and-naming.md` before implementation.
 - Use the exact domain names `TodoHandoff`, `RequestTodoHandoff`, `AcceptTodoHandoff`, `RejectTodoHandoff`, `CancelTodoHandoff`, `GetTodoHandoffWorkspace`, and `GetAssignedTodoWorkspace`.
 - Status is exactly `requested | accepted | rejected | canceled`; terminal timestamp is `resolvedAt` / `resolved_at`.
@@ -56,7 +56,7 @@
 - Create: `apps/api/src/routes/todo-handoffs.integration.test.ts`
 
 **Interfaces:**
-- Consumes: Better Auth session User, `CurrentMembershipContext`, existing Todo/Membership schema, request-scoped `AmidalaDatabase`, `Clock`, and `IdGenerator`.
+- Consumes: Better Auth session User, `CurrentMembershipContext`, existing Todo/Membership schema, request-scoped `AimaniAiDatabase`, `Clock`, and `IdGenerator`.
 - Produces:
 
 ```ts
@@ -235,8 +235,8 @@ First behavior:
 
 ```ts
 it('moves responsibility only when the recipient accepts the Todo Handoff', async () => {
-  const ownerCookie = await signIn('owner@amidala.local')
-  const moriCookie = await signIn('mori@amidala.local')
+  const ownerCookie = await signIn('owner@aimani-ai.local')
+  const moriCookie = await signIn('mori@aimani-ai.local')
   const todo = await createTodo(ownerCookie, {
     contextMembershipId: 'acme-studio-sato',
     assigneeMembershipId: 'acme-studio-owner',
@@ -265,9 +265,9 @@ Second behavior:
 
 ```ts
 it('serializes competing decisions, rejects another Organization, and allows cancellation', async () => {
-  const ownerCookie = await signIn('owner@amidala.local')
-  const satoCookie = await signIn('sato@amidala.local')
-  const suzukiCookie = await signIn('suzuki@amidala.local')
+  const ownerCookie = await signIn('owner@aimani-ai.local')
+  const satoCookie = await signIn('sato@aimani-ai.local')
+  const suzukiCookie = await signIn('suzuki@aimani-ai.local')
   const todo = await createOwnerAssignedTodo(ownerCookie)
   const requested = await requestHandoff(ownerCookie, todo.todoId, {
     recipientMembershipId: 'acme-studio-sato',
@@ -324,7 +324,7 @@ Test helpers must construct real Hono `Request` objects and consistently return 
 Run against a disposable migrated and seeded PostgreSQL:
 
 ```bash
-pnpm --filter @amidala/api test:integration -- todo-handoffs.integration.test.ts
+pnpm --filter @aimani-ai/api test:integration -- todo-handoffs.integration.test.ts
 ```
 
 Expected: FAIL because the endpoints and `todo_handoff` table do not exist. A connection/setup error is not an acceptable RED; fix the test environment until the failure names the missing behavior.
@@ -353,7 +353,7 @@ todo_handoff_todo_timeline_idx
 Generate migration with:
 
 ```bash
-pnpm --filter @amidala/db exec drizzle-kit generate --name=todo_handoff
+pnpm --filter @aimani-ai/db exec drizzle-kit generate --name=todo_handoff
 ```
 
 Inspect generated SQL and confirm it creates the Todo composite unique before the Handoff composite foreign key.
@@ -445,10 +445,10 @@ Register repository and all six use cases in `RequestCradle` and `withRequestSco
 Run:
 
 ```bash
-pnpm --filter @amidala/api test:integration -- todo-handoffs.integration.test.ts
-pnpm --filter @amidala/api test -- --run
-pnpm --filter @amidala/api build
-pnpm --filter @amidala/db build
+pnpm --filter @aimani-ai/api test:integration -- todo-handoffs.integration.test.ts
+pnpm --filter @aimani-ai/api test -- --run
+pnpm --filter @aimani-ai/api build
+pnpm --filter @aimani-ai/db build
 ```
 
 Expected: 2 focused integration behaviors pass, existing API unit tests pass, and both packages compile without warnings from the changed code.
@@ -557,8 +557,8 @@ Create `peopleQuery` around the existing `getPeople` Server Function for Dialog 
 Run:
 
 ```bash
-pnpm --filter @amidala/web exec tsc --noEmit
-pnpm --filter @amidala/web build
+pnpm --filter @aimani-ai/web exec tsc --noEmit
+pnpm --filter @aimani-ai/web build
 ```
 
 Expected: client and SSR bundles build; no server-only import leaks into client output.
@@ -610,7 +610,7 @@ type RequestTodoHandoffDialogProps = {
 Run:
 
 ```bash
-pnpm --filter @amidala/web add @base-ui/react@1.6.0
+pnpm --filter @aimani-ai/web add @base-ui/react@1.6.0
 ```
 
 Do not add a generic design-system package or AlertDialog wrapper.
@@ -714,8 +714,8 @@ Use existing tokens and the Relationship rail. Accepted uses connected, requeste
 Run:
 
 ```bash
-pnpm --filter @amidala/web exec tsc --noEmit
-pnpm --filter @amidala/web build
+pnpm --filter @aimani-ai/web exec tsc --noEmit
+pnpm --filter @aimani-ai/web build
 git diff --check
 ```
 
@@ -787,12 +787,12 @@ At 390×844:
 Run:
 
 ```bash
-pnpm --filter @amidala/api test -- --run
-pnpm --filter @amidala/api test:integration -- todo-handoffs.integration.test.ts
-pnpm --filter @amidala/web exec tsc --noEmit
+pnpm --filter @aimani-ai/api test -- --run
+pnpm --filter @aimani-ai/api test:integration -- todo-handoffs.integration.test.ts
+pnpm --filter @aimani-ai/web exec tsc --noEmit
 pnpm build --force
-pnpm --filter @amidala/api exec wrangler deploy --dry-run
-pnpm --filter @amidala/web exec wrangler deploy --dry-run
+pnpm --filter @aimani-ai/api exec wrangler deploy --dry-run
+pnpm --filter @aimani-ai/web exec wrangler deploy --dry-run
 git diff --check
 ```
 

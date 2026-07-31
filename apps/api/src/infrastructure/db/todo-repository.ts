@@ -1,8 +1,8 @@
 import { and, desc, eq, or, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
-import { membership, organization, relationship, todo, todoHandoff } from '@amidala/db/schema';
-import type { AmidalaDatabase } from '@amidala/db/client';
-import { relationshipKindSchema, type RelationshipKind, type TeamWorkOverview } from '@amidala/contracts';
+import { membership, organization, relationship, todo, todoHandoff } from '@aimani-ai/db/schema';
+import type { AimaniAiDatabase } from '@aimani-ai/db/client';
+import { relationshipKindSchema, type RelationshipKind, type TeamWorkOverview } from '@aimani-ai/contracts';
 import type { CurrentMembershipContext } from '../../domain/identity';
 import type {
   CreateSharedTodoCommand,
@@ -19,7 +19,7 @@ const membershipRoles = new Set<CurrentMembershipContext['role']>(['owner', 'man
 const relationshipOrder: Record<RelationshipKind, number> = { manager_report: 0, supporter: 1, peer: 2 };
 
 type TodoRow = typeof todo.$inferSelect;
-type Db = AmidalaDatabase;
+type Db = AimaniAiDatabase;
 type TodoProjection = {
   creatorName?: string | null;
   creatorTitle?: string | null;
@@ -37,7 +37,7 @@ type TodoProjection = {
 };
 
 export class TodoRepositoryDrizzle implements TodoRepositoryPort {
-  constructor(private readonly database: AmidalaDatabase) {}
+  constructor(private readonly database: AimaniAiDatabase) {}
 
   async findActiveMembershipForUser(userId: string, organizationId: string): Promise<CurrentMembershipContext | null> {
     const rows = await this.database

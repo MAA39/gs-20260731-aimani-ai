@@ -1,6 +1,6 @@
 import '@tanstack/react-start/server-only';
-import { createApiClient } from '@amidala/api-client';
-import { assignedTodoWorkspaceSchema, createTodoBodySchema, personTodoPathSchema, sharedTodoWorkspaceSchema } from '@amidala/contracts';
+import { createApiClient } from '@aimani-ai/api-client';
+import { assignedTodoWorkspaceSchema, createTodoBodySchema, personTodoPathSchema, sharedTodoWorkspaceSchema } from '@aimani-ai/contracts';
 import {
   createSharedTodoResponseSchema,
   type CreateSharedTodoInput,

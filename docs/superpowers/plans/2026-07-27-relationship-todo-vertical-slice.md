@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- Modify only `/Users/maa/Projects/gs/000_参照用/amidala-v2`; legacy Amidala/BYARD repositories remain read-only.
+- Modify only `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`; legacy Aimani AI/BYARD repositories remain read-only.
 - Use the exact domain terms `Todo`, `CurrentMembershipContext`, `Context Membership`, `Creator Membership`, and `Assignee Membership`; never use User ID as an Organization-scoped actor.
 - Browser inputs never contain `creatorMembershipId`, `userId`, or `organizationId` outside typed route params. The API derives creator from the Better Auth session and active Membership.
 - Every Todo query and write includes `organization_id`; all three Membership references use composite FKs to `(membership.id, membership.organization_id)`.
@@ -49,7 +49,7 @@
 - Produces `CreateSharedTodo.execute(userId, input): Promise<TodoSummary>`.
 - Produces `GetSharedTodoWorkspace.execute(userId, input): Promise<SharedTodoWorkspace>`.
 - Produces `GET|POST /organizations/:organizationId/people/:contextMembershipId/todos`.
-- Produces `createTodoInputSchema`, `sharedTodoWorkspaceSchema`, `TodoSummary`, and `SharedTodoWorkspace` from `@amidala/contracts`.
+- Produces `createTodoInputSchema`, `sharedTodoWorkspaceSchema`, `TodoSummary`, and `SharedTodoWorkspace` from `@aimani-ai/contracts`.
 
 - [ ] **Step 1: Write the failing integration test**
 
@@ -57,7 +57,7 @@ Add `apps/api/src/routes/todos.integration.test.ts`. Connect a real `pg.Client` 
 
 The single test is named `keeps a shared Todo inside its Organization relationship context` and performs these observable actions. The test connects to PostgreSQL but its first DB query occurs only after the POST 201 assertion. Therefore the pre-schema RED stops on an observable 404 assertion failure and cannot reach a missing-table query:
 
-1. sign in as `owner@amidala.local`;
+1. sign in as `owner@aimani-ai.local`;
 2. POST Acme / Sato with `{ title: '次回1on1の論点をまとめる <uuid>', description: '共有メモを一つにする', assigneeMembershipId: 'acme-studio-sato' }`;
 3. assert 201 and the returned Todo has creator `acme-studio-owner`, context `acme-studio-sato`, assignee `acme-studio-sato`, status `open`;
 4. GET the same pair and assert the Todo is present with owner/Sato display names;
@@ -71,8 +71,8 @@ The production change this test catches is removal of session-derived creator/Or
 Run:
 
 ```bash
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala \
-  pnpm --filter @amidala/api test:integration -- --run src/routes/todos.integration.test.ts
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani-ai \
+  pnpm --filter @aimani-ai/api test:integration -- --run src/routes/todos.integration.test.ts
 ```
 
 Expected before implementation: the POST route returns 404. A setup error, TypeScript error, or missing database is not an accepted RED.
@@ -108,7 +108,7 @@ relationship_organization_target_kind_idx
   (organization_id, target_membership_id, kind)
 ```
 
-Export the table, run `pnpm --filter @amidala/db exec drizzle-kit generate`, inspect the generated SQL, run `pnpm db:migrate`, and do not hand-write an alternative migration.
+Export the table, run `pnpm --filter @aimani-ai/db exec drizzle-kit generate`, inspect the generated SQL, run `pnpm db:migrate`, and do not hand-write an alternative migration.
 
 - [ ] **Step 4: Define the shared contracts**
 
@@ -169,11 +169,11 @@ The Hono POST parses path and JSON separately, calls `CreateSharedTodo`, and ret
 Run:
 
 ```bash
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala \
-  pnpm --filter @amidala/api test:integration -- --run src/routes/todos.integration.test.ts
-pnpm --filter @amidala/api test
-pnpm --filter @amidala/api build
-pnpm --filter @amidala/db build
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani-ai \
+  pnpm --filter @aimani-ai/api test:integration -- --run src/routes/todos.integration.test.ts
+pnpm --filter @aimani-ai/api test
+pnpm --filter @aimani-ai/api build
+pnpm --filter @aimani-ai/db build
 ```
 
 Expected: the new test is 1/1 passing; existing API unit tests remain 2/2 passing. Commit `feat: add relationship Todo API`.
@@ -193,7 +193,7 @@ Expected: the new test is 1/1 passing; existing API unit tests remain 2/2 passin
 - Create: `apps/web/src/features/todos/todo-queries.ts`
 
 **Interfaces:**
-- Consumes typed Hono endpoints from Task 1 through `@amidala/api-client`.
+- Consumes typed Hono endpoints from Task 1 through `@aimani-ai/api-client`.
 - Produces `sharedTodoWorkspaceQuery({ organizationId, contextMembershipId })`.
 - Produces `getSharedTodoWorkspace` GET Server Function and `createSharedTodo` POST Server Function.
 - Adds `queryClient` to typed TanStack Router context.
@@ -254,8 +254,8 @@ The query function returns the full typed result union; it does not throw for ex
 Run:
 
 ```bash
-pnpm --filter @amidala/web exec tsc --noEmit
-pnpm --filter @amidala/web build
+pnpm --filter @aimani-ai/web exec tsc --noEmit
+pnpm --filter @aimani-ai/web build
 ```
 
 Inspect the client build and ensure `cloudflare:workers`, DB, Hono server implementation, and Better Auth server code are not exposed through Todo client chunks. Commit `feat: add Todo Query BFF boundary`.
@@ -334,8 +334,8 @@ Update authenticated-shell Organization extraction with the exact match `^/([^/]
 Run:
 
 ```bash
-pnpm --filter @amidala/web exec tsc --noEmit
-pnpm --filter @amidala/web build
+pnpm --filter @aimani-ai/web exec tsc --noEmit
+pnpm --filter @aimani-ai/web build
 pnpm build
 git diff --check
 ```
@@ -379,13 +379,13 @@ Sign in as Sato and verify the same Acme pair sees the shared Todo, then verify 
 Run fresh, non-cached evidence:
 
 ```bash
-pnpm --filter @amidala/api test
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala \
-  pnpm --filter @amidala/api test:integration -- --run
-pnpm --filter @amidala/web exec tsc --noEmit
+pnpm --filter @aimani-ai/api test
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani-ai \
+  pnpm --filter @aimani-ai/api test:integration -- --run
+pnpm --filter @aimani-ai/web exec tsc --noEmit
 pnpm build --force
-pnpm --filter @amidala/api exec wrangler deploy --dry-run
-pnpm --filter @amidala/web exec wrangler deploy --config dist/server/wrangler.json --dry-run
+pnpm --filter @aimani-ai/api exec wrangler deploy --dry-run
+pnpm --filter @aimani-ai/web exec wrangler deploy --config dist/server/wrangler.json --dry-run
 git diff --check
 ```
 

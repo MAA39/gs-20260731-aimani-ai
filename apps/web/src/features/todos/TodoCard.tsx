@@ -1,5 +1,5 @@
 import { CheckCircle2, Circle } from 'lucide-react';
-import type { TodoSummary } from '@amidala/contracts';
+import type { TodoSummary } from '@aimani-ai/contracts';
 import type { ReactNode } from 'react';
 
 export function TodoCard({ todo, action }: { todo: TodoSummary; action?: ReactNode }) {

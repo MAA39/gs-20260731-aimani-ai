@@ -1,6 +1,6 @@
-# Amidala v2 Design Foundation
+# Aimani AI v2 Design Foundation
 
-基準日: 2026-07-26  
+基準日: 2026-07-26
 ステータス: Touchable MVP 用。実画面レビューで更新する
 
 ## デザインの主題
@@ -39,13 +39,13 @@ rail は decoration ではなく、責任がどこからどこへ動くかを表
 
 ## Color tokens
 
-既存 Amidala の indigo と BYARD の状態表現を再解釈する。緑を brand color ではなく成功/接続の意味に限定する。
+既存 Aimani AI の indigo と BYARD の状態表現を再解釈する。緑を brand color ではなく成功/接続の意味に限定する。
 
 | token | value | 用途 |
 |---|---:|---|
 | `--ink` | `#26264A` | 見出し、主要本文 |
 | `--ink-muted` | `#686A86` | 補助情報 |
-| `--canvas` | `#F6F7FB` | app 背景。既存 Amidala を継承 |
+| `--canvas` | `#F6F7FB` | app 背景。既存 Aimani AI を継承 |
 | `--surface` | `#FFFFFF` | card / dialog |
 | `--line` | `#E1E3EF` | border / rail inactive |
 | `--brand` | `#6677E8` | primary action。既存 `#758BFD` を少し締める |
@@ -58,7 +58,7 @@ rail は decoration ではなく、責任がどこからどこへ動くかを表
 
 ## Typography
 
-- Display / heading: `Manrope`, 既存 Amidala の親しみを継承。
+- Display / heading: `Manrope`, 既存 Aimani AI の親しみを継承。
 - Body: `Noto Sans JP`, 日本語の可読性と文字幅を優先。
 - Utility / data: `Manrope`, 数値・status label・date に限定。
 - body 16px / 1.65、caption 13px / 1.5。既存 14px body は密度が高いため採用しない。
@@ -179,7 +179,7 @@ Button は結果を表す。「送信」ではなく「引き継ぎを依頼」�
 2. 今どの組織・誰との文脈かが分かるか。
 3. Todo の現在担当と Handoff の行き先が分かるか。
 4. 空/待機/失敗時に次の操作があるか。
-5. 既存 Amidala/BYARD の認知を活かしつつ、古い画面の密度を持ち込んでいないか。
+5. 既存 Aimani AI/BYARD の認知を活かしつつ、古い画面の密度を持ち込んでいないか。
 
 重箱の隅の pixel review はこの段階では行わない。触った時に判断を妨げる問題を先に直す。
 

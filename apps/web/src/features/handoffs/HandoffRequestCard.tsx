@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { TodoHandoffSummary } from '@amidala/contracts';
+import type { TodoHandoffSummary } from '@aimani-ai/contracts';
 import { rejectTodoHandoff, cancelTodoHandoff } from './handoffs.functions';
 import { AcceptTodoHandoffDialog } from './AcceptTodoHandoffDialog';
 import type { TodoHandoffMutationResult } from './handoff-schema';

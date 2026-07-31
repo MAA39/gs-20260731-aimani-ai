@@ -1,4 +1,4 @@
-export const DEMO_DATABASE_NAME = 'amidala_demo'
+export const DEMO_DATABASE_NAME = 'aimani_ai_demo'
 
 const LOCAL_HOSTS = new Set(['127.0.0.1', 'localhost'])
 

@@ -2,7 +2,7 @@ import { Dialog } from '@base-ui/react/dialog';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import type { TodoHandoffSummary } from '@amidala/contracts';
+import type { TodoHandoffSummary } from '@aimani-ai/contracts';
 import { acceptTodoHandoff } from './handoffs.functions';
 import type { TodoHandoffMutationResult } from './handoff-schema';
 

@@ -4,8 +4,8 @@ import { DEMO_ACTORS, demoActorSwitchFailureMessage, isDemoActorSwitchEnabled } 
 
 test('demo actors use the domain names and seeded emails', () => {
   assert.deepEqual(DEMO_ACTORS, [
-    { id: 'tanaka', name: '田中 彩', email: 'owner@amidala.local' },
-    { id: 'mori', name: '森 ハル', email: 'mori@amidala.local' },
+    { id: 'tanaka', name: '田中 彩', email: 'owner@aimani-ai.local' },
+    { id: 'mori', name: '森 ハル', email: 'mori@aimani-ai.local' },
   ])
 })
 

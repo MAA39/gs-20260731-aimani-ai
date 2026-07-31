@@ -1,5 +1,5 @@
 {
-  "name": "@amidala/web",
+  "name": "@aimani-ai/web",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,8 +8,8 @@
     "test": "node --import=tsx --test src/features/*/*.test.ts"
   },
   "dependencies": {
-    "@amidala/api-client": "workspace:*",
-    "@amidala/contracts": "workspace:*",
+    "@aimani-ai/api-client": "workspace:*",
+    "@aimani-ai/contracts": "workspace:*",
     "@base-ui/react": "1.6.0",
     "@tanstack/react-query": "5.101.4",
     "@tanstack/react-router": "1.170.18",

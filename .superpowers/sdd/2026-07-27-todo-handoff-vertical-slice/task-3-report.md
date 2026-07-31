@@ -11,8 +11,8 @@ status: DONE_WITH_CONCERNS
 
 ## 検証
 
-- `pnpm --filter @amidala/web exec tsc --noEmit` passed
-- `pnpm --filter @amidala/web build` passed
+- `pnpm --filter @aimani-ai/web exec tsc --noEmit` passed
+- `pnpm --filter @aimani-ai/web build` passed
 - `git diff --check` passed
 - commit: `aae9d23 feat: add touchable Todo Handoff workspace`
 
@@ -30,7 +30,7 @@ status: DONE_WITH_CONCERNS
 - Handoff railをstatus別にrequested=提案、accepted=責任移動/connected、rejected/canceled=変更なし/neutralへ明示。
 - mutation progress/resultをcard aria-live領域へ表示。
 
-検証: `pnpm --filter @amidala/web exec tsc --noEmit`、`pnpm --filter @amidala/web build`、`git diff --check` 全てpass。
+検証: `pnpm --filter @aimani-ai/web exec tsc --noEmit`、`pnpm --filter @aimani-ai/web build`、`git diff --check` 全てpass。
 
 ## Fix round 1 follow-up
 

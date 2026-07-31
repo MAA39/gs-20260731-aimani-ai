@@ -2,20 +2,20 @@
 
 - 日付: 2026-07-28（Asia/Tokyo）
 - status: user-approved design
-- repository: `/Users/maa/Projects/gs/000_参照用/amidala-v2`
+- repository: `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`
 - route: `/$organizationId/process-lab`
 - UI label: `工程ラボ`
 - deploy: local only。Cloudflareへdeployしない
 
 ## 1. 目的
 
-BYARDの工程管理UIで価値があった「工程をノードとして置き、前後関係を線で追い、担当・期限・進捗を同じ場所で判断する」体験をAmidala v2で試す。
+BYARDの工程管理UIで価値があった「工程をノードとして置き、前後関係を線で追い、担当・期限・進捗を同じ場所で判断する」体験をAimani AI v2で試す。
 
 これは新製品の正式な工程管理機能ではなく、ユーザーが実画面を触って次を判断するためのexperimentである。
 
 1. Todo一覧より、仕事の前後関係が見えるほうが状況を理解しやすいか
 2. 担当者だけでなく「何を待っているか」が見えると次の行動を選びやすいか
-3. ノードを動かし、依存関係をつなぐ操作がAmidalaの責任移管UXと両立するか
+3. ノードを動かし、依存関係をつなぐ操作がAimani AIの責任移管UXと両立するか
 
 モックデータやclient-only fixtureは使わない。local PostgreSQLへ永続化された実データを、TanStack Start Web Worker → Server Function → Service Binding → Hono API Worker → PostgreSQLの実経路で操作する。
 
@@ -136,7 +136,7 @@ Work CompilerではProductionに7 Node / 0 EdgeのFlowを保存できた。画�
 - `@dagrejs/dagre`: 自動配置を導入すると、人が作った意味のある位置と永続positionの責任が曖昧になる。初期boardはseedで決定論的に配置し、以後は人のdragを正とする
 - `elkjs`: Work Compilerでは`0.11.1`を初期自動配置に使った実績がある。port制約や動的な複雑layoutが必要になった時の候補だが、今回の5〜7 nodeには過剰
 - `cytoscape`: graph解析には強いが、業務cardを直接操作するReact component中心のeditorにはReact Flowのほうが適合する
-- React Flow UI / Pro components: 既存Amidalaのvisual languageを維持し、追加のdesign systemや有償機能へ依存しない
+- React Flow UI / Pro components: 既存Aimani AIのvisual languageを維持し、追加のdesign systemや有償機能へ依存しない
 
 追加dependencyは`@xyflow/react`だけとする。
 
@@ -222,7 +222,7 @@ mutation:
 
 ## 7. UI / UX
 
-### 既存Amidalaを踏襲する
+### 既存Aimani AIを踏襲する
 
 - App shell、top bar、side / bottom navigation
 - `--canvas`、`--surface`、`--line`、`--brand`、`--attention`、`--connected`

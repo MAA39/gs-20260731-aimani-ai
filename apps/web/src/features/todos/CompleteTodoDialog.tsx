@@ -1,7 +1,7 @@
 import { Dialog } from '@base-ui/react/dialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import type { TodoSummary } from '@amidala/contracts';
+import type { TodoSummary } from '@aimani-ai/contracts';
 import { completeTodo } from './todos.functions';
 import { todoFailureMessage } from './todo-error-presentation';
 import { completeTodoSuccessMessage } from './complete-todo-presentation';

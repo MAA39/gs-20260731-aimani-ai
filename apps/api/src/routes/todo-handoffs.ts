@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
-import { acceptTodoHandoffBodySchema, organizationPathSchema, requestTodoHandoffBodySchema, requestTodoHandoffPathSchema, todoHandoffPathSchema } from '@amidala/contracts';
+import { acceptTodoHandoffBodySchema, organizationPathSchema, requestTodoHandoffBodySchema, requestTodoHandoffPathSchema, todoHandoffPathSchema } from '@aimani-ai/contracts';
 import type { ApiEnv } from '../app';
 import type { RequestTodoHandoff } from '../application/request-todo-handoff';
 import type { AcceptTodoHandoff } from '../application/accept-todo-handoff';

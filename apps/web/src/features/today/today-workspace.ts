@@ -1,4 +1,4 @@
-import type { AssignedTodoWorkspace, TodoHandoffWorkspace } from '@amidala/contracts';
+import type { AssignedTodoWorkspace, TodoHandoffWorkspace } from '@aimani-ai/contracts';
 
 export type TodayWorkspace = {
   organization: AssignedTodoWorkspace['organization'];

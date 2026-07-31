@@ -1,13 +1,13 @@
 import { and, desc, eq, inArray, ne, or, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
-import { membership, organization, todo, todoHandoff } from '@amidala/db/schema';
-import type { AmidalaDatabase } from '@amidala/db/client';
-import type { TodoSummary } from '@amidala/contracts';
+import { membership, organization, todo, todoHandoff } from '@aimani-ai/db/schema';
+import type { AimaniAiDatabase } from '@aimani-ai/db/client';
+import type { TodoSummary } from '@aimani-ai/contracts';
 import type { TodoHandoffRepository as Port, RequestTodoHandoffCommand, AcceptTodoHandoffCommand, RejectTodoHandoffCommand, CancelTodoHandoffCommand, TodoHandoffConflictReason, RequestTodoHandoffOutcome, AcceptTodoHandoffOutcome, RejectTodoHandoffOutcome, CancelTodoHandoffOutcome } from '../../domain/todo-handoff';
 import type { CurrentMembershipContext } from '../../domain/identity';
 import { ApiError } from '../../errors/api-error';
 
-type Db = AmidalaDatabase;
+type Db = AimaniAiDatabase;
 type TodoRow = typeof todo.$inferSelect;
 type HandoffRow = typeof todoHandoff.$inferSelect;
 const roles = new Set(['owner', 'manager', 'member'] as const);
@@ -23,7 +23,7 @@ export class TodoHandoffRepositoryDrizzle implements Port {
     return { ...row, role: row.role as CurrentMembershipContext['role'] };
   }
 
-  private async summary(db: Db, h: HandoffRow, t?: TodoRow): Promise<{ handoff: import('@amidala/contracts').TodoHandoffSummary; todo: TodoSummary }> {
+  private async summary(db: Db, h: HandoffRow, t?: TodoRow): Promise<{ handoff: import('@aimani-ai/contracts').TodoHandoffSummary; todo: TodoSummary }> {
     const todoRow = t ?? (await db.select().from(todo).where(and(eq(todo.id, h.todoId), eq(todo.organizationId, h.organizationId))).limit(1))[0];
     if (!todoRow) throw new Error('Todo disappeared while projecting handoff.');
     const creator = alias(membership, 'handoff_creator'); const assignee = alias(membership, 'handoff_assignee'); const requester = alias(membership, 'handoff_requester'); const recipient = alias(membership, 'handoff_recipient');

@@ -1,8 +1,8 @@
 # ADR-0001: 2026-07-26 技術選定
 
-日付: 2026-07-26  
-ステータス: 採用。触れる MVP で再評価する  
-対象: Amidala v2。`共通` と記した判断は他プロダクトでも再利用可能
+日付: 2026-07-26
+ステータス: 採用。触れる MVP で再評価する
+対象: Aimani AI v2。`共通` と記した判断は他プロダクトでも再利用可能
 
 ## 結論
 
@@ -49,7 +49,7 @@ pnpm は workspace と content-addressable store を持ち、複数アプリと�
 - 不採用: npm workspace は可能だが、workspace 運用と省ディスクを pnpm に統一する。Nx/Bazel はこの規模の初期 MVP には運用面が大きい。
 - 根拠: [pnpm](https://pnpm.io/)、[Turborepo support policy](https://turborepo.dev/docs/support-policy)
 
-### TanStack Start / Router / Query / Form — 採用（共通、一部 Amidala 固有）
+### TanStack Start / Router / Query / Form — 採用（共通、一部 Aimani AI 固有）
 
 Router の path/search params の型安全、loader と Query の接続、Vite ベースの SSR、Server Function を一貫して使える。Router 依存を `routes` に限定し、ドメインの実体は `features` に置く。
 
@@ -61,7 +61,7 @@ Router の path/search params の型安全、loader と Query の接続、Vite �
 - 注意: `@tanstack/start` ではなく `@tanstack/react-start` を使う。React Server Components は初期採用しない。
 - 根拠: [Start Server Functions](https://tanstack.com/start/latest/docs/framework/react/guide/server-functions)、[Router](https://tanstack.com/router/latest/docs/quick-start)、[Query](https://tanstack.com/query/latest/docs/framework/react/overview)、[Form](https://tanstack.com/form/latest/docs/overview)
 
-### public Web Worker + private Hono API Worker — 採用（Amidala 固有）
+### public Web Worker + private Hono API Worker — 採用（Aimani AI 固有）
 
 Web と API を Service Binding で接続する。API Worker は公開 route を持たず、Web Worker だけがブラウザから見える。
 
@@ -80,7 +80,7 @@ framework-agnostic な TypeScript 認証を PostgreSQL 上で使える。Better 
 - 不採用: Clerk は初期 UX は速いが認証主体とデータの所有権が外部サービスへ寄る。Supabase Auth は DB 選択と認証選択が結びつく。Auth.js は候補だが Better Auth の typed plugin/API と独立運用を優先する。
 - 根拠: [Better Auth repository](https://github.com/better-auth/better-auth)、[Hono integration](https://www.better-auth.com/docs/integrations/hono)
 
-### Awilix — 採用（Amidala 固有、使い方は共通化可能）
+### Awilix — 採用（Aimani AI 固有、使い方は共通化可能）
 
 DI は API の Composition Root だけで使う。root container は stateless dependency、request scope は DB/repository/use case を保持する。strict mode と明示 `register` を使う。
 
@@ -103,7 +103,7 @@ PostgreSQL の制約と移植性を保ち、SQL に近い Drizzle で schema/mig
 
 Tailwind は token を CSS variable として表現し、Base UI は Dialog/Menu/Tabs 等の挙動とアクセシビリティに限定する。Lucide でアイコンの語彙を統一する。
 
-- 採用理由: CSS の所有権を Amidala に残しながら、keyboard/focus/ARIA の primitive を一から作らずに済む。
+- 採用理由: CSS の所有権を Aimani AI に残しながら、keyboard/focus/ARIA の primitive を一から作らずに済む。
 - 不採用: shadcn/ui は出発点として有効だが、既製の見た目とコピーが設計判断を引っ張りやすい。Radix を個別に組むより Base UI の統一 API を選ぶ。MUI は既存製品で有効だったが、新規の固有デザインには runtime/style layer が大きい。
 - 原則: Base UI は必要な primitive だけ導入する。汎用 component catalog を先に作らない。
 - 根拠: [Tailwind CSS v4](https://tailwindcss.com/blog/tailwindcss-v4)、[Base UI](https://base-ui.com/react/overview/about)、[Lucide](https://lucide.dev/)

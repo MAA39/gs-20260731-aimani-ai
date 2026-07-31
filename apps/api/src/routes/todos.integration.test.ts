@@ -10,10 +10,10 @@ describe('Todo relationship boundary', () => {
   it('keeps a shared Todo inside its Organization relationship context', async () => {
     const app = createApp();
     const signIn = async (email: string) => {
-      const response = await app.fetch(new Request('http://localhost:8787/api/auth/sign-in/email', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email, password: 'amidala-demo-2026' }) }), env);
+      const response = await app.fetch(new Request('http://localhost:8787/api/auth/sign-in/email', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email, password: 'aimani-ai-demo-2026' }) }), env);
       return response.headers.getSetCookie().join('; ');
     };
-    const ownerCookie = await signIn('owner@amidala.local');
+    const ownerCookie = await signIn('owner@aimani-ai.local');
     const title = `次回1on1の論点をまとめる ${randomUUID()}`;
     const post = await app.fetch(new Request('http://localhost:8787/organizations/org_acme_studio/people/acme-studio-sato/todos', { method: 'POST', headers: { 'content-type': 'application/json', cookie: ownerCookie }, body: JSON.stringify({ title, description: '共有メモを一つにする', assigneeMembershipId: 'acme-studio-sato' }) }), env);
     expect(post.status).toBe(201);
@@ -30,7 +30,7 @@ describe('Todo relationship boundary', () => {
     expect(listedTodo?.creator.name).toBe('田中 彩');
     expect(listedTodo?.assignee.name).toBe('佐藤 花子');
 
-    const satoCookie = await signIn('sato@amidala.local');
+    const satoCookie = await signIn('sato@aimani-ai.local');
     const db = new pg.Client({ connectionString: databaseUrl });
     await db.connect();
     try {

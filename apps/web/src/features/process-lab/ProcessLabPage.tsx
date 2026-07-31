@@ -2,7 +2,7 @@ import { ArrowLeft, FlaskConical, RefreshCw } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import type { ProcessStepStatus } from '@amidala/contracts';
+import type { ProcessStepStatus } from '@aimani-ai/contracts';
 import { updateProcessStepStatus } from './process-lab.functions';
 import { processLabKey } from './process-lab-query-key';
 import type { ProcessLabResult } from './process-lab-schema';

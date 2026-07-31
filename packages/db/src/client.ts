@@ -1,8 +1,8 @@
 import { Client } from 'pg';
 import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from './schema/index.js';
-export type AmidalaDatabase = NodePgDatabase<typeof schema>;
-export interface DatabaseResource { client: Client; database: AmidalaDatabase }
+export type AimaniAiDatabase = NodePgDatabase<typeof schema>;
+export interface DatabaseResource { client: Client; database: AimaniAiDatabase }
 
 export function createNodePgDatabase(connectionString: string): DatabaseResource {
   const client = new Client({ connectionString });

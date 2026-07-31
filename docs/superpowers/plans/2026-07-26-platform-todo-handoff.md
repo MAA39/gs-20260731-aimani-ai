@@ -1,4 +1,4 @@
-# Amidala v2 Touchable MVP Implementation Plan
+# Aimani AI v2 Touchable MVP Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- Modify only `/Users/maa/Projects/gs/000_参照用/amidala-v2`.
+- Modify only `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`.
 - Before every task, dispatch a read-only research agent using `docs/standards/research-before-build.md`; update the task brief from current official practices before implementation.
 - Optimize for a touchable browser experience; do not add coverage thresholds, exhaustive state tests, RLS, outbox, Queue, Webhook Worker, generic component frameworks, or speculative abstractions.
 - Keep User independent from Organization and connect them through Membership. Reserve Better Auth `Account` for credentials.
@@ -35,7 +35,7 @@
 - Create: `apps/api/package.json`, `apps/api/wrangler.jsonc`, `apps/api/src/app.ts`, `apps/api/src/worker.ts`
 - Create: `packages/contracts/package.json`, `packages/api-client/package.json`
 
-**Produces:** `pnpm dev` opens an Amidala v2 shell and the API `/health` returns `{ "ok": true }`.
+**Produces:** `pnpm dev` opens an Aimani AI v2 shell and the API `/health` returns `{ "ok": true }`.
 
 - [x] Audit the shell against current React 19, TanStack Start, and Cloudflare practices; record the rules in `docs/standards/react-tanstack-practices.md`.
 - [x] Pin the exact versions in ADR-0001 and install the workspace; TypeScript 7 / Worker build compatibility is verified.
@@ -45,7 +45,7 @@
 - [x] Implement the design tokens and typography from `docs/design/foundation.md`; add visible keyboard focus and reduced-motion defaults.
 - [x] Add Hono `/health` and Web Worker Service Binding `API`.
 - [x] Run `pnpm dev` and verify the desktop shell at 1280px and mobile bottom navigation at 390px in the in-app browser without horizontal overflow.
-- [x] Run `pnpm build` and commit `feat: add touchable Amidala v2 shell`.
+- [x] Run `pnpm build` and commit `feat: add touchable Aimani AI v2 shell`.
 
 ### Task 2: Local PostgreSQL, Drizzle, and Awilix Composition Root
 
@@ -157,7 +157,7 @@ DB / Auth / Peopleは水平分割せず、[Identity → People縦切り計画](.
 - [x] Run the two tests and manually complete both accept and reject flows in the browser (Task 4 desktop/mobile verification recorded; reduced-motion remains pending).
 - [x] Commit `feat: add interactive Todo handoff`.
 
-Task 4 verification completed against disposable `amidala_handoff`; desktop/mobile browser evidence and screenshots are recorded in `docs/research/2026-07-27-todo-handoff-verification.md`. Recipient role used the latest local Better Auth session row because logout UI is not implemented. Reduced-motion remains pending.
+Task 4 verification completed against disposable `aimani_ai_handoff`; desktop/mobile browser evidence and screenshots are recorded in `docs/research/2026-07-27-todo-handoff-verification.md`. Recipient role used the latest local Better Auth session row because logout UI is not implemented. Reduced-motion remains pending.
 
 Final review fixes `9108967` / `7527f41` scope Inbox read models to Membership parties, apply terminal `resolvedAt DESC` + SQL limit 20, keep Assigned Todo open-only and reactive through `useSuspenseQuery`, restrict accepted CTA to recipient/current assignee, and show Recent `resolvedAt`. Final API unit 2/2, integration 6/6, Web typecheck, full build, and diff-check pass. These structural/query fixes were not browser-rerun; independent review judged a rerun unnecessary.
 

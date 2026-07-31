@@ -26,8 +26,8 @@
 ## Verification
 
 ```text
-pnpm --filter @amidala/web exec tsc --noEmit  # passed
-pnpm --filter @amidala/web build              # passed
+pnpm --filter @aimani-ai/web exec tsc --noEmit  # passed
+pnpm --filter @aimani-ai/web build              # passed
 ```
 
 Build後の`dist/client/assets/todos-*.js`を確認し、`cloudflare:workers`、DB/Drizzle、Hono server implementation、Better Auth server code、`server-only`のTodo client chunkへの混入がないことを確認した。

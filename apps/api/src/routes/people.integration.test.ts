@@ -7,7 +7,7 @@ const env = { DATABASE_URL: databaseUrl, BETTER_AUTH_SECRET: 'integration-secret
 describe('People API tenant boundary', () => {
   it('rejects a user requesting another organization', async () => {
     const app = createApp();
-    const signIn = await app.fetch(new Request('http://localhost:8787/api/auth/sign-in/email', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email: 'sato@amidala.local', password: 'amidala-demo-2026' }) }), env);
+    const signIn = await app.fetch(new Request('http://localhost:8787/api/auth/sign-in/email', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email: 'sato@aimani-ai.local', password: 'aimani-ai-demo-2026' }) }), env);
     const cookies = signIn.headers.getSetCookie();
     const response = await app.fetch(new Request('http://localhost:8787/organizations/org_northstar_lab/people', { headers: { cookie: cookies.join('; ') } }), env);
     expect(response.status).toBe(403);

@@ -2,7 +2,7 @@
 
 - 日付: 2026-07-27
 - 状態: 実装対象
-- 対象: Amidala v2
+- 対象: Aimani AI v2
 - 目的: 「普通のTodo管理と何が違うのか」を3分の操作で判断できる状態にする
 
 ## 1. 結論
@@ -104,12 +104,12 @@ TanStack Router/Query公式のloader prefetch + `useSuspenseQuery`をそのま�
 
 ### Demo dataは専用databaseへ分離する
 
-integration test databaseを画面用に使わない。local demoは`amidala_demo`、integrationは`amidala_handoff`を使う。
+integration test databaseを画面用に使わない。local demoは`aimani_ai_demo`、integrationは`aimani_ai_handoff`を使う。
 
 `db:demo:reset`は次の安全条件をすべて満たす場合だけ実行する。
 
 - hostnameが`127.0.0.1`または`localhost`
-- database名が`amidala_demo`
+- database名が`aimani_ai_demo`
 - production/preview bindingを使用しない
 
 resetは`public` schemaを作り直し、全migrationとdeterministic demo seedを適用する。既存`db:seed`はupsert用途のまま保つ。
@@ -262,7 +262,7 @@ UI snapshotの大量作成、coverage gate、全branch testは行わない。
 
 - 3つのPRが`main`へmerge済み
 - feature branch/worktreeが残っていない
-- fresh `amidala_demo`で3分journeyを完走
+- fresh `aimani_ai_demo`で3分journeyを完走
 - current actorと次のactorが全画面で明確
 - accept前後の責任移動がTodayで理解できる
 - desktop/mobileで操作可能

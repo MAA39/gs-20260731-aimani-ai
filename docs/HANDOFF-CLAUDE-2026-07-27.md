@@ -1,12 +1,12 @@
-# Claude 作業移管 — Amidala v2
+# Claude 作業移管 — Aimani AI v2
 
 > [!IMPORTANT]
-> この文書は2026-07-27時点の統合履歴である。現在状態の正本は `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/HANDOFF-CLAUDE-2026-07-28.md`。Claude Codeは先に新正本を読むこと。
+> この文書は2026-07-27時点の統合履歴である。現在状態の正本は `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/HANDOFF-CLAUDE-2026-07-28.md`。Claude Codeは先に新正本を読むこと。
 
 - 作成日: 2026-07-27（Asia/Tokyo）
-- 履歴資料の絶対パス: `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/HANDOFF-CLAUDE-2026-07-27.md`
-- GitHub: <https://github.com/MAA39/amidala-v2>
-- Todo Handoff review archive: <https://github.com/MAA39/amidala-v2/pull/1>
+- 履歴資料の絶対パス: `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/HANDOFF-CLAUDE-2026-07-27.md`
+- GitHub: <https://github.com/MAA39/aimani-ai-v2>
+- Todo Handoff review archive: <https://github.com/MAA39/aimani-ai-v2/pull/1>
 - 引き継ぎ時点の branch: `main`（最終SHAは本書末尾の完了記録を正本とする）
 - 状態: Touchable MVPを`main`へ統合し、feature worktreeを撤去してから移管。Cloudflare deploy は未実施
 
@@ -14,11 +14,11 @@
 
 この履歴資料から作業を再開しない。次の文章だけを新しいClaude Codeセッションへ渡す。
 
-> `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/HANDOFF-CLAUDE-2026-07-28.md` を現在状態の正本として最初から最後まで読み、同文書の「Claude Codeへの最初の依頼」に従ってください。この2026-07-27文書は統合履歴としてのみ参照してください。
+> `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/HANDOFF-CLAUDE-2026-07-28.md` を現在状態の正本として最初から最後まで読み、同文書の「Claude Codeへの最初の依頼」に従ってください。この2026-07-27文書は統合履歴としてのみ参照してください。
 
 ## 1. 最重要の意図
 
-このプロダクトは、旧 Amidala の単純な移植ではない。Amidala と BYARD から良いドメイン境界・情報設計・UX を抽出し、新製品の核としてゼロから作る。
+このプロダクトは、旧 Aimani AI の単純な移植ではない。Aimani AI と BYARD から良いドメイン境界・情報設計・UX を抽出し、新製品の核としてゼロから作る。
 
 優先順位は次のとおり。
 
@@ -36,23 +36,23 @@
 
 変更可能な新規プロダクト:
 
-- repository: `/Users/maa/Projects/gs/000_参照用/amidala-v2`
-- 引き継ぎ時のroot: `/Users/maa/Projects/gs/000_参照用/amidala-v2`
+- repository: `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`
+- 引き継ぎ時のroot: `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`
 - 次の実装はrootを直接汚さず、`main`から新しいfeature worktreeを切る
 
 以下は調査用であり、原則として変更しない。
 
-- `/Users/maa/Projects/gs/000_参照用/amidala`
-- `/Users/maa/Projects/gs/000_参照用/amidala-angular`
-- `/Users/maa/Projects/gs/000_参照用/amidala-admin`
-- `/Users/maa/Projects/gs/000_参照用/amidala-infra`
+- `/Users/maa/Projects/gs/000_参照用/aimani-ai`
+- `/Users/maa/Projects/gs/000_参照用/aimani-ai-angular`
+- `/Users/maa/Projects/gs/000_参照用/aimani-ai-admin`
+- `/Users/maa/Projects/gs/000_参照用/aimani-ai-infra`
 - `/Users/maa/Projects/gs/000_参照用/BYARD`
 - `/Users/maa/Projects/gs/000_参照用/kakeai.next`
 - `/Users/maa/Projects/gs/000_参照用/inquiry.kakeai.com`
 
 ### 旧ベースworktreeのユーザー変更を保護した記録
 
-統合前のベースworktree `/Users/maa/Projects/gs/000_参照用/amidala-v2` には次のユーザー所有変更が残っていた。
+統合前のベースworktree `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2` には次のユーザー所有変更が残っていた。
 
 ```text
  M apps/web/src/features/todos/Page.tsx
@@ -72,8 +72,8 @@
 
 | 項目 | 値 |
 |---|---|
-| private repository | `MAA39/amidala-v2` |
-| remote | `origin = https://github.com/MAA39/amidala-v2.git` |
+| private repository | `MAA39/aimani-ai-v2` |
+| remote | `origin = https://github.com/MAA39/aimani-ai-v2.git` |
 | main | `289431a` |
 | Todo Handoff review | PR #1。`impl/todo-handoff` → `feat/touchable-mvp` |
 | Touchable MVP integration | PR #2。`feat/touchable-mvp` → `main` |
@@ -93,10 +93,10 @@ main（Touchable MVP統合済み）
 
 | path | branch | SHA | 用途 |
 |---|---|---|---|
-| `/Users/maa/Projects/gs/000_参照用/amidala-v2` | 統合後は`main` | 完了記録参照 | 唯一残すroot |
-| `/Users/maa/Projects/gs/000_参照用/amidala-v2/.worktrees/identity-people` | `impl/identity-people` | `ccff02e` | 完了済み参照 |
-| `/Users/maa/Projects/gs/000_参照用/amidala-v2/.worktrees/relationship-todo` | `impl/relationship-todo` | `9d260a9` | 完了済み参照 |
-| `/Users/maa/Projects/gs/000_参照用/amidala-v2/.worktrees/todo-handoff` | `impl/todo-handoff` | この文書追加前は `61fb950` | 現在の安全な作業場所 |
+| `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2` | 統合後は`main` | 完了記録参照 | 唯一残すroot |
+| `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/.worktrees/identity-people` | `impl/identity-people` | `ccff02e` | 完了済み参照 |
+| `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/.worktrees/relationship-todo` | `impl/relationship-todo` | `9d260a9` | 完了済み参照 |
+| `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/.worktrees/todo-handoff` | `impl/todo-handoff` | この文書追加前は `61fb950` | 現在の安全な作業場所 |
 
 PR #1はTodo Handoffのレビュー履歴、PR #2はTouchable MVP全体の`main`統合履歴として残す。次の作業をこれらのbranchへ継ぎ足さず、最新`main`から新しいbranch/worktreeを作る。
 
@@ -104,7 +104,7 @@ PR #1はTodo Handoffのレビュー履歴、PR #2はTouchable MVP全体の`main`
 
 ### 横断調査の正本
 
-`/Users/maa/Projects/gs/000_参照用/Docs` には Amidala / BYARD / TanStack Start / Next.js から抽出した横断調査がある。特に次を先に読む。
+`/Users/maa/Projects/gs/000_参照用/Docs` には Aimani AI / BYARD / TanStack Start / Next.js から抽出した横断調査がある。特に次を先に読む。
 
 1. `/Users/maa/Projects/gs/000_参照用/Docs/09_next_conversation_handoff.md`
 2. `/Users/maa/Projects/gs/000_参照用/Docs/19_todo_transfer_history_exhaustive_analysis.md`
@@ -115,7 +115,7 @@ PR #1はTodo Handoffのレビュー履歴、PR #2はTouchable MVP全体の`main`
 7. `/Users/maa/Projects/gs/000_参照用/Docs/25_tanstack_start_nextjs_principles_matrix.md`
 8. `/Users/maa/Projects/gs/000_参照用/Docs/26_tanstack_start_recipes.md`
 
-### Amidala v2 固有Docsの読む順番
+### Aimani AI v2 固有Docsの読む順番
 
 1. `docs/README.md`
 2. `docs/standards/reusable-product-baseline.md`
@@ -125,7 +125,7 @@ PR #1はTodo Handoffのレビュー履歴、PR #2はTouchable MVP全体の`main`
 6. `docs/decisions/0001-technology-selection-2026-07-26.md`
 7. `docs/design/foundation.md`
 8. `docs/product/legacy-ux-audit.md`
-9. `docs/superpowers/specs/2026-07-26-amidala-v2-platform-design.md`
+9. `docs/superpowers/specs/2026-07-26-aimani-ai-v2-platform-design.md`
 10. `docs/superpowers/specs/2026-07-27-todo-handoff-slice-design.md`
 11. `docs/research/2026-07-27-todo-handoff-verification.md`
 
@@ -291,7 +291,7 @@ global `/todos` と `/handoffs` のplaceholderは削除済み。Organizationが�
 
 ## 9. デザイン / UX 方針
 
-デザインは旧AmidalaとBYARDを参照したが、見た目のコピーではない。
+デザインは旧Aimani AIとBYARDを参照したが、見た目のコピーではない。
 
 - relationship-first。Peopleを入口に相手との文脈からTodo/Handoffへ進む
 - indigoを軸にした落ち着いた画面だが、汎用admin templateにはしない
@@ -306,8 +306,8 @@ global `/todos` と `/handoffs` のplaceholderは削除済み。Organizationが�
 
 確認済み画像:
 
-- `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/assets/todo-handoff/accepted-recent-desktop.png`
-- `/Users/maa/Projects/gs/000_参照用/amidala-v2/docs/assets/todo-handoff/request-or-incoming-mobile.png`
+- `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/assets/todo-handoff/accepted-recent-desktop.png`
+- `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2/docs/assets/todo-handoff/request-or-incoming-mobile.png`
 
 ## 10. Todo Handoff branch の実装履歴
 
@@ -377,23 +377,23 @@ Web Wrangler dry-run + Service Binding確認: PASS
 直近の再実行コマンド:
 
 ```bash
-cd /Users/maa/Projects/gs/000_参照用/amidala-v2
-pnpm --filter @amidala/web test
-pnpm --filter @amidala/web exec tsc --noEmit
+cd /Users/maa/Projects/gs/000_参照用/aimani-ai-v2
+pnpm --filter @aimani-ai/web test
+pnpm --filter @aimani-ai/web exec tsc --noEmit
 pnpm build --force
 ```
 
 PostgreSQL integration:
 
 ```bash
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff \
-  pnpm --filter @amidala/api test:integration -- todo-handoffs.integration.test.ts --run
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_handoff \
+  pnpm --filter @aimani-ai/api test:integration -- todo-handoffs.integration.test.ts --run
 ```
 
 既知の非エラー警告:
 
 ```text
-Turbo: no output files found for task @amidala/db#build
+Turbo: no output files found for task @aimani-ai/db#build
 ```
 
 `packages/db`のTypeScript build自体は成功しており、`turbo.json`のoutputs指定に対応する生成物がないという設定上の警告である。次のCI整備時に扱えばよく、現状のユーザージャーニーを止めない。
@@ -419,7 +419,7 @@ BETTER_AUTH_URL
 基本操作:
 
 ```bash
-cd /Users/maa/Projects/gs/000_参照用/amidala-v2
+cd /Users/maa/Projects/gs/000_参照用/aimani-ai-v2
 pnpm install
 pnpm db:up
 pnpm db:migrate
@@ -427,14 +427,14 @@ pnpm db:seed
 pnpm dev
 ```
 
-PostgreSQL composeはhost port `54329`、local user/password/databaseは開発専用の`amidala`。integration検証では分離DB`amidala_handoff`を使った。既存volume/DBをdropまたはrecreateする前には、対象がlocal disposable DBか確認する。
+PostgreSQL composeはhost port `54329`、local user/password/databaseは開発専用の`aimani-ai`。integration検証では分離DB`aimani_ai_handoff`を使った。既存volume/DBをdropまたはrecreateする前には、対象がlocal disposable DBか確認する。
 
 seed accountの表示用情報:
 
-- `owner@amidala.local` — 田中 彩
-- `sato@amidala.local` — 佐藤 花子
-- `mori@amidala.local` — 森 ハル
-- `suzuki@amidala.local` — 鈴木 健
+- `owner@aimani-ai.local` — 田中 彩
+- `sato@aimani-ai.local` — 佐藤 花子
+- `mori@aimani-ai.local` — 森 ハル
+- `suzuki@aimani-ai.local` — 鈴木 健
 - Organizations: Acme Studio / Northstar Lab
 
 seed passwordは`apps/api/src/dev/seed.ts`を読んで確認する。Docsへ新たな本番資格情報を記載しない。
@@ -445,10 +445,10 @@ seed passwordは`apps/api/src/dev/seed.ts`を読んで確認する。Docsへ新�
 
 設定済みのコード上の形:
 
-- API Worker: `amidala-api`
+- API Worker: `aimani-ai-api`
 - APIは`workers_dev: false`, `preview_urls: false`
-- Web Worker: `amidala-web`
-- WebのService Binding: `API -> amidala-api`
+- Web Worker: `aimani-ai-web`
+- WebのService Binding: `API -> aimani-ai-api`
 - compatibility date: `2026-06-24`
 - compatibility flag: `nodejs_compat`
 - production DBは`HYPERDRIVE` binding、localは`DATABASE_URL`
@@ -473,7 +473,7 @@ deploy前に必要:
 
 > 技術的には簡単なCRUD以上のものが動いているが、これが良いプロダクト体験なのか、未実装機能を足せば面白くなるのか、現画面からは判断できない。
 
-現在は、認証、Organization境界、People、Todo作成・閲覧、Todo Handoffの依頼・承認・見送り・取消、transactionalな担当変更まで成立している。したがって「技術的に縦切りが成立する」ことは確認できた。一方で、ユーザーが「なぜ普通のタスク管理ではなくAmidalaを使うのか」を感じる体験にはまだ届いていない。
+現在は、認証、Organization境界、People、Todo作成・閲覧、Todo Handoffの依頼・承認・見送り・取消、transactionalな担当変更まで成立している。したがって「技術的に縦切りが成立する」ことは確認できた。一方で、ユーザーが「なぜ普通のタスク管理ではなくAimani AIを使うのか」を感じる体験にはまだ届いていない。
 
 不足しているCRUDを一覧順に追加してはいけない。Todo編集・削除・検索を増やせば便利にはなるが、プロダクトが面白くなる保証はない。次は機能充足ではなく、次の物語を3分で理解・操作できるかを検証する。
 
@@ -493,7 +493,7 @@ deploy前に必要:
 4. Handoffへ背景、期待する結果、期限または確認事項を短く添える
 5. accept後に担当者名が変わるだけでなく、「次に誰が何をするか」が変化したことを一画面で強く示す
 
-この優先順位も仮説である。Claude Codeは実装前に既存Amidala/BYARDのUXと競合体験を再調査し、ユーザーへ触れる小さな提案として具体化すること。一般的なCRUD backlogへ分解して消化しない。
+この優先順位も仮説である。Claude Codeは実装前に既存Aimani AI/BYARDのUXと競合体験を再調査し、ユーザーへ触れる小さな提案として具体化すること。一般的なCRUD backlogへ分解して消化しない。
 
 ### 2026-07-27 ローカル実機確認
 
@@ -552,7 +552,7 @@ Webhookは将来あり得るが、現時点では「分離可能な契約を保�
 blockingではない。
 
 - `people.server.ts`のdefault unavailable文言取得に`peopleFailureMessage(503)`を使っている。将来status別文言を増やす場合はdefault用APIを分けると明瞭
-- root `turbo.json`に`test` taskがなく、Web mapper testsは`pnpm --filter @amidala/web test`で個別実行する。CI導入時に統合する
+- root `turbo.json`に`test` taskがなく、Web mapper testsは`pnpm --filter @aimani-ai/web test`で個別実行する。CI導入時に統合する
 - TodoComposerはBFFが返すerrorは日本語化済みだが、browser↔Web Worker transport自体のruntime errorをそのまま描画する可能性がある
 - reduced-motionは未エミュレート
 - browserでrecipient loginしたとは記録できない。検証時はlocal disposable DBのBetter Auth session rowをMoriへ更新した。logout/actor switch UXが必要
@@ -653,7 +653,7 @@ git diff --check: PASS
 git status: clean
 ```
 
-既知の警告は`@amidala/db#build`のTurbo outputs未設定だけで、buildは成功している。
+既知の警告は`@aimani-ai/db#build`のTurbo outputs未設定だけで、buildは成功している。
 
 ### Claude監査
 
@@ -666,7 +666,7 @@ git status: clean
 ### 最終workspace状態
 
 ```text
-root: /Users/maa/Projects/gs/000_参照用/amidala-v2
+root: /Users/maa/Projects/gs/000_参照用/aimani-ai-v2
 branch: main
 main integration SHA: d88213c368ab17febb5b88c8106793ea4e11ddf6
 worktrees: root 1件だけ

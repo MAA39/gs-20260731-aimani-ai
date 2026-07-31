@@ -1,5 +1,5 @@
-import { completeTodoPathSchema, completeTodoResponseSchema, todoSummarySchema } from '@amidala/contracts';
-import type { SharedTodoWorkspace, TodoSummary } from '@amidala/contracts';
+import { completeTodoPathSchema, completeTodoResponseSchema, todoSummarySchema } from '@aimani-ai/contracts';
+import type { SharedTodoWorkspace, TodoSummary } from '@aimani-ai/contracts';
 import { z } from 'zod';
 
 export const personTodoPathInputSchema = z.object({
@@ -26,7 +26,7 @@ export const createSharedTodoResponseSchema = {
 export type PersonTodoPath = { organizationId: string; contextMembershipId: string };
 export type CreateSharedTodoInput = z.infer<typeof createSharedTodoInputSchema>;
 export type AssignedTodoWorkspaceInput = z.infer<typeof assignedTodoWorkspaceInputSchema>;
-export type { SharedTodoWorkspace, TodoSummary } from '@amidala/contracts';
+export type { SharedTodoWorkspace, TodoSummary } from '@aimani-ai/contracts';
 export const completeTodoInputSchema = completeTodoPathSchema;
 export type CompleteTodoInput = (typeof completeTodoInputSchema)['_output'];
 export { completeTodoResponseSchema };

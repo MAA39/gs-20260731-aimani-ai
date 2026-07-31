@@ -5,8 +5,8 @@ export type DemoActor = {
 }
 
 export const DEMO_ACTORS = [
-  { id: 'tanaka', name: '田中 彩', email: 'owner@amidala.local' },
-  { id: 'mori', name: '森 ハル', email: 'mori@amidala.local' },
+  { id: 'tanaka', name: '田中 彩', email: 'owner@aimani-ai.local' },
+  { id: 'mori', name: '森 ハル', email: 'mori@aimani-ai.local' },
 ] as const satisfies readonly DemoActor[]
 
 export function isDemoActorSwitchEnabled(dev: boolean, password: string | undefined): password is string {

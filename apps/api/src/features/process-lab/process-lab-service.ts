@@ -1,7 +1,7 @@
 import type {
   ConnectProcessStepsInput,
   ProcessStepStatus,
-} from '@amidala/contracts';
+} from '@aimani-ai/contracts';
 import type { Clock } from '../../application/health-check';
 import { ApiError } from '../../errors/api-error';
 import {

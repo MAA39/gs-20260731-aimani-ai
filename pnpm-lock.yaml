@@ -23,10 +23,10 @@ importers:
 
   apps/api:
     dependencies:
-      '@amidala/contracts':
+      '@aimani-ai/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
-      '@amidala/db':
+      '@aimani-ai/db':
         specifier: workspace:*
         version: link:../../packages/db
       '@better-auth/drizzle-adapter':
@@ -63,10 +63,10 @@ importers:
 
   apps/web:
     dependencies:
-      '@amidala/api-client':
+      '@aimani-ai/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
-      '@amidala/contracts':
+      '@aimani-ai/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
       '@base-ui/react':
@@ -137,7 +137,7 @@ importers:
         specifier: 4.12.32
         version: 4.12.32
     devDependencies:
-      '@amidala/api':
+      '@aimani-ai/api':
         specifier: workspace:*
         version: link:../../apps/api
 

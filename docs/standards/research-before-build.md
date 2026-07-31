@@ -1,7 +1,7 @@
 # 実装前 Research Gate
 
-基準日: 2026-07-26  
-適用範囲: Amidala v2 と、この Docs を叩き台にする全プロダクト
+基準日: 2026-07-26
+適用範囲: Aimani AI v2 と、この Docs を叩き台にする全プロダクト
 
 ## 目的
 
@@ -65,7 +65,7 @@ Research Gate は test case を大量に増やす gate ではない。
 
 - 他製品でも使える: `docs/standards/`
 - 技術選定の変更: `docs/decisions/`
-- Amidala固有の画面/ドメイン: `docs/product/` または platform spec
+- Aimani AI固有の画面/ドメイン: `docs/product/` または platform spec
 - 一時的な調査で、実装判断を変えない: task report のみに残す
 
 ## 禁止する進め方

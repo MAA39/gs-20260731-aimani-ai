@@ -1,5 +1,5 @@
-import { createNodePgDatabase } from '@amidala/db/client'
-import { migrateDatabase } from '@amidala/db/migrations'
+import { createNodePgDatabase } from '@aimani-ai/db/client'
+import { migrateDatabase } from '@aimani-ai/db/migrations'
 import { deriveLocalDemoDatabaseUrl, assertLocalDemoDatabaseUrl } from './demo-database-url'
 import { seedDevelopmentData } from './seed-development-data'
 
@@ -13,8 +13,8 @@ maintenance.pathname = '/postgres'
 const maintenanceClient = createNodePgDatabase(maintenance.toString()).client
 await maintenanceClient.connect()
 try {
-  const exists = await maintenanceClient.query('select 1 from pg_database where datname = $1', ['amidala_demo'])
-  if (exists.rowCount === 0) await maintenanceClient.query('CREATE DATABASE amidala_demo')
+  const exists = await maintenanceClient.query('select 1 from pg_database where datname = $1', ['aimani_ai_demo'])
+  if (exists.rowCount === 0) await maintenanceClient.query('CREATE DATABASE aimani_ai_demo')
 } finally {
   await maintenanceClient.end()
 }
@@ -31,4 +31,4 @@ try {
 
 await migrateDatabase(target.toString())
 await seedDevelopmentData(target.toString())
-console.log('Demo database reset complete: amidala_demo')
+console.log('Demo database reset complete: aimani_ai_demo')

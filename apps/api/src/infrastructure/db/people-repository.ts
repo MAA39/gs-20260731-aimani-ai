@@ -1,14 +1,14 @@
 import { and, eq, ne, or } from 'drizzle-orm';
-import { membership, relationship } from '@amidala/db/schema';
-import type { AmidalaDatabase } from '@amidala/db/client';
-import { relationshipKindSchema, type MemberSummary, type RelationshipKind } from '@amidala/contracts';
+import { membership, relationship } from '@aimani-ai/db/schema';
+import type { AimaniAiDatabase } from '@aimani-ai/db/client';
+import { relationshipKindSchema, type MemberSummary, type RelationshipKind } from '@aimani-ai/contracts';
 import type { CurrentMembershipContext } from '../../domain/identity';
 const membershipRoleValues = new Set(['owner', 'manager', 'member'] as const);
 
 const relationshipOrder: Record<RelationshipKind, number> = { manager_report: 0, supporter: 1, peer: 2 };
 
 export class PeopleRepository {
-  constructor(private readonly database: AmidalaDatabase) {}
+  constructor(private readonly database: AimaniAiDatabase) {}
 
   async findActiveMembershipForUser(userId: string, organizationId: string): Promise<CurrentMembershipContext | null> {
     const rows = await this.database.select({ membershipId: membership.id, organizationId: membership.organizationId, userId: membership.userId, role: membership.role })

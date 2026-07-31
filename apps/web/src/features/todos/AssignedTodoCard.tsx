@@ -1,4 +1,4 @@
-import type { TodoSummary } from '@amidala/contracts';
+import type { TodoSummary } from '@aimani-ai/contracts';
 import { useRef } from 'react';
 import { RequestTodoHandoffDialog } from '../handoffs/RequestTodoHandoffDialog';
 import { TodoCard } from './TodoCard';

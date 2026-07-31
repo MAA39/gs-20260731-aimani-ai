@@ -1,4 +1,4 @@
-import type { TodoSummary } from '@amidala/contracts';
+import type { TodoSummary } from '@aimani-ai/contracts';
 
 export type TeamWorkStatus =
   | { kind: 'in_progress'; label: '対応中' }

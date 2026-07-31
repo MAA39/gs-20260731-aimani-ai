@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import type { TodoSummary } from '@amidala/contracts';
+import type { TodoSummary } from '@aimani-ai/contracts';
 import { teamWorkStatus } from './team-work-status';
 
 const openTodo: TodoSummary = {

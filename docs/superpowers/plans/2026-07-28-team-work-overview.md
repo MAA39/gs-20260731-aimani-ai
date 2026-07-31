@@ -63,8 +63,8 @@ const getTeamWork = async (cookie: string, organizationId = 'org_acme_studio') =
 
 ```ts
 it('groups open work under the current assignee and keeps pending Handoff with its requester', async () => {
-  const ownerCookie = await signIn('owner@amidala.local');
-  const moriCookie = await signIn('mori@amidala.local');
+  const ownerCookie = await signIn('owner@aimani-ai.local');
+  const moriCookie = await signIn('mori@aimani-ai.local');
   const ownerTodo = await createTodo(ownerCookie, 'acme-studio-owner');
   const moriTodo = await createTodo(ownerCookie, 'acme-studio-mori');
   await requestHandoff(ownerCookie, ownerTodo.todoId, { recipientMembershipId: 'acme-studio-mori' });
@@ -86,31 +86,31 @@ it('groups open work under the current assignee and keeps pending Handoff with i
 
 ```ts
 it('shows every Acme open Todo to an Acme Member without leaking Northstar work', async () => {
-  const result = teamWorkOverviewSchema.parse((await getTeamWork(await signIn('mori@amidala.local'))).body);
+  const result = teamWorkOverviewSchema.parse((await getTeamWork(await signIn('mori@aimani-ai.local'))).body);
   const ids = result.members.flatMap((group) => group.openTodos.map((todo) => todo.todoId));
   expect(ids).toEqual(expect.arrayContaining([acmeOwnerTodoId, acmeMoriTodoId]));
   expect(ids).not.toContain(northstarTodoId);
 });
 
 it('returns forbidden when a Northstar Member requests the Acme overview', async () => {
-  expect((await getTeamWork(await signIn('suzuki@amidala.local'), 'org_acme_studio')).status).toBe(403);
+  expect((await getTeamWork(await signIn('suzuki@aimani-ai.local'), 'org_acme_studio')).status).toBe(403);
 });
 
 it('omits active Members without open work and work assigned to a suspended Member', async () => {
-  const overview = teamWorkOverviewSchema.parse((await getTeamWork(await signIn('owner@amidala.local'))).body);
+  const overview = teamWorkOverviewSchema.parse((await getTeamWork(await signIn('owner@aimani-ai.local'))).body);
   const membershipIds = overview.members.map((group) => group.member.membershipId);
   expect(membershipIds).not.toContain(emptyActiveMembershipId);
   expect(membershipIds).not.toContain(suspendedMembershipId);
 });
 
 it('orders open work by updatedAt then Todo ID descending', async () => {
-  const overview = teamWorkOverviewSchema.parse((await getTeamWork(await signIn('owner@amidala.local'))).body);
+  const overview = teamWorkOverviewSchema.parse((await getTeamWork(await signIn('owner@aimani-ai.local'))).body);
   expect(overview.members.find((group) => group.member.membershipId === 'acme-studio-owner')?.openTodos.map((todo) => todo.todoId))
     .toEqual([newerTodoId, sameTimestampHigherId, sameTimestampLowerId]);
 });
 
 it('returns only the latest 20 completed Todos in stable order', async () => {
-  const overview = teamWorkOverviewSchema.parse((await getTeamWork(await signIn('owner@amidala.local'))).body);
+  const overview = teamWorkOverviewSchema.parse((await getTeamWork(await signIn('owner@aimani-ai.local'))).body);
   expect(overview.recentlyCompletedTodos).toHaveLength(20);
   expect(overview.recentlyCompletedTodos.map((todo) => todo.todoId)).toEqual(expectedLatest20Ids);
   expect(overview.recentlyCompletedTodos.map((todo) => todo.todoId)).not.toContain(oldestCompletedTodoId);
@@ -124,8 +124,8 @@ DB fixture insertは既存testのparameterized query patternを使い、title以
 - [x] **Step 4: REDを確認する**
 
 ```bash
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff \
-  pnpm --filter @amidala/api test:integration -- todo-handoffs.integration.test.ts --run
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_handoff \
+  pnpm --filter @aimani-ai/api test:integration -- todo-handoffs.integration.test.ts --run
 ```
 
 Expected: `/work`が存在せず404のためnew testsがfailする。既存Handoff testはpassする。
@@ -268,8 +268,8 @@ open queryはrequested Handoff joinsを`TodoProjection`へ渡す。completed que
 - [x] **Step 5: GREENを確認する**
 
 ```bash
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff \
-  pnpm --filter @amidala/api test:integration -- todo-handoffs.integration.test.ts --run
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_handoff \
+  pnpm --filter @aimani-ai/api test:integration -- todo-handoffs.integration.test.ts --run
 ```
 
 Expected: new testsと既存tests pass。
@@ -314,7 +314,7 @@ test('Team Work statusはTodoとpending Handoffから導出する', () => {
 });
 ```
 
-Run `pnpm --filter @amidala/web test`。Expected: module不存在でfail。
+Run `pnpm --filter @aimani-ai/web test`。Expected: module不存在でfail。
 
 - [x] **Step 2: presenterをGREENにする**
 
@@ -355,8 +355,8 @@ Server Function validatorは`z.object({ organizationId: z.string().min(1) })`。
 - [x] **Step 4: Web tests / typecheckを確認する**
 
 ```bash
-pnpm --filter @amidala/web test
-pnpm --filter @amidala/web exec tsc --noEmit
+pnpm --filter @aimani-ai/web test
+pnpm --filter @aimani-ai/web exec tsc --noEmit
 ```
 
 - [x] **Step 5: presenter / BFF commitを作る**
@@ -443,10 +443,10 @@ TodoCard、rail、status、empty surface、button、radius、shadow、font token
 - [x] **Step 5: tests / build / generated routeを検証する**
 
 ```bash
-pnpm --filter @amidala/web test
+pnpm --filter @aimani-ai/web test
 pnpm build
 rg -n "'/\$organizationId/work'" apps/web/src/routeTree.gen.ts
-! rg -n 'owner@amidala\.local|mori@amidala\.local|amidala-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist
+! rg -n 'owner@aimani-ai\.local|mori@aimani-ai\.local|aimani-ai-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist
 git diff --check
 ```
 
@@ -490,7 +490,7 @@ mutationがTeam Work pageから実行されるわけではないためoptimistic
 - [x] **Step 2: Web tests / buildを再実行する**
 
 ```bash
-pnpm --filter @amidala/web test
+pnpm --filter @aimani-ai/web test
 pnpm build
 ```
 
@@ -516,13 +516,13 @@ git commit -m "fix: refresh Team Work after responsibility changes"
 - [x] **Step 1: full verificationを実行する**
 
 ```bash
-pnpm --filter @amidala/api test
-pnpm --filter @amidala/web test
-TEST_DATABASE_URL=postgresql://amidala:amidala@127.0.0.1:54329/amidala_handoff pnpm --filter @amidala/api test:integration --run
-pnpm --filter @amidala/api test:demo --run
+pnpm --filter @aimani-ai/api test
+pnpm --filter @aimani-ai/web test
+TEST_DATABASE_URL=postgresql://aimani_ai:aimani_ai@127.0.0.1:54329/aimani_ai_handoff pnpm --filter @aimani-ai/api test:integration --run
+pnpm --filter @aimani-ai/api test:demo --run
 pnpm build
 git diff --exit-code -- apps/web/src/routeTree.gen.ts
-! rg -n 'owner@amidala\.local|mori@amidala\.local|amidala-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist
+! rg -n 'owner@aimani-ai\.local|mori@aimani-ai\.local|aimani-ai-demo-2026|VITE_DEMO_ACTOR_PASSWORD' apps/web/dist
 git diff --check
 ```
 

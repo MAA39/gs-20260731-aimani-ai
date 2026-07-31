@@ -1,10 +1,10 @@
 # Team Work Overview local runtime verification
 
 - 日付: 2026-07-28（Asia/Tokyo）
-- repository: `/Users/maa/Projects/gs/000_参照用/amidala-v2`
+- repository: `/Users/maa/Projects/gs/000_参照用/aimani-ai-v2`
 - 実装branch基準: `6b7da4f`
 - 対象: `/$organizationId/work`（UI表示: `チームのボール`）
-- deploy: Cloudflareへは未deploy。local `amidala_demo` PostgreSQLだけを使用
+- deploy: Cloudflareへは未deploy。local `aimani_ai_demo` PostgreSQLだけを使用
 
 ## 結果
 
@@ -37,7 +37,7 @@ Organization内で「誰が現在担当し、引き継ぎ確認待ち・対応�
 API unit: 13/13 PASS
 Web tests: 17/17 PASS
 PostgreSQL integration: 24/24 PASS
-demo seed: 1/1 PASS（amidala_demo reset後）
+demo seed: 1/1 PASS（aimani_ai_demo reset後）
 full monorepo build: 3/3 PASS
 generated route diff: PASS
 production artifact demo marker scan: 0 matches
@@ -77,6 +77,6 @@ cold restart後の同一認証条件で次へ復帰した。
 
 ## local envとbuild cacheの注意
 
-worktreeのignored `.dev.vars`をsymlinkしたままWeb buildすると、auxiliary API bundleが`dist/amidala_api/.dev.vars`を含む場合がある。さらにTurbo cacheがそのartifactを復元し得る。
+worktreeのignored `.dev.vars`をsymlinkしたままWeb buildすると、auxiliary API bundleが`dist/aimani-ai_api/.dev.vars`を含む場合がある。さらにTurbo cacheがそのartifactを復元し得る。
 
 最終buildではworktreeのenv symlinkを外し、`pnpm clean:web:build && pnpm exec turbo run build --force`を実行した。その後、local env file名がdistに0件であることとdemo marker 0件を確認した。値をlogやDocsへ出してはいけない。

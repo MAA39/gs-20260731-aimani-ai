@@ -2,7 +2,7 @@ import { Dialog } from '@base-ui/react/dialog';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import type { TodoSummary } from '@amidala/contracts';
+import type { TodoSummary } from '@aimani-ai/contracts';
 import { peopleQuery } from '../people/people-queries';
 import { requestTodoHandoff } from './handoffs.functions';
 import { assignedTodoWorkspaceKey } from '../todos/assigned-todo-queries';

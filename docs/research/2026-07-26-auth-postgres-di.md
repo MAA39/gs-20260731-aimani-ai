@@ -4,7 +4,7 @@
 
 ## 目的
 
-Identity → People 縦切りを実装する前に、Cloudflare Workers、PostgreSQL、Better Auth、Drizzle、Awilix の現行プラクティスを公式資料から確認した記録。Amidala v2 だけでなく、同じ構成を採る新製品の叩き台として扱う。
+Identity → People 縦切りを実装する前に、Cloudflare Workers、PostgreSQL、Better Auth、Drizzle、Awilix の現行プラクティスを公式資料から確認した記録。Aimani AI v2 だけでなく、同じ構成を採る新製品の叩き台として扱う。
 
 優先順位は、金融系の過剰な堅牢性ではなく、ブラウザで早く触れて確認できること。そのうえで、認証・テナント境界・秘密情報の置き場所だけは後から崩しにくい形にする。
 

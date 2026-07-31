@@ -22,8 +22,8 @@ DONE
 
 ## commands / output
 
-- `pnpm --filter @amidala/web exec tsc --noEmit` — pass
-- `pnpm --filter @amidala/web build` — pass (client/SSR/API bundles)
+- `pnpm --filter @aimani-ai/web exec tsc --noEmit` — pass
+- `pnpm --filter @aimani-ai/web build` — pass (client/SSR/API bundles)
 - `git diff --check` — pass
 
 ## commit
@@ -40,7 +40,7 @@ DONE
 - assigned Todo adapter/function を Todos feature に集約し、Handoffs から重複公開を削除。
 - `as any` を除去し、server-only 内の最小 local endpoint interface + `unknown` narrow に限定。
 - Handoff input schema は Task 1 の shared path/body schemas を intersection で再利用。
-- 検証: `pnpm --filter @amidala/web exec tsc --noEmit`、`pnpm --filter @amidala/web build`、`git diff --check` 全て成功。
+- 検証: `pnpm --filter @aimani-ai/web exec tsc --noEmit`、`pnpm --filter @aimani-ai/web build`、`git diff --check` 全て成功。
 
 ## Fix round 2
 

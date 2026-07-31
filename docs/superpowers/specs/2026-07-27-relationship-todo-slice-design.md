@@ -1,9 +1,9 @@
 # Relationship Todo Vertical Slice Design
 
 - 日付: 2026-07-27
-- 対象: `amidala-v2`
+- 対象: `aimani-ai-v2`
 - 状態: 実装用に確定
-- 親仕様: [`2026-07-26-amidala-v2-platform-design.md`](./2026-07-26-amidala-v2-platform-design.md)
+- 親仕様: [`2026-07-26-aimani-ai-v2-platform-design.md`](./2026-07-26-aimani-ai-v2-platform-design.md)
 
 ## 1. 目的
 
@@ -143,7 +143,7 @@ routeは`/$organizationId/people/$contextMembershipId/todos`とする。
 
 Organization全体のglobal Todos一覧はこのsliceの対象外とする。Person Todo workspaceではshellのTodos項目を現在URLへ向けてactive表示し、People項目は`/$organizationId/people`へ戻す。これにより未実装の`/todos`へ遷移してOrganization/Contextを失わない。
 
-旧AmidalaのPeople→相手workspace→Todoという情報設計は継承する。一方、Chart/Matrix、priority、label、添付、複雑filter、期限、完了操作はこのsliceへ入れない。
+旧Aimani AIのPeople→相手workspace→Todoという情報設計は継承する。一方、Chart/Matrix、priority、label、添付、複雑filter、期限、完了操作はこのsliceへ入れない。
 
 ## 7. テスト予算
 

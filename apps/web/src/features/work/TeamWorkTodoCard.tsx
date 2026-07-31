@@ -1,4 +1,4 @@
-import type { TodoSummary } from '@amidala/contracts';
+import type { TodoSummary } from '@aimani-ai/contracts';
 import { TodoCard } from '../todos/TodoCard';
 import { teamWorkStatus } from './team-work-status';
 

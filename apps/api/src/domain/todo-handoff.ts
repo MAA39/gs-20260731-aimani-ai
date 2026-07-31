@@ -1,4 +1,4 @@
-import type { AssignedTodoWorkspace, TodoHandoffStatus, TodoHandoffSummary, TodoHandoffWorkspace, TodoSummary } from '@amidala/contracts';
+import type { AssignedTodoWorkspace, TodoHandoffStatus, TodoHandoffSummary, TodoHandoffWorkspace, TodoSummary } from '@aimani-ai/contracts';
 import type { CurrentMembershipContext } from './identity';
 export type { TodoHandoffWorkspace, AssignedTodoWorkspace, TodoHandoffSummary };
 export interface RequestTodoHandoffCommand { id:string; organizationId:string; todoId:string; requesterMembershipId:string; recipientMembershipId:string; requestMessage:string|null; now:Date }

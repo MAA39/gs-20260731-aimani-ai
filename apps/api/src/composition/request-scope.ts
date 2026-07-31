@@ -3,7 +3,7 @@ import { HealthCheck, type Clock } from '../application/health-check';
 import type { RootContainer, RootCradle } from './root-container';
 import type { ApiBindings } from '../config/env';
 import { resolveDatabaseUrl } from '../config/env';
-import { createNodePgDatabase, type DatabaseResource } from '@amidala/db/client';
+import { createNodePgDatabase, type DatabaseResource } from '@aimani-ai/db/client';
 import { createAuth } from '../auth/create-auth';
 import { MembershipRepository } from '../infrastructure/db/membership-repository';
 import { ListOrganizationMembershipsForUser } from '../application/list-organizations';

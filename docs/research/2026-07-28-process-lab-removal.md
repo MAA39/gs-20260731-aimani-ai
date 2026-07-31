@@ -2,7 +2,7 @@
 
 ## 目的
 
-`工程ラボ` は BYARD の工程管理UIを Amidala の責任移動モデルへ取り込めるか確かめる実験機能である。実験結果が悪い場合に、既存の People / Todo / Handoff / Team Work を壊さず撤去できるよう、所有ファイルと統合点をここに固定する。
+`工程ラボ` は BYARD の工程管理UIを Aimani AI の責任移動モデルへ取り込めるか確かめる実験機能である。実験結果が悪い場合に、既存の People / Todo / Handoff / Team Work を壊さず撤去できるよう、所有ファイルと統合点をここに固定する。
 
 ## 機能が所有するもの
 
@@ -52,7 +52,7 @@
 10. `apps/web/src/routeTree.gen.ts`
     - routeファイル削除後にVite/TanStack Routerで再生成する。手編集しない。
 11. `apps/web/package.json` / `pnpm-lock.yaml`
-    - 他機能が利用していなければ `pnpm --filter @amidala/web remove @xyflow/react` を実行する。
+    - 他機能が利用していなければ `pnpm --filter @aimani-ai/web remove @xyflow/react` を実行する。
 
 ## PostgreSQL migration
 
@@ -71,8 +71,8 @@
 
 ```bash
 rg -n "process-lab|ProcessLab|processLab|process_lab" apps packages
-pnpm --filter @amidala/api test
-pnpm --filter @amidala/web test
+pnpm --filter @aimani-ai/api test
+pnpm --filter @aimani-ai/web test
 pnpm build
 ```
 

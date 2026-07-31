@@ -2,7 +2,7 @@
 
 - 実行日: 2026-07-28（Asia/Tokyo）
 - code baseline: `18366d915ce9ce8cc6df36795c124cff56ea921b`
-- 対象: local `amidala_demo` PostgreSQL、TanStack Start Web Worker、auxiliary Hono API Worker
+- 対象: local `aimani_ai_demo` PostgreSQL、TanStack Start Web Worker、auxiliary Hono API Worker
 - Cloudflare deploy: 未実施
 
 ## 目的
@@ -18,7 +18,7 @@ HTTP client + Better Auth cookie
   → Cloudflare Service Binding (`env.API.fetch`)
   → private Hono API Worker
   → Drizzle transaction
-  → local PostgreSQL `amidala_demo`
+  → local PostgreSQL `aimani_ai_demo`
   → Today SSR
 ```
 
@@ -26,7 +26,7 @@ REST endpointをWeb Workerへ直接POSTする検証ではない。ブラウザUI
 
 ## 前提
 
-- `apps/api/.dev.vars`はignoredで、`DATABASE_URL`がlocal `amidala_demo`を指す
+- `apps/api/.dev.vars`はignoredで、`DATABASE_URL`がlocal `aimani_ai_demo`を指す
 - `apps/web/.env.development.local`はignoredで、development-only Actor Switch用passwordが設定済み
 - 値は出力・記録していない
 - `pnpm db:demo:reset`のDB名guardを通し、demo DBだけを初期化した

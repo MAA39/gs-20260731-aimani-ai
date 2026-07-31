@@ -13,11 +13,11 @@
 
 - `pnpm install` — 成功（pnpm 11.17.0、lockfile 生成）
 - `pnpm build` — 成功（Turbo: API tsc + Web Vite build）
-- `pnpm --filter @amidala/api exec wrangler dev --local --port 8788` + `curl http://localhost:8788/health` — `{"ok":true}`
+- `pnpm --filter @aimani-ai/api exec wrangler dev --local --port 8788` + `curl http://localhost:8788/health` — `{"ok":true}`
 
 ## 結果
 
-ブラウザで触れる Amidala v2 シェルと API health endpoint を提供できる状態。
+ブラウザで触れる Aimani AI v2 シェルと API health endpoint を提供できる状態。
 
 ## 未解決懸念
 
@@ -76,8 +76,8 @@
 
 ### Commands / results
 
-- `pnpm build` — 成功。`dist/server/index.js`、SSR worker-entry、`dist/amidala_api/index.js` を生成
-- `pnpm --filter @amidala/web exec wrangler deploy --dry-run --config dist/server/wrangler.json` — 成功。SSR Worker entry と 7 modules / 800.92 KiB、API Service Binding を確認。外部 deploy は未実行
+- `pnpm build` — 成功。`dist/server/index.js`、SSR worker-entry、`dist/aimani-ai_api/index.js` を生成
+- `pnpm --filter @aimani-ai/web exec wrangler deploy --dry-run --config dist/server/wrangler.json` — 成功。SSR Worker entry と 7 modules / 800.92 KiB、API Service Binding を確認。外部 deploy は未実行
 - `wrangler dev` local runtime — compatibility date `2026-07-26` が現在の workerd (`2026-06-24` 対応) より新しく、起動時に拒否された
 
 ### 懸念
