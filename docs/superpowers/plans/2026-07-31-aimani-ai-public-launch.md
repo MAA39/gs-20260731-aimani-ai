@@ -1,5 +1,7 @@
 # アイマニAI 改名・外部公開 Implementation Plan
 
+> **停止事項（2026-07-31）:** 本計画のTask 3以降にあるSupabase前提は撤回された。Task 3以降は実行禁止とし、`docs/superpowers/specs/2026-07-31-planetscale-cloudflare-database-design.md` の承認後にPlanetScale前提で計画を書き直す。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 現在ローカルで動く製品を「アイマニAI」へ改名し、既存製品を変更せず、専用PostgreSQLとCloudflare Workersで触れる公開デモとして提供する。
