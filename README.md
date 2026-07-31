@@ -1,6 +1,6 @@
-# Aimani AI
+# アイマニAI
 
-Aimani AI は、チームの仕事について「誰の作業がどこで止まっているかを見て、引き継ぐ」ためのワークスペースです。担当者・作業・引き継ぎの状態を同じ画面で確認し、次にボールを持つ人へ責任を移せます。
+アイマニAI（Aimani AI）は、チームの仕事について「誰の作業がどこで止まっているかを見て、引き継ぐ」ためのワークスペースです。担当者・作業・引き継ぎの状態を同じ画面で確認し、次にボールを持つ人へ責任を移せます。
 
 ## できること
 
@@ -14,7 +14,7 @@ Aimani AI は、チームの仕事について「誰の作業がどこで止ま�
 ## アーキテクチャ
 
 ```text
-TanStack Start (Web/BFF) → Hono API Worker → PostgreSQL
+TanStack Start Web Worker --Service Binding/RPC--> Hono API Worker --Hyperdrive--> 専用Supabase PostgreSQL
              ↘ shared contracts / API client
 ```
 
@@ -45,7 +45,7 @@ pnpm dev
 
 この資格情報とデータは機密ではなく、共有デモを触るための固定値です。個人情報や本番データを入力せず、デモ環境はリセットされる前提で利用してください。本番運用の認証情報として再利用しないでください。
 
-Process Lab は仮説検証のための試験機能であり、後で削除できる扱いです。公開URLはデプロイ時（Task 4）に deployment docs へ追記します。
+Process Lab は仮説検証のための試験機能であり、後で削除できる扱いです。公開URLはデプロイ完了後に deployment docs へ追記します。
 
 ## 開発者向け検証
 

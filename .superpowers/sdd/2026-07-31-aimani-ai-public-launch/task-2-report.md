@@ -17,3 +17,7 @@
 
 - 公開URLはTask 4のデプロイ完了後にREADMEとdeployment docsへ追記する。
 - 公開デモは固定共有資格情報・リセット前提のため、機密情報や個人情報を入力しない。
+
+## Fix round 1
+
+公開表示を「アイマニAI」に統一し、READMEの実構成（TanStack Start Web Worker → Service Binding/RPC → Hono API Worker → Hyperdrive → 専用Supabase PostgreSQL）を明記した。公開URLの追記表現から内部Task番号を削除し、deployment docsのSupabase、Hyperdrive、Workers、bindings資産名と作成順を正規化した。
