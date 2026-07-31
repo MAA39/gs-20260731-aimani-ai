@@ -1,5 +1,7 @@
 # アイマニAI PlanetScale・Cloudflare公開 Implementation Plan
 
+> **停止（2026-07-31）:** 提出を優先してDBなしmock API方式へ変更したため、本計画のPlanetScale/Hyperdrive作成タスクは実行しない。公開Web Workerは `gs-20260731-aimani-ai-web`。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** アイマニAIを、他製品や業務用Supabaseへ一切触れず、専用PlanetScale PostgresとCloudflare Workersで操作可能な公開デモとして提供する。

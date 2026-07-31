@@ -14,7 +14,8 @@
 ## アーキテクチャ
 
 ```text
-TanStack Start Web Worker --Service Binding/RPC--> Hono API Worker --Hyperdrive--> 専用PlanetScale Postgres
+公開デモ: TanStack Start Web Worker --> server-only mock API --> 固定デモデータ
+製品実装: TanStack Start Web Worker --Service Binding/RPC--> Hono API Worker --Hyperdrive--> PostgreSQL
              ↘ shared contracts / API client
 ```
 
@@ -36,16 +37,11 @@ pnpm dev
 
 ## 公開デモ
 
-公開デモは共有デモ専用環境です。seedのownerアカウントを使います。
+公開デモ: https://gs-20260731-aimani-ai-web.masa-nekoshinshi39.workers.dev
 
-```text
-メールアドレス: owner@aimani-ai.local
-パスワード: aimani-ai-demo-2026
-```
+ログイン情報は不要です。「デモを開く」から操作できます。公開版はDBを使わず、Worker内の固定デモデータを返します。操作内容はWorkerの再起動などで初期状態へ戻るため、個人情報や本番データは入力しないでください。
 
-この資格情報とデータは機密ではなく、共有デモを触るための固定値です。個人情報や本番データを入力せず、デモ環境はリセットされる前提で利用してください。本番運用の認証情報として再利用しないでください。
-
-Process Lab は仮説検証のための試験機能であり、後で削除できる扱いです。公開URLはデプロイ完了後に deployment docs へ追記します。
+Process Lab は仮説検証のための試験機能であり、後で削除できる扱いです。
 
 ## 開発者向け検証
 

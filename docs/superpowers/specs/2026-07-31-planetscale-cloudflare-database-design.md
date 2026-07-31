@@ -1,6 +1,6 @@
 # アイマニAI PlanetScale・Cloudflare データベース設計
 
-**Status:** 採用済み。外部資産の作成前に本書を実装正本とする。
+**Status:** 将来案。2026-07-31の提出用公開デモではDBなしmock API方式へ変更し、PlanetScale資産は作成していない。
 
 ## 目的
 

@@ -1,5 +1,7 @@
 # アイマニAI PlanetScale運用Runbook
 
+> **現在は未採用:** 2026-07-31の提出用公開デモはDBなしのmock API方式を採用した。このRunbookは将来、永続DBが必要になった場合だけ使用する。
+
 ## 対象
 
 このRunbookはアイマニAI公開デモ専用です。
