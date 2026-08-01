@@ -1,8 +1,10 @@
 # ADR-0001: 2026-07-26 技術選定
 
 日付: 2026-07-26
-ステータス: 採用。触れる MVP で再評価する
+ステータス: 採用方針。一部有効・一部未導入。段階導入はADR-0002を優先する
 対象: Aimani AI v2。`共通` と記した判断は他プロダクトでも再利用可能
+
+> 2026-08-01追記: 現在の公開デモはこの構成のうちWeb WorkerとTanStack層だけを有効化し、DB/API/Authは将来capabilityとして保持している。技術の撤回ではなく導入順の変更である。現在の判断は[ADR-0002](0002-staged-product-and-platform-evolution.md)を参照する。
 
 ## 結論
 
@@ -38,6 +40,8 @@ UI は TanStack Router / Query / Form、Tailwind CSS v4、Base UI、Lucide で�
 | E2E | `@playwright/test` | `1.62.0` |
 
 TypeScript 7 は周辺パッケージの peer dependency と Cloudflare build を scaffold 時に確認する。互換性に問題があれば 2026-07-26 時点の最新対応版へ下げ、その理由を本 ADR に追記する。
+
+表は選定時の候補versionであり、導入済み一覧ではない。2026-08-01現在、TanStack FormとPlaywrightはroot/workspaceの直接dependencyとして未導入で、現行formはReact state、browser確認は手動smokeが中心である。導入時はregistry、peer dependency、lockfileを再確認する。
 
 ## 判断一覧
 

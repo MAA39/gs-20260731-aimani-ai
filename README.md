@@ -15,11 +15,11 @@
 
 ```text
 公開デモ: TanStack Start Web Worker --> server-only mock API --> 固定デモデータ
-製品実装: TanStack Start Web Worker --Service Binding/RPC--> Hono API Worker --Hyperdrive--> PostgreSQL
+将来の製品経路: TanStack Start Web Worker --Service Binding/RPC--> Hono API Worker --Hyperdrive--> PostgreSQL
              ↘ shared contracts / API client
 ```
 
-WebのServer Functionが認証cookieをAPIへ転送し、APIのapplication/domain層とPostgreSQLを通して組織境界・責任移管を検証します。データモデルとAPI契約は `packages/contracts`、DBスキーマは `packages/db` にあります。
+将来の製品経路を支えるコードはローカル実装済みですが、公開版では未有効です。製品経路ではWebのServer Functionが認証cookieをAPIへ転送し、APIのapplication/domain層とPostgreSQLを通して組織境界・責任移管を検証します。Hono RPCは部分実装で、cast/raw fetchの解消は将来capabilityです。データモデルとAPI契約は `packages/contracts`、DBスキーマは `packages/db` にあります。
 
 ## ローカルで起動
 
@@ -39,7 +39,7 @@ pnpm dev
 
 公開デモ: https://gs-20260731-aimani-ai-web.masa-nekoshinshi39.workers.dev
 
-ログイン情報は不要です。「デモを開く」から操作できます。公開版はDBを使わず、Worker内の固定デモデータを返します。操作内容はWorkerの再起動などで初期状態へ戻るため、個人情報や本番データは入力しないでください。
+ログイン情報は不要です。「Acme Studio」を選ぶと操作できます。公開版はDBを使わず、Worker内の固定初期データを返します。操作内容はWorkerの再起動などで初期状態へ戻り、閲覧者間で一時的に混ざる可能性もあるため、個人情報や本番データは入力しないでください。
 
 Process Lab は仮説検証のための試験機能であり、後で削除できる扱いです。
 
